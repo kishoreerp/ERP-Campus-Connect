@@ -1,8 +1,8 @@
-// lib/screens/slec_home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'student_login_screen.dart';
 import 'admin_portal_screen.dart';
+import 'admission_portal_screen.dart';
 
 class SlecHomeScreen extends StatelessWidget {
   const SlecHomeScreen({super.key});
@@ -168,7 +168,6 @@ class _PortalSection extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         children: [
-          // ✅ Admission Portal - now navigates to AdmissionPortalScreen
           _PortalCard(
             color: const Color(0xFFDCFAE6),
             icon: Icons.assignment_turned_in_outlined,
@@ -181,8 +180,6 @@ class _PortalSection extends StatelessWidget {
               );
             },
           ),
-
-          // Admin Portal (existing)
           _PortalCard(
             color: const Color(0xFFE4EBFF),
             icon: Icons.admin_panel_settings_outlined,
@@ -195,8 +192,6 @@ class _PortalSection extends StatelessWidget {
               );
             },
           ),
-
-          // Student Portal (existing)
           _PortalCard(
             color: const Color(0xFFF4E8FF),
             icon: Icons.school_outlined,
@@ -205,7 +200,8 @@ class _PortalSection extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const StudentLoginScreen()),
+                MaterialPageRoute(
+                  builder: (context) => const StudentLoginScreen()),
               );
             },
           ),
@@ -315,32 +311,6 @@ class _FooterSection extends StatelessWidget {
               style: GoogleFonts.inter(color: Colors.grey[600], fontSize: 12),
               textAlign: TextAlign.center),
         ],
-      ),
-    );
-  }
-}
-
-/// ---------------- Placeholder Admission Portal Screen ----------------
-/// Replace with your real Admission screen when ready.
-class AdmissionPortalScreen extends StatelessWidget {
-  const AdmissionPortalScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Admission Portal'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        elevation: 0,
-        centerTitle: true,
-      ),
-      body: Center(
-        child: Text(
-          'Admission portal screen (placeholder).\nReplace with your actual screen.',
-          textAlign: TextAlign.center,
-          style: GoogleFonts.inter(color: Colors.grey[800], fontSize: 16),
-        ),
       ),
     );
   }

@@ -186,7 +186,7 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
                   useEmail ? Icons.email_outlined : Icons.person_outline,
                   color: Colors.grey[700],
                 ),
-                hintText: useEmail ? 'student@slec.ac.in' : 'roll number',
+                hintText: useEmail ? 'student@email.com' : 'roll number',
                 filled: true,
                 fillColor: Colors.grey[100],
                 border: OutlineInputBorder(

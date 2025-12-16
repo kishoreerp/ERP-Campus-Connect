@@ -1,3 +1,4 @@
+// lib/screens/hod_portal/hod_attendance_screen.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -97,8 +98,7 @@ class HODAttendanceScreen extends StatelessWidget {
                       // TODO: Add navigation
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 14),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(14),
@@ -172,9 +172,10 @@ class HODAttendanceScreen extends StatelessWidget {
       ),
     );
   }
+
 }
 
 
 
 
-
+ 
