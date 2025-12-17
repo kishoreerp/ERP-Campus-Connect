@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'Internal_assessment_1_screen.dart';
 import 'internal_assessment2_screen.dart';
+import 'model_exam_screen.dart';
 
 class StaffMarksScreen extends StatelessWidget {
   const StaffMarksScreen({super.key});
@@ -79,8 +80,9 @@ class StaffMarksScreen extends StatelessWidget {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) =>
-                            const PlaceholderScreen(title: "Model Examination")));
+                        builder: (_) => const ModelExamScreen()
+                    ),
+                );
               },
             ),
             _buildOptionCard(

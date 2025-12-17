@@ -2,8 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class InternalAssessment2Screen extends StatelessWidget {
-const InternalAssessment2Screen({super.key});
+class ModelExamScreen extends StatelessWidget {
+
+  const ModelExamScreen({super.key});
 
   // sample subjects (you can replace with your real data)
   final List<_SubjectItem> subjects = const [
@@ -18,7 +19,8 @@ const InternalAssessment2Screen({super.key});
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(color: Colors.black87),
-        title: Text('Internal Assessment 2',
+        title: Text('Model Examination',
+
             style: GoogleFonts.inter(color: Colors.black87)),
         backgroundColor: Colors.white,
         elevation: 0,
@@ -184,7 +186,7 @@ const InternalAssessment2Screen({super.key});
                         child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Internal Assessment 2 - $subject',
+                              Text('Model Examination - $subject',
                                   style: GoogleFonts.inter(
                                       fontSize: 16, fontWeight: FontWeight.w700)),
                               const SizedBox(height: 4),
