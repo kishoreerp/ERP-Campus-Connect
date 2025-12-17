@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-
+import 'hod_portal/hod_portal_screen.dart';
 import 'staff_portal/staff_portal_screen.dart';
 import 'hod_portal/hod_portal_screen.dart';
 import 'reset_password/admin_reset_email_screen.dart';

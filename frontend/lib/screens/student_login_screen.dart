@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'reset_password/reset_email_screen.dart';
 import 'student_portal/student_portal_screen.dart';
+import '../../services/auth_service.dart';
+import '../../services/user_service.dart';
 
 
 class StudentLoginScreen extends StatefulWidget {
@@ -14,6 +16,10 @@ class StudentLoginScreen extends StatefulWidget {
 
 
 class _StudentLoginScreenState extends State<StudentLoginScreen> {
+  final AuthService _authService = AuthService();
+final UserService _userService = UserService();
+
+
   bool useEmail = false;
   bool rememberMe = false;
   bool obscurePassword = true;
@@ -22,6 +28,49 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
   final TextEditingController rollController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
+Future<void> handleStudentLogin() async {
+  try {
+    // 1. Login using Firebase (email + password)
+    final user = await _authService.login(
+      email: emailController.text.trim(),
+      password: passwordController.text.trim(),
+    );
+
+    if (user == null) {
+      throw 'Login failed';
+    }
+
+    // 2. Get student data from Firestore
+    final data = await _userService.getUserByUid(user.uid);
+
+    if (data == null) {
+      throw 'Student record not found';
+    }
+
+    // 3. Check role
+    if (data['role'] != 'student') {
+      throw 'This is not a student account';
+    }
+
+    // 4. Check roll number
+    if (data['rollNo'] != rollController.text.trim()) {
+      throw 'Wrong roll number';
+    }
+
+    // ✅ SUCCESS → go to Student Portal
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const StudentPortalScreen(),
+      ),
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(e.toString())),
+    );
+  }
+}
 
 
   @override
@@ -279,14 +328,8 @@ class _StudentLoginScreenState extends State<StudentLoginScreen> {
                       borderRadius: BorderRadius.circular(10)),
                   backgroundColor: const Color(0xFF8E2DE2),
                 ),
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => StudentPortalScreen( ),
-                    ),
-                  );
-                },
+              onPressed: handleStudentLogin,
+
                 child: Text('Sign In',
                     style: GoogleFonts.inter(
                         fontWeight: FontWeight.w600, color: Colors.white)),

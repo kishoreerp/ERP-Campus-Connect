@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'Internal_assessment_1_screen.dart';
+import 'internal_assessment2_screen.dart';
 
 class StaffMarksScreen extends StatelessWidget {
   const StaffMarksScreen({super.key});
@@ -40,11 +42,12 @@ class StaffMarksScreen extends StatelessWidget {
               title: "Internal Assessment 1",
               subtitle: "Enter and manage IA1 marks for your subjects",
               onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) =>
-                            const PlaceholderScreen(title: "Internal Assessment 1")));
+                 Navigator.push(
+                context,
+                 MaterialPageRoute(
+                 builder: (_) => const InternalAssessment1Screen(),
+                ),
+               );
               },
             ),
             _buildOptionCard(
@@ -58,8 +61,11 @@ class StaffMarksScreen extends StatelessWidget {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) =>
-                            const PlaceholderScreen(title: "Internal Assessment 2")));
+                        builder: (_) => const InternalAssessment2Screen()
+                    ),
+                );
+
+
               },
             ),
             _buildOptionCard(
