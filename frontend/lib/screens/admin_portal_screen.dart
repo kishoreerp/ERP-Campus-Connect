@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'hod_portal/hod_portal_screen.dart';
+
 import 'staff_portal/staff_portal_screen.dart';
 import 'hod_portal/hod_portal_screen.dart';
+
 import 'reset_password/admin_reset_email_screen.dart';
 
 class AdminPortalScreen extends StatefulWidget {
@@ -42,14 +43,15 @@ void _handleLogin() {
         builder: (_) => StaffPortalScreen(username: usernameController.text),
       ),
     );
-  } else if (selectedRole == 'HOD') {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => HODPortalScreen(username: usernameController.text),
-      ),
-    );
-  } else {
+    } else if (selectedRole == 'HOD') {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) =>
+             HODPortalScreen(username: usernameController.text),
+          ),
+        );
+  }  else {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Login for $selectedRole coming soon!'),

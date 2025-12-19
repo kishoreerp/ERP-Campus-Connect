@@ -1,36 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class UserService {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final _db = FirebaseFirestore.instance;
 
-  /// Get user document by UID
+  /// Get user by UID
   Future<Map<String, dynamic>?> getUserByUid(String uid) async {
     final doc = await _db.collection('users').doc(uid).get();
-
-    if (!doc.exists) return null;
-
-    return doc.data();
+    return doc.exists ? doc.data() : null;
   }
 
-  /// Create user if not exists (on first login)
-  Future<void> createUserIfNotExists({
-    required String uid,
-    required String email,
-    required String role, // student | admin | hod
-    required String name,
-  }) async {
-    final ref = _db.collection('users').doc(uid);
-    final doc = await ref.get();
+  /// Get user by roll number (for roll login)
+  Future<Map<String, dynamic>?> getUserByRoll(String rollNo) async {
+    final snap = await _db
+        .collection('users')
+        .where('rollNo', isEqualTo: rollNo)
+        .limit(1)
+        .get();
 
-    if (!doc.exists) {
-      await ref.set({
-        'uid': uid,
-        'email': email,
-        'name': name,
-        'role': role,
-        'createdAt': FieldValue.serverTimestamp(),
-        'isActive': true,
-      });
-    }
+    if (snap.docs.isEmpty) return null;
+    return snap.docs.first.data();
   }
 }

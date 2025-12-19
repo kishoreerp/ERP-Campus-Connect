@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'reset_password/reset_email_screen.dart';
 import 'student_portal/student_portal_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/auth_service.dart';
 import '../../services/user_service.dart';
+
 
 
 class StudentLoginScreen extends StatefulWidget {
@@ -11,66 +14,95 @@ class StudentLoginScreen extends StatefulWidget {
 
 
   @override
-  State<StudentLoginScreen> createState() => _StudentLoginScreenState(); // ✅ correct
+  State<StudentLoginScreen> createState() => _StudentLoginScreenState();
 }
+ class _StudentLoginScreenState extends State<StudentLoginScreen> {
+  String? selectedRegulation;
 
 
-class _StudentLoginScreenState extends State<StudentLoginScreen> {
+  
   final AuthService _authService = AuthService();
-final UserService _userService = UserService();
+  final UserService _userService = UserService();
 
 
-  bool useEmail = false;
-  bool rememberMe = false;
+bool rememberMe = false;
   bool obscurePassword = true;
 
 
-  final TextEditingController rollController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+
+
+final TextEditingController emailController = TextEditingController();
+final TextEditingController passwordController = TextEditingController();
 
 Future<void> handleStudentLogin() async {
-  try {
-    // 1. Login using Firebase (email + password)
-    final user = await _authService.login(
-      email: emailController.text.trim(),
-      password: passwordController.text.trim(),
-    );
+   try {
+  if (selectedRegulation == null) {
+  throw 'Please select regulation';
+}
 
-    if (user == null) {
-      throw 'Login failed';
+    final input = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    if (input.isEmpty || password.isEmpty) {
+      throw 'Enter email / roll number and password';
     }
 
-    // 2. Get student data from Firestore
-    final data = await _userService.getUserByUid(user.uid);
+    User? user;
 
-    if (data == null) {
-      throw 'Student record not found';
+    // 🔹 CASE 1: EMAIL LOGIN
+    if (input.contains('@')) {
+      user = await _authService.loginWithEmail(
+        email: input,
+        password: password,
+      );
+    } 
+    // 🔹 CASE 2: ROLL NUMBER LOGIN
+    else {
+      final data = await _userService.getUserByRoll(input);
+      if (data == null) throw 'Invalid roll number';
+
+      user = await _authService.loginWithEmail(
+        email: data['email'],
+        password: password,
+      );
     }
 
-    // 3. Check role
-    if (data['role'] != 'student') {
-      throw 'This is not a student account';
+    if (user == null) throw 'Login failed';
+
+    // 🔹 VERIFY STUDENT ROLE
+final userData = await _userService.getUserByUid(user.uid);
+if (userData == null) throw 'User record not found';
+
+if (userData['role'] != 'student') {
+  throw 'Not a student account';
+}
+
+// 🔥 REGULATION CHECK (THIS FIXES YOUR ISSUE)
+if (userData['regulation'] != selectedRegulation) {
+  throw 'Invalid regulation selected';
+}
+
+
+    // 🔹 REMEMBER ME
+    if (rememberMe) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('rememberMe', true);
+      await prefs.setString('userRole', 'student');
     }
 
-    // 4. Check roll number
-    if (data['rollNo'] != rollController.text.trim()) {
-      throw 'Wrong roll number';
-    }
-
-    // ✅ SUCCESS → go to Student Portal
+    // ✅ SUCCESS
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        builder: (_) => const StudentPortalScreen(),
-      ),
+      MaterialPageRoute(builder: (_) => const StudentPortalScreen()),
     );
+
   } catch (e) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(e.toString())),
     );
   }
 }
+
 
 
   @override
@@ -163,79 +195,44 @@ Future<void> handleStudentLogin() async {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ---- Toggle Buttons ----
-            Container(
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => setState(() => useEmail = false),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        decoration: BoxDecoration(
-                          color: !useEmail ? Colors.black : Colors.transparent,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Roll Number',
-                            style: GoogleFonts.inter(
-                              color: !useEmail ? Colors.white : Colors.black87,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => setState(() => useEmail = true),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        decoration: BoxDecoration(
-                          color: useEmail ? Colors.black : Colors.transparent,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Email',
-                            style: GoogleFonts.inter(
-                              color: useEmail ? Colors.white : Colors.black87,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+            // ---- REGULATION ----
+            Text('Regulation *',
+                style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+            const SizedBox(height: 6),
+            DropdownButtonFormField<String>(
+              value: selectedRegulation,
+              items: const [
+                DropdownMenuItem(value: '2021', child: Text('2021')),
+                DropdownMenuItem(value: '2025', child: Text('2025')),
+              ],
+              onChanged: (value) {
+                setState(() => selectedRegulation = value);
+              },
+              decoration: InputDecoration(
+                prefixIcon:
+                    Icon(Icons.rule_outlined, color: Colors.grey[700]),
+                hintText: 'Select regulation',
+                filled: true,
+                fillColor: Colors.grey[100],
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
               ),
             ),
 
+            const SizedBox(height: 16),
 
-            const SizedBox(height: 20),
-
-
-            // ---- Roll or Email Field ----
-            Text(
-              useEmail ? 'Email Address *' : 'Roll Number *',
-              style: GoogleFonts.inter(fontWeight: FontWeight.w600),
-            ),
+            // ---- EMAIL ----
+            Text('Email Address *',
+                style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
             const SizedBox(height: 6),
             TextField(
-              controller: useEmail ? emailController : rollController,
+              controller: emailController,
               decoration: InputDecoration(
-                prefixIcon: Icon(
-                  useEmail ? Icons.email_outlined : Icons.person_outline,
-                  color: Colors.grey[700],
-                ),
-                hintText: useEmail ? 'student@email.com' : 'roll number',
+                prefixIcon:
+                    Icon(Icons.email_outlined, color: Colors.grey[700]),
+                hintText: 'student@slec.ac.in',
                 filled: true,
                 fillColor: Colors.grey[100],
                 border: OutlineInputBorder(
@@ -248,21 +245,25 @@ Future<void> handleStudentLogin() async {
 
             const SizedBox(height: 16),
 
-
-            // ---- Password ----
-            Text('Password *', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+            // ---- PASSWORD ----
+            Text('Password *',
+                style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
             const SizedBox(height: 6),
             TextField(
               controller: passwordController,
               obscureText: obscurePassword,
               decoration: InputDecoration(
-                prefixIcon: Icon(Icons.lock_outline, color: Colors.grey[700]),
+                prefixIcon:
+                    Icon(Icons.lock_outline, color: Colors.grey[700]),
                 suffixIcon: IconButton(
                   icon: Icon(
-                    obscurePassword ? Icons.visibility_off : Icons.visibility,
+                    obscurePassword
+                        ? Icons.visibility_off
+                        : Icons.visibility,
                     color: Colors.grey[700],
                   ),
-                  onPressed: () => setState(() => obscurePassword = !obscurePassword),
+                  onPressed: () =>
+                      setState(() => obscurePassword = !obscurePassword),
                 ),
                 hintText: 'Enter your password',
                 filled: true,
@@ -286,20 +287,23 @@ Future<void> handleStudentLogin() async {
                   children: [
                     Checkbox(
                       value: rememberMe,
-                      onChanged: (v) => setState(() => rememberMe = v!),
+                      onChanged: (v) =>
+                          setState(() => rememberMe = v!),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
                     Text('Remember me',
-                        style: GoogleFonts.inter(fontSize: 13, color: Colors.black87)),
+                        style: GoogleFonts.inter(
+                            fontSize: 13, color: Colors.black87)),
                   ],
                 ),
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const ResetEmailScreen()),
+                      MaterialPageRoute(
+                          builder: (_) => const ResetEmailScreen()),
                     );
                   },
                   child: Text(
@@ -317,8 +321,7 @@ Future<void> handleStudentLogin() async {
 
             const SizedBox(height: 10),
 
-
-            // ---- Sign In Button ----
+            // ---- SIGN IN ----
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -328,17 +331,14 @@ Future<void> handleStudentLogin() async {
                       borderRadius: BorderRadius.circular(10)),
                   backgroundColor: const Color(0xFF8E2DE2),
                 ),
-              onPressed: handleStudentLogin,
-
+                onPressed: handleStudentLogin,
                 child: Text('Sign In',
                     style: GoogleFonts.inter(
-                        fontWeight: FontWeight.w600, color: Colors.white)),
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white)),
               ),
             ),
-
-
-            const SizedBox(height: 16),
-          ],
+        ],
         ),
       ),
     );
@@ -349,31 +349,11 @@ Future<void> handleStudentLogin() async {
   Widget _buildFooter() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Column(
-        children: [
-          GestureDetector(
-            onTap: () {},
-            child: Text(
-              'Having trouble logging in? Contact IT Support',
-              style: GoogleFonts.inter(
-                color: Colors.blueAccent,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            '© 2024 ST. Lourdes Engineering College',
-            style: GoogleFonts.inter(color: Colors.grey[600], fontSize: 12),
-          ),
-        ],
+      child: Text(
+        '© 2024 ST. Lourdes Engineering College',
+        style: GoogleFonts.inter(color: Colors.grey[600], fontSize: 12),
       ),
     );
-  }
-}
-
-
-
+  }}
 
 
