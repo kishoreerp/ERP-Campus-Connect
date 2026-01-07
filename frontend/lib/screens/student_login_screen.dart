@@ -6,6 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/auth_service.dart';
 import '../../services/user_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 
 
@@ -35,10 +37,10 @@ final TextEditingController emailController = TextEditingController();
 final TextEditingController passwordController = TextEditingController();
 
 Future<void> handleStudentLogin() async {
-   try {
-  if (selectedRegulation == null) {
-  throw 'Please select regulation';
-}
+  try {
+    if (selectedRegulation == null) {
+      throw 'Please select regulation';
+    }
 
     final input = emailController.text.trim();
     final password = passwordController.text.trim();
@@ -49,17 +51,17 @@ Future<void> handleStudentLogin() async {
 
     User? user;
 
-    // 🔹 CASE 1: EMAIL LOGIN
+    // 🔹 EMAIL LOGIN
     if (input.contains('@')) {
       user = await _authService.loginWithEmail(
         email: input,
         password: password,
       );
-    } 
-    // 🔹 CASE 2: ROLL NUMBER LOGIN
+    }
+    // 🔹 Email NUMBER LOGIN
     else {
       final data = await _userService.getUserByRoll(input);
-      if (data == null) throw 'Invalid roll number';
+      if (data == null) throw 'Invalid EMAIL ID';
 
       user = await _authService.loginWithEmail(
         email: data['email'],
@@ -69,32 +71,33 @@ Future<void> handleStudentLogin() async {
 
     if (user == null) throw 'Login failed';
 
-    // 🔹 VERIFY STUDENT ROLE
-final userData = await _userService.getUserByUid(user.uid);
-if (userData == null) throw 'User record not found';
+    // 🔹 FETCH USER RECORD
+    final userData = await _userService.getUserByUid(user.uid);
+    if (userData == null) throw 'User record not found';
 
-if (userData['role'] != 'student') {
-  throw 'Not a student account';
-}
+    // 🔹 ROLE CHECK
+    if (userData['role'] != 'student') {
+      throw 'Not a student account';
+    }
 
-// 🔥 REGULATION CHECK (THIS FIXES YOUR ISSUE)
-if (userData['regulation'] != selectedRegulation) {
-  throw 'Invalid regulation selected';
-}
-
+    // 🔹 REGULATION CHECK ✅
+    if (userData['regulation'] != selectedRegulation) {
+      throw 'Invalid regulation selected';
+    }
 
     // 🔹 REMEMBER ME
-    if (rememberMe) {
-      final prefs = await SharedPreferences.getInstance();
+    final prefs = await SharedPreferences.getInstance();
+    if (rememberMe)
+     {
       await prefs.setBool('rememberMe', true);
       await prefs.setString('userRole', 'student');
+    } else {
+      await prefs.clear();
     }
 
     // ✅ SUCCESS
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const StudentPortalScreen()),
-    );
+   Navigator.pushReplacementNamed(context, '/student');
+
 
   } catch (e) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -102,6 +105,7 @@ if (userData['regulation'] != selectedRegulation) {
     );
   }
 }
+
 
 
 

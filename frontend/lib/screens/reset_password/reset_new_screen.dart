@@ -1,14 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'reset_success_screen.dart';
 
 class ResetNewScreen extends StatelessWidget {
-  const ResetNewScreen({super.key});
+  final String email; // ✅ REQUIRED
+
+  const ResetNewScreen({super.key, required this.email});
 
   @override
   Widget build(BuildContext context) {
     final TextEditingController pass1 = TextEditingController();
     final TextEditingController pass2 = TextEditingController();
+
+    Future<void> handleReset() async {
+      try {
+        final p1 = pass1.text.trim();
+        final p2 = pass2.text.trim();
+
+        if (p1.length < 6) {
+          throw 'Password must be at least 6 characters';
+        }
+
+        if (p1 != p2) {
+          throw 'Passwords do not match';
+        }
+
+        // 🔐 FIREBASE RESET (EMAIL BASED)
+        await FirebaseAuth.instance.sendPasswordResetEmail(
+          email: email,
+        );
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const ResetSuccessScreen(),
+          ),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      }
+    }
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -29,9 +63,14 @@ class ResetNewScreen extends StatelessWidget {
                           style: GoogleFonts.inter(
                               fontWeight: FontWeight.bold, fontSize: 16)),
                       const SizedBox(height: 6),
-                      Text('Choose a strong password for your account',
-                          style: GoogleFonts.inter(color: Colors.grey[700], fontSize: 13)),
+                      Text(
+                        'Choose a strong password for your account',
+                        style: GoogleFonts.inter(
+                            color: Colors.grey[700], fontSize: 13),
+                      ),
                       const SizedBox(height: 16),
+
+                      // NEW PASSWORD
                       TextField(
                         controller: pass1,
                         obscureText: true,
@@ -46,7 +85,10 @@ class ResetNewScreen extends StatelessWidget {
                           ),
                         ),
                       ),
+
                       const SizedBox(height: 10),
+
+                      // CONFIRM PASSWORD
                       TextField(
                         controller: pass2,
                         obscureText: true,
@@ -61,21 +103,21 @@ class ResetNewScreen extends StatelessWidget {
                           ),
                         ),
                       ),
+
                       const SizedBox(height: 16),
+
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
                           style: _buttonStyle(),
-                          onPressed: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => const ResetSuccessScreen()),
-                            );
-                          },
-                          child: Text('Reset Password',
-                              style: GoogleFonts.inter(
-                                  color: Colors.white, fontWeight: FontWeight.w600)),
+                          onPressed: handleReset,
+                          child: Text(
+                            'Reset Password',
+                            style: GoogleFonts.inter(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -101,12 +143,19 @@ class ResetNewScreen extends StatelessWidget {
               shape: BoxShape.circle,
               color: Colors.blue,
             ),
-            child: const Icon(Icons.lock_outline, color: Colors.white, size: 30),
+            child:
+                const Icon(Icons.lock_outline, color: Colors.white, size: 30),
           ),
           const SizedBox(height: 14),
-          Text('Reset Password',
-              style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 18)),
-          Text('Student Portal', style: GoogleFonts.inter(color: Colors.grey[700])),
+          Text(
+            'Reset Password',
+            style:
+                GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 18),
+          ),
+          Text(
+            'Student Portal',
+            style: GoogleFonts.inter(color: Colors.grey[700]),
+          ),
           const SizedBox(height: 20),
         ],
       );
@@ -126,7 +175,9 @@ class ResetNewScreen extends StatelessWidget {
   ButtonStyle _buttonStyle() => ElevatedButton.styleFrom(
         backgroundColor: Colors.black,
         padding: const EdgeInsets.symmetric(vertical: 12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
       );
 
   Widget _dotIndicator(int activeIndex) => Row(
@@ -139,7 +190,8 @@ class ResetNewScreen extends StatelessWidget {
             height: 8,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: index == activeIndex ? Colors.blueAccent : Colors.grey[300],
+              color:
+                  index == activeIndex ? Colors.blueAccent : Colors.grey[300],
             ),
           ),
         ),

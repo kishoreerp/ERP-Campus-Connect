@@ -20,4 +20,16 @@ class UserService {
     if (snap.docs.isEmpty) return null;
     return snap.docs.first.data();
   }
+  Future<Map<String, dynamic>?> getUserByUsername(String username) async {
+  final query = await FirebaseFirestore.instance
+      .collection('users')
+      .where('username', isEqualTo: username)
+      .limit(1)
+      .get();
+
+  if (query.docs.isEmpty) return null;
+
+  return query.docs.first.data();
+}
+
 }

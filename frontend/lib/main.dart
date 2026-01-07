@@ -21,37 +21,46 @@ void main() async {
 /// ------------------------------------------------------------
 /// AUTH GATE (AUTO LOGIN LOGIC)
 /// ------------------------------------------------------------
-class AuthGate extends StatelessWidget {
+class AuthGate extends StatefulWidget {
   const AuthGate({super.key});
 
-  Future<Widget> _getStartScreen() async {
+  @override
+  State<AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<AuthGate> {
+  @override
+  void initState() {
+    super.initState();
+    _decide();
+  }
+
+  Future<void> _decide() async {
     final prefs = await SharedPreferences.getInstance();
 
     final rememberMe = prefs.getBool('rememberMe') ?? false;
     final role = prefs.getString('userRole');
 
-    if (rememberMe && role == 'student') {
-      return const StudentPortalScreen();
-    }
+    debugPrint('REMEMBER ME: $rememberMe');
+    debugPrint('USER ROLE: $role');
 
-    return const SlecHomeScreen();
+    if (!mounted) return;
+
+    if (rememberMe && role == 'student') {
+      Navigator.pushReplacementNamed(context, '/student');
+    } else {
+      Navigator.pushReplacementNamed(context, '/home');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Widget>(
-      future: _getStartScreen(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-        return snapshot.data!;
-      },
+    return const Scaffold(
+      body: Center(child: CircularProgressIndicator()),
     );
   }
 }
+
 
 /// ------------------------------------------------------------
 /// APP ROOT
@@ -90,7 +99,13 @@ class MyApp extends StatelessWidget {
       ),
 
       /// 🔑 ENTRY POINT
-      home: const AuthGate(),
+      initialRoute: '/',
+routes: {
+  '/': (context) => const AuthGate(),
+  '/home': (context) => const SlecHomeScreen(),
+  '/student': (context) => const StudentPortalScreen(),
+},
+
     );
   }
 }

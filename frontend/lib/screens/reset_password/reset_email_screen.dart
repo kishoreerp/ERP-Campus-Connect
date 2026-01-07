@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'reset_otp_screen.dart';
+import '../../services/otp_service.dart';
+
 
 class ResetEmailScreen extends StatelessWidget {
   const ResetEmailScreen({super.key});
@@ -53,9 +55,14 @@ class ResetEmailScreen extends StatelessWidget {
                           style: _buttonStyle(),
                           onPressed: () {
                             Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => const ResetOTPScreen()),
-                            );
+  context,
+  MaterialPageRoute(
+    builder: (_) => ResetOTPScreen(
+      email: emailController.text.trim(),
+    ),
+  ),
+);
+
                           },
                           child: Text('Send OTP',
                               style: GoogleFonts.inter(

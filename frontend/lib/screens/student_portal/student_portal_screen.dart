@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:myapp/screens/student_login_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../main.dart'; // for AuthGate
+
+
 
 import 'student_home_screen.dart';
 import 'student_subjects_screen.dart';
@@ -26,6 +32,25 @@ class _StudentPortalScreenState extends State<StudentPortalScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+  title: const Text('Student Portal'),
+  actions: [
+    IconButton(
+      icon: const Icon(Icons.logout),
+ onPressed: () async {
+  await FirebaseAuth.instance.signOut();
+
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.clear();
+
+  Navigator.pushReplacementNamed(context, '/home');
+},
+
+
+    ),
+  ],
+),
+
       backgroundColor: Colors.white, // ✅ Pure white background
       body: SafeArea(child: _pages[_selectedIndex]),
 
@@ -55,4 +80,18 @@ class _StudentPortalScreenState extends State<StudentPortalScreen> {
       ),
     );
   }
+
+
+Future<void> logout(BuildContext context) async {
+  await FirebaseAuth.instance.signOut();
+
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.clear();
+
+  Navigator.of(context).pushAndRemoveUntil(
+    MaterialPageRoute(builder: (_) => const StudentLoginScreen()),
+    (route) => false,
+  );
+}
+
 }

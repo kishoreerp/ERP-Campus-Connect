@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../services/auth_service.dart';
+import '../../services/user_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 
 import 'staff_portal/staff_portal_screen.dart';
@@ -16,50 +21,86 @@ class AdminPortalScreen extends StatefulWidget {
 
 class _AdminPortalScreenState extends State<AdminPortalScreen> {
   String? selectedRole;
-  final TextEditingController usernameController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+
+final TextEditingController emailController = TextEditingController();
+
+final TextEditingController passwordController = TextEditingController();
+
 
   final roles = ['Principal', 'HOD', 'Staff', 'Clerk'];
 
-void _handleLogin() {
-  // Basic validation
-  if (selectedRole == null ||
-      usernameController.text.isEmpty ||
-      passwordController.text.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Please fill in all fields.'),
-        backgroundColor: Colors.redAccent,
-      ),
-    );
-    return;
-  }
+Future<void> _handleLogin() async {
+  try {
+    if (selectedRole == null ||
+        emailController.text.isEmpty ||
+        passwordController.text.isEmpty) {
+      throw 'Please fill all fields';
+    }
 
-  // Navigate based on role
-  if (selectedRole == 'Staff') {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => StaffPortalScreen(username: usernameController.text),
-      ),
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    // 🔐 LOGIN USING EMAIL
+    final user = await AuthService().loginWithEmail(
+      email: email,
+      password: password,
     );
-    } else if (selectedRole == 'HOD') {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) =>
-             HODPortalScreen(username: usernameController.text),
+
+    if (user == null) {
+      throw 'Login failed';
+    }
+
+    // 🔎 FETCH USER DATA
+    final userData =
+        await UserService().getUserByUid(user.uid);
+
+    if (userData == null) {
+      throw 'User record not found';
+    }
+
+    final actualRole = userData['role'];
+
+    // 🚫 ROLE VALIDATION (IMPORTANT STEP 5)
+    if (actualRole.toLowerCase() !=
+        selectedRole!.toLowerCase()) {
+      throw 'You selected the wrong role';
+    }
+
+    // 💾 SAVE SESSION (OPTIONAL)
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('userRole', actualRole);
+
+    // 🚀 NAVIGATION
+    if (actualRole == 'Staff') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => StaffPortalScreen(
+            username: userData['username'] ?? email,
           ),
-        );
-  }  else {
+        ),
+      );
+    } else if (actualRole == 'HOD') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => HODPortalScreen(
+            username: userData['username'] ?? email,
+          ),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$actualRole portal coming soon')),
+      );
+    }
+  } catch (e) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Login for $selectedRole coming soon!'),
-        backgroundColor: Colors.blueGrey,
-      ),
+      SnackBar(content: Text(e.toString())),
     );
   }
 }
+
 
 
   @override
@@ -89,13 +130,15 @@ void _handleLogin() {
                       const SizedBox(height: 6),
                       _buildDropdown(),
                       const SizedBox(height: 16),
-                      Text('Username',
-                          style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-                       const SizedBox(height: 6),
-                      _buildTextField(
-                          controller: usernameController,
-                          hint: 'Enter your username',
-                          icon: Icons.person_outline),
+                      Text('Email',
+                      style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+                        const SizedBox(height: 6),
+                        _buildTextField(
+                        controller: emailController,
+                       hint: 'Enter your email',
+                        icon: Icons.email_outlined,
+                      ),
+
                       const SizedBox(height: 16),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -238,4 +281,5 @@ void _handleLogin() {
               offset: const Offset(0, 4))
         ],
       );
-}
+
+ }
