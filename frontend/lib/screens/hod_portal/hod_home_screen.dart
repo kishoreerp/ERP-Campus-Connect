@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'make_announcement_dialog.dart';
 import 'hod_events_screen.dart';
+import 'notification_dialog.dart';
+import 'hod_notes_screen.dart';
+import 'approvals_entry_dialog.dart';
+import 'leave_dialogs.dart';
 class HODHomeScreen extends StatelessWidget {
   final String username;
   const HODHomeScreen({super.key, required this.username});
@@ -119,7 +123,7 @@ class HODHomeScreen extends StatelessWidget {
                     icon: Icons.notifications_outlined,
                     label: 'Notifications',
                     onTap: () {
-                      // TODO: Notifications popup or screen
+                       showNotificationsDialog(context);
                     },
                   ),
                   _quickTileCentered(
@@ -127,7 +131,12 @@ class HODHomeScreen extends StatelessWidget {
                     icon: Icons.note_alt_outlined,
                     label: 'Notes',
                     onTap: () {
-                      // TODO: Notes screen
+                     Navigator.push(
+                      context,
+                        MaterialPageRoute(
+                       builder: (_) => const HODNotesScreen(),
+                      ),
+                       );
                     },
                   ),
                   _quickTileCentered(
@@ -135,15 +144,16 @@ class HODHomeScreen extends StatelessWidget {
                     icon: Icons.approval,
                     label: 'Approvals',
                     onTap: () {
-                      // TODO: Approvals popup/screen
+                     showApprovalsEntryDialog(context);
                     },
                   ),
                   _quickTileCentered(
                     context,
                     icon: Icons.calendar_month,
                     label: 'Request Leave',
-                    onTap: () {
-                      // TODO: Request leave popup/screen
+                    onTap: () {  
+                       showLeaveManagementDialog(context);
+                     
                     },
                   ),
                 ],
@@ -953,4 +963,3 @@ class _EditAnnouncementDialogState extends State<_EditAnnouncementDialog> {
     );
   }
 }
-

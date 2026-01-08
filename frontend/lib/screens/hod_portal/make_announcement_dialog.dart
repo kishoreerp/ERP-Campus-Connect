@@ -1,22 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-
 class MakeAnnouncementDialog extends StatefulWidget {
   const MakeAnnouncementDialog({super.key});
-
 
   @override
   State<MakeAnnouncementDialog> createState() => _MakeAnnouncementDialogState();
 }
-
 
 class _MakeAnnouncementDialogState extends State<MakeAnnouncementDialog> {
   final _formKey = GlobalKey<FormState>();
   String? _selectedType;
   String? _selectedAudience = 'All Years';
   final TextEditingController _messageCtrl = TextEditingController();
-
 
   final List<String> _types = [
     'General',
@@ -26,7 +22,6 @@ class _MakeAnnouncementDialogState extends State<MakeAnnouncementDialog> {
     'Other',
   ];
 
-
   final List<String> _audiences = [
     'All Years',
     '1st Year',
@@ -35,9 +30,7 @@ class _MakeAnnouncementDialogState extends State<MakeAnnouncementDialog> {
     '4th Year',
   ];
 
-
   bool _submitting = false;
-
 
   @override
   void dispose() {
@@ -45,34 +38,26 @@ class _MakeAnnouncementDialogState extends State<MakeAnnouncementDialog> {
     super.dispose();
   }
 
-
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
-
     setState(() => _submitting = true);
-
 
     // simulate network / API call
     await Future.delayed(const Duration(seconds: 1));
 
-
     setState(() => _submitting = false);
-
 
     // Return result or show snackbar — here we pop dialog and show a snack
     Navigator.of(context).pop(true);
-
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Announcement published', style: GoogleFonts.inter())),
     );
 
-
     // TODO: replace the delay above with actual API call to publish announcement
     // using _selectedType, _messageCtrl.text, _selectedAudience
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +98,6 @@ class _MakeAnnouncementDialogState extends State<MakeAnnouncementDialog> {
                       ],
                     ),
 
-
                     const SizedBox(height: 2),
                     Text(
                       'Make Announcement',
@@ -128,7 +112,6 @@ class _MakeAnnouncementDialogState extends State<MakeAnnouncementDialog> {
                     ),
                     const SizedBox(height: 16),
 
-
                     // Form fields with spacing to match screenshot
                     // 1) Title (dropdown)
                     _fieldLabel('Title'),
@@ -141,9 +124,7 @@ class _MakeAnnouncementDialogState extends State<MakeAnnouncementDialog> {
                       validator: (v) => (v == null || v.isEmpty) ? 'Please select a type' : null,
                     ),
 
-
                     const SizedBox(height: 12),
-
 
                     // 2) Message (multiline)
                     _fieldLabel('Message'),
@@ -164,9 +145,7 @@ class _MakeAnnouncementDialogState extends State<MakeAnnouncementDialog> {
                       validator: (v) => (v == null || v.trim().isEmpty) ? 'Please enter a message' : null,
                     ),
 
-
                     const SizedBox(height: 12),
-
 
                     // 3) Target Audience
                     _fieldLabel('Target Audience'),
@@ -179,9 +158,7 @@ class _MakeAnnouncementDialogState extends State<MakeAnnouncementDialog> {
                       validator: (_) => null,
                     ),
 
-
                     const SizedBox(height: 18),
-
 
                     // Buttons: Publish (dark) + Cancel (outlined)
                     Row(
@@ -221,7 +198,6 @@ class _MakeAnnouncementDialogState extends State<MakeAnnouncementDialog> {
                 ),
               ),
 
-
               // Close icon top-right
               Positioned(
                 right: 0,
@@ -247,7 +223,6 @@ class _MakeAnnouncementDialogState extends State<MakeAnnouncementDialog> {
     );
   }
 
-
   // helper: label above fields
   Widget _fieldLabel(String text) {
     return Align(
@@ -258,7 +233,6 @@ class _MakeAnnouncementDialogState extends State<MakeAnnouncementDialog> {
       ),
     );
   }
-
 
   // helper: dropdown styled like screenshot
   Widget _buildDropdown({
@@ -284,7 +258,3 @@ class _MakeAnnouncementDialogState extends State<MakeAnnouncementDialog> {
     );
   }
 }
-
-
-
-

@@ -1,19 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter/material.dart';
 
+Future<void> showMakeEventDialog(BuildContext context) {
+  return showDialog<void>(
+    context: context,
+    builder: (_) {
+      return Dialog(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: const Text("Make Event"),
+        ),
+      );
+    },
+  );
+}
 
 
 
 /* ================= MAKE EVENT POPUP ================= */
 
-
-Future<void> showMakeEventDialog(BuildContext context) {
-  return showDialog(
+Future<void> showEditEventDialog(BuildContext context) {
+  return showDialog<void>(
     context: context,
-    barrierDismissible: true,
-    builder: (_) => _MakeEventDialog(),
+    builder: (_) {
+      return Dialog(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: const Text("Edit Event"),
+        ),
+      );
+    },
   );
 }
+
 
 
 class _MakeEventDialog extends StatefulWidget {
@@ -21,10 +41,8 @@ class _MakeEventDialog extends StatefulWidget {
   State<_MakeEventDialog> createState() => _MakeEventDialogState();
 }
 
-
 class _MakeEventDialogState extends State<_MakeEventDialog> {
   String? eventType;
-
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +75,6 @@ class _MakeEventDialogState extends State<_MakeEventDialog> {
     );
   }
 
-
   Widget _header(BuildContext c, String t, String s) => Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -78,14 +95,12 @@ class _MakeEventDialogState extends State<_MakeEventDialog> {
         ],
       );
 
-
   Widget _label(String t) => Padding(
         padding: const EdgeInsets.only(top: 12, bottom: 6),
         child: Text(t,
             style:
                 GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600)),
       );
-
 
   Widget _input(String hint, IconData? icon, {int maxLines = 1}) {
     return TextField(
@@ -101,7 +116,6 @@ class _MakeEventDialogState extends State<_MakeEventDialog> {
       ),
     );
   }
-
 
   Widget _dropdown() {
     return DropdownButtonFormField<String>(
@@ -121,7 +135,6 @@ class _MakeEventDialogState extends State<_MakeEventDialog> {
     );
   }
 
-
   Widget _primaryButton(String t) => SizedBox(
         width: double.infinity,
         child: ElevatedButton(
@@ -135,7 +148,6 @@ class _MakeEventDialogState extends State<_MakeEventDialog> {
         ),
       );
 
-
   Widget _cancel(BuildContext c) => Center(
         child: TextButton(
             onPressed: () => Navigator.pop(c),
@@ -143,108 +155,106 @@ class _MakeEventDialogState extends State<_MakeEventDialog> {
       );
 }
 
-
 /* ================= MANAGE EVENTS POPUP ================= */
 
-
 Future<void> showManageEventsDialog(BuildContext context) {
-  return showDialog(
+  return showDialog<void>(
     context: context,
-    barrierDismissible: true,
-    builder: (_) => _ManageEventsDialog(),
+    builder: (_) {
+      return Dialog(
+        insetPadding: const EdgeInsets.all(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Manage Events",
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                "View and edit department events",
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              _manageEventItem(
+                context,
+                title: "Mid-term Exam Starts",
+                date: "2024-01-25 • Full Day",
+              ),
+
+              const SizedBox(height: 12),
+
+              _manageEventItem(
+                context,
+                title: "Republic Day Holiday",
+                date: "2024-01-26 • Closed",
+              ),
+            ],
+          ),
+        ),
+      );
+    },
   );
 }
 
-
-class _ManageEventsDialog extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _title(context),
-            _event("Department Review Meeting", "2024-01-22 • 10:00 AM"),
-            _event("Mid-term Exam Starts", "2024-01-25 • Full Day"),
-          ],
-        ),
-      ),
-    );
-  }
-
-
-  Widget _title(BuildContext c) => Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            children: [
-              Text("Manage Events",
-                  style: GoogleFonts.inter(
-                      fontSize: 18, fontWeight: FontWeight.w700)),
-              Text("View and edit department events",
-                  style: GoogleFonts.inter(fontSize: 13, color: Colors.grey)),
-            ],
-          ),
-          IconButton(
-              icon: const Icon(Icons.close),
-              onPressed: () => Navigator.pop(c))
-        ],
-      );
-
-
-  Widget _event(String title, String date) => Container(
-        margin: const EdgeInsets.only(top: 12),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey.shade200)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title,
-                style:
-                    GoogleFonts.inter(fontWeight: FontWeight.w600)),
-            Text(date,
-                style: GoogleFonts.inter(fontSize: 12, color: Colors.grey)),
-            const SizedBox(height: 8),
-           Row(
-  children: [
-    InkWell(
-      onTap: () {
-        
-      },
-      child: Row(
-        children: const [
-          Icon(Icons.edit_outlined, size: 16),
-          SizedBox(width: 4),
-          Text("Edit"),
-        ],
-      ),
+Widget _manageEventItem(
+  BuildContext context, {
+  required String title,
+  required String date,
+}) {
+  return Container(
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(12),
+      border: Border.all(color: Colors.grey.shade200),
     ),
-    const SizedBox(width: 24),
-    Row(
-      children: const [
-        Icon(Icons.delete_outline, size: 16, color: Colors.red),
-        SizedBox(width: 4),
-        Text(
-          "Delete",
-          style: TextStyle(color: Colors.red),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+        const SizedBox(height: 4),
+        Text(date,
+            style: GoogleFonts.inter(fontSize: 12, color: Colors.grey)),
+        const SizedBox(height: 10),
+
+        Row(
+          children: [
+            InkWell(
+              onTap: () {
+                Navigator.pop(context);
+                showEditEventDialog(context);
+              },
+              child: Row(
+                children: const [
+                  Icon(Icons.edit_outlined, size: 16),
+                  SizedBox(width: 4),
+                  Text("Edit"),
+                ],
+              ),
+            ),
+            const SizedBox(width: 24),
+            Row(
+              children: const [
+                Icon(Icons.delete_outline,
+                    size: 16, color: Colors.red),
+                SizedBox(width: 4),
+                Text("Delete",
+                    style: TextStyle(color: Colors.red)),
+              ],
+            ),
+          ],
         ),
       ],
     ),
-  ],
-),
-
-
-          ],
-        ),
-      );
+  );
 }
-
-
-
-

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'hod_events_screen.dart';
-import 'event_dialogs.dart';
+import 'event_dialogs.dart'; // ✅ REQUIRED
+
+
 class HODEventsScreen extends StatelessWidget {
   const HODEventsScreen({super.key});
-
 
   @override
   Widget build(BuildContext context) {
@@ -51,9 +51,7 @@ class HODEventsScreen extends StatelessWidget {
                 ],
               ),
 
-
               const SizedBox(height: 16),
-
 
               // ACTION BUTTONS
               Row(
@@ -105,9 +103,7 @@ class HODEventsScreen extends StatelessWidget {
                 ],
               ),
 
-
               const SizedBox(height: 18),
-
 
               // CALENDAR CARD
               Container(
@@ -135,9 +131,7 @@ class HODEventsScreen extends StatelessWidget {
                 ),
               ),
 
-
               const SizedBox(height: 22),
-
 
               Text(
                 "Upcoming Events",
@@ -147,9 +141,7 @@ class HODEventsScreen extends StatelessWidget {
                 ),
               ),
 
-
               const SizedBox(height: 12),
-
 
               _eventTile(
                 title: "Department Review Meeting",
@@ -157,9 +149,7 @@ class HODEventsScreen extends StatelessWidget {
                 tag: "event",
               ),
 
-
               const SizedBox(height: 12),
-
 
               _eventTile(
                 title: "Mid-term Exam Starts",
@@ -172,7 +162,6 @@ class HODEventsScreen extends StatelessWidget {
       ),
     );
   }
-
 
   // EVENT CARD
   Widget _eventTile({
@@ -245,11 +234,9 @@ class HODEventsScreen extends StatelessWidget {
   }
 }
 
-
 /// CALENDAR GRID (STATIC — MATCHES SS)
 class _CalendarGrid extends StatelessWidget {
   const _CalendarGrid();
-
 
   @override
   Widget build(BuildContext context) {
@@ -261,7 +248,6 @@ class _CalendarGrid extends StatelessWidget {
       "21","22","23","24","25","26","27",
       "28","29","30","31","1","2","3",
     ];
-
 
     return GridView.builder(
       shrinkWrap: true,
@@ -275,7 +261,6 @@ class _CalendarGrid extends StatelessWidget {
       itemBuilder: (_, i) {
         final isSelected = days[i] == "17";
         final isHeader = i < 7;
-
 
         return Center(
           child: isSelected
@@ -304,7 +289,3 @@ class _CalendarGrid extends StatelessWidget {
     );
   }
 }
-
-
-
-

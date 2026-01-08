@@ -31,9 +31,12 @@ class OtpService {
     required String email,
     required String otp,
   }) async {
-    final url = Uri.parse(
-      'https://YOUR_BACKEND_URL/send-otp', // 👈 replace later
-    );
+ final url = Uri.parse(
+ 'https://asia-south1-erp-campus-connect.cloudfunctions.net/sendOtpEmail'
+);
+
+
+
 
     final response = await http.post(
       url,

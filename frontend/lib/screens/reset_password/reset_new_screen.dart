@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'reset_success_screen.dart';
+import 'package:http/http.dart' as http;
+
 
 class ResetNewScreen extends StatelessWidget {
   final String email; // ✅ REQUIRED
@@ -14,35 +16,41 @@ class ResetNewScreen extends StatelessWidget {
     final TextEditingController pass2 = TextEditingController();
 
     Future<void> handleReset() async {
-      try {
-        final p1 = pass1.text.trim();
-        final p2 = pass2.text.trim();
+  try {
+    final p1 = pass1.text.trim();
+    final p2 = pass2.text.trim();
 
-        if (p1.length < 6) {
-          throw 'Password must be at least 6 characters';
-        }
-
-        if (p1 != p2) {
-          throw 'Passwords do not match';
-        }
-
-        // 🔐 FIREBASE RESET (EMAIL BASED)
-        await FirebaseAuth.instance.sendPasswordResetEmail(
-          email: email,
-        );
-
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const ResetSuccessScreen(),
-          ),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
-        );
-      }
+    if (p1.length < 6) {
+      throw 'Password must be at least 6 characters';
     }
+
+    if (p1 != p2) {
+      throw 'Passwords do not match';
+    }
+
+    // ✅ CALL YOUR BACKEND – OTP BASED UPDATE
+    await http.post(
+      Uri.parse("https://YOUR_BACKEND_URL/student/reset-password"),
+      headers: {'Content-Type': 'application/json'},
+      body: '''
+      {
+        "email": "$email",
+        "password": "$p1"
+      }
+      ''',
+    );
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const ResetSuccessScreen()),
+    );
+
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(e.toString())),
+    );
+  }
+}
 
     return Scaffold(
       backgroundColor: Colors.white,

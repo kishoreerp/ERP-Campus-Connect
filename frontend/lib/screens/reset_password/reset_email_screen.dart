@@ -2,14 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'reset_otp_screen.dart';
 import '../../services/otp_service.dart';
+import 'package:cloud_functions/cloud_functions.dart';
+
 
 
 class ResetEmailScreen extends StatelessWidget {
   const ResetEmailScreen({super.key});
 
+
+  Future<void> callSendOtp(String email, String otp) async {
+
+  final callable =
+      FirebaseFunctions.instance.httpsCallable('sendOtpEmail');
+
+  final result = await callable.call({
+    "email": email,
+    "otp": otp,
+  });
+
+}
+
+
   @override
   Widget build(BuildContext context) {
     final TextEditingController emailController = TextEditingController();
+    final OtpService otpService = OtpService();
+
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -53,17 +71,51 @@ class ResetEmailScreen extends StatelessWidget {
                         width: double.infinity,
                         child: ElevatedButton(
                           style: _buttonStyle(),
-                          onPressed: () {
-                            Navigator.push(
-  context,
-  MaterialPageRoute(
-    builder: (_) => ResetOTPScreen(
-      email: emailController.text.trim(),
-    ),
-  ),
-);
+                          onPressed: () async {
+  try {
 
-                          },
+    final email = emailController.text.trim();
+
+    if (email.isEmpty || !email.contains("@")) {
+      throw "Enter registered email";
+    }
+
+    // 🔢 GENERATE OTP
+    final otp = otpService.generateOtp();
+
+    // 💾 SAVE OTP
+    await otpService.saveOtp(
+      email: email,
+      otp: otp,
+    );
+
+    // 📩 SEND EMAIL (EmailJS backend)
+    await otpService.sendOtpEmail(
+      email: email,
+      otp: otp,
+    );
+
+    // ✔ SHOW MESSAGE
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("OTP sent to email")),
+    );
+
+    // ➜ NAVIGATE AFTER SUCCESS ONLY
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ResetOTPScreen(email: email),
+      ),
+    );
+
+  } catch (e) {
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(e.toString())),
+    );
+
+  }
+},
                           child: Text('Send OTP',
                               style: GoogleFonts.inter(
                                   color: Colors.white, fontWeight: FontWeight.w600)),
