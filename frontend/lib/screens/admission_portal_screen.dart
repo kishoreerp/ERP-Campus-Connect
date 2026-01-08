@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'application_form_screen.dart';
+
+
 
 class AdmissionPortalScreen extends StatelessWidget {
   const AdmissionPortalScreen({super.key});
@@ -159,7 +162,8 @@ class AdmissionPortalScreen extends StatelessWidget {
                           // Navigate to a placeholder application screen (or implement flow)
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => const _ApplicationPlaceholder()),
+                            MaterialPageRoute(builder: (_) => const ApplicationFormScreen()),
+
                           );
                         },
                       ),

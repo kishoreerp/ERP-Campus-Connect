@@ -1,10 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-      import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 // ---------------- MAIN PROFILE SCREEN ----------------
-class StudentProfileScreen extends StatelessWidget {
+class StudentProfileScreen extends StatefulWidget {
   const StudentProfileScreen({super.key});
+
+  @override
+  State<StudentProfileScreen> createState() => _StudentProfileScreenState();
+}
+
+class _StudentProfileScreenState extends State<StudentProfileScreen> {
+  // 🔹 Student data variables (Step 2)
+String name = '';
+String rollNumber = '';
+String email = '';
+String department = '';
+String year = '';
+String cgpa = '';
+String attendance = '';
+String semester = '';
+int subjects = 0;
+int arrears = 0;
+String phone = '';
+String address = '';
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +50,34 @@ class StudentProfileScreen extends StatelessWidget {
       ),
     );
   }
+  Future<void> _loadStudentProfile() async {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user == null) return;
+
+  final doc = await FirebaseFirestore.instance
+      .collection('students')
+      .doc(user.uid)
+      .get();
+
+  final data = doc.data();
+  if (data == null) return;
+
+  setState(() {
+    name = data['name'] ?? '';
+    rollNumber = data['rollNumber'] ?? '';
+    email = data['email'] ?? '';
+    department = data['department'] ?? '';
+    year = data['year'] ?? '';
+    cgpa = data['cgpa'] ?? '';
+    attendance = data['attendance'] ?? '';
+    semester = data['semester'] ?? '';
+    subjects = data['subjects'] ?? 0;
+    arrears = data['arrears'] ?? 0;
+    phone = data['phone'] ?? '';
+    address = data['address'] ?? '';
+  });
+}
+
 
   // ---------------- HEADER ----------------
   Widget _buildHeader(BuildContext context) {
@@ -214,22 +263,19 @@ Widget _buildLogoutSection(BuildContext context) {
 }
 
   // ---------------- WHITE BOX DECORATION ----------------
-  BoxDecoration _whiteBox() {
-    return BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.05),
-          blurRadius: 6,
-          offset: const Offset(0, 3),
-        ),
-      ],
-    );
-  }
-
-
-
+BoxDecoration _whiteBox() {
+  return BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(16),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.05),
+        blurRadius: 6,
+        offset: const Offset(0, 3),
+      ),
+    ],
+  );
+ }
 // ---------------- SETTINGS POPUP ----------------
 void _showSettingsDialog(BuildContext context) {
   showDialog(

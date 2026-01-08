@@ -11,16 +11,13 @@ class ResetEmailScreen extends StatelessWidget {
 
 
   Future<void> callSendOtp(String email, String otp) async {
+    final HttpsCallable callable = FirebaseFunctions.instance.httpsCallable('sendOtp');
 
-  final callable =
-      FirebaseFunctions.instance.httpsCallable('sendOtpEmail');
-
-  final result = await callable.call({
-    "email": email,
-    "otp": otp,
-  });
-
-}
+    final result = await callable.call({
+      "email": email,
+      "otp": otp,
+    });
+  }
 
 
   @override
@@ -72,49 +69,36 @@ class ResetEmailScreen extends StatelessWidget {
                         child: ElevatedButton(
                           style: _buttonStyle(),
                           onPressed: () async {
-  try {
+ try {
 
-    final email = emailController.text.trim();
+  final email = emailController.text.trim();
 
-    if (email.isEmpty || !email.contains("@")) {
-      throw "Enter registered email";
-    }
+  final otp = otpService.generateOtp();
 
-    // 🔢 GENERATE OTP
-    final otp = otpService.generateOtp();
+  await otpService.saveOtp(email: email, otp: otp);
 
-    // 💾 SAVE OTP
-    await otpService.saveOtp(
-      email: email,
-      otp: otp,
-    );
+  // 🔥 CALLABLE FUNCTION
+  await callSendOtp(email, otp);
 
-    // 📩 SEND EMAIL (EmailJS backend)
-    await otpService.sendOtpEmail(
-      email: email,
-      otp: otp,
-    );
-
-    // ✔ SHOW MESSAGE
-    ScaffoldMessenger.of(context).showSnackBar(
+  ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("OTP sent to email")),
-    );
+  );
 
-    // ➜ NAVIGATE AFTER SUCCESS ONLY
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => ResetOTPScreen(email: email),
-      ),
-    );
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => ResetOTPScreen(email: email),
+    ),
+  );
 
-  } catch (e) {
+ } catch(e) {
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(e.toString())),
-    );
+   ScaffoldMessenger.of(context).showSnackBar(
+       SnackBar(content: Text(e.toString())),
+   );
 
-  }
+ }
+
 },
                           child: Text('Send OTP',
                               style: GoogleFonts.inter(
