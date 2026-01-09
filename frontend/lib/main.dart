@@ -1,13 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'firebase_options.dart';
 
+// ================= IMPORT SCREENS =================
 import 'screens/slec_home_screen.dart';
 import 'screens/student_portal/student_portal_screen.dart';
 
-import 'package:shared_preferences/shared_preferences.dart';
+// HOD ATTENDANCE
+import 'screens/hod_portal/hod_mark_attendance_screen.dart';
+import 'screens/hod_portal/hod_view_attendance_screen.dart';
 
+// HOD MARKS
+import 'screens/hod_portal/hod_marks_screen.dart';
+import 'screens/hod_portal/hod_department_marks_screen.dart';
+import 'screens/hod_portal/hod_university_results_screen.dart';
+import 'screens/hod_portal/hod_university_results_download_screen.dart';
+
+// ==================================================
+// GLOBAL NAVIGATOR KEY (KEEP FROM TEAMMATE CODE)
+// ==================================================
+final GlobalKey<NavigatorState> rootNavigatorKey =
+    GlobalKey<NavigatorState>();
+
+// ==================================================
+// MAIN
+// ==================================================
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -18,9 +38,9 @@ void main() async {
   runApp(const MyApp());
 }
 
-/// ------------------------------------------------------------
-/// AUTH GATE (AUTO LOGIN LOGIC)
-/// ------------------------------------------------------------
+// ==================================================
+// AUTH GATE (AUTO LOGIN LOGIC)
+// ==================================================
 class AuthGate extends StatefulWidget {
   const AuthGate({super.key});
 
@@ -61,10 +81,9 @@ class _AuthGateState extends State<AuthGate> {
   }
 }
 
-
-/// ------------------------------------------------------------
-/// APP ROOT
-/// ------------------------------------------------------------
+// ==================================================
+// APP ROOT
+// ==================================================
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -72,7 +91,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      navigatorKey: rootNavigatorKey,
       title: 'SLEC Campus Connect',
+
       theme: ThemeData(
         brightness: Brightness.light,
         primaryColor: Colors.deepPurple,
@@ -98,14 +119,33 @@ class MyApp extends StatelessWidget {
         ).copyWith(surface: Colors.white),
       ),
 
-      /// 🔑 ENTRY POINT
+      // 🔑 ENTRY POINT
       initialRoute: '/',
-routes: {
-  '/': (context) => const AuthGate(),
-  '/home': (context) => const SlecHomeScreen(),
-  '/student': (context) => const StudentPortalScreen(),
-},
 
+      // ================= ROUTES =================
+      routes: {
+        '/': (context) => const AuthGate(),
+
+        // COMMON
+        '/home': (context) => const SlecHomeScreen(),
+
+        // STUDENT
+        '/student': (context) => const StudentPortalScreen(),
+
+        // HOD ATTENDANCE
+        '/hod-mark-attendance': (context) =>
+            const HODMarkAttendanceScreen(),
+        '/hod-view-attendance': (context) =>
+            const HODViewAttendanceScreen(),
+
+        // HOD MARKS
+        '/hod-marks': (context) => const HODMarksScreen(),
+        '/hod-department-marks': (context) =>
+            const HODDepartmentMarksScreen(),
+        '/hod-university-results': (context) =>
+            const HODUniversityResultsScreen(),
+
+      },
     );
   }
 }
