@@ -7,20 +7,27 @@ import '../../main.dart'; // for AuthGate
 
 
 
+
+
+
 import 'student_home_screen.dart';
 import 'student_subjects_screen.dart';
 import 'student_attendance_screen.dart';
 import 'student_profile_screen.dart';
 
+
 class StudentPortalScreen extends StatefulWidget {
   const StudentPortalScreen({super.key});
+
 
   @override
   State<StudentPortalScreen> createState() => _StudentPortalScreenState();
 }
 
+
 class _StudentPortalScreenState extends State<StudentPortalScreen> {
   int _selectedIndex = 0;
+
 
   final List<Widget> _pages = const [
     StudentHomeScreen(),
@@ -29,30 +36,47 @@ class _StudentPortalScreenState extends State<StudentPortalScreen> {
     StudentProfileScreen(), // ✅ Removed dark mode params
   ];
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-  title: const Text('Student Portal'),
-  actions: [
-    IconButton(
-      icon: const Icon(Icons.logout),
- onPressed: () async {
-  await FirebaseAuth.instance.signOut();
-
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.clear();
-
-  Navigator.pushReplacementNamed(context, '/home');
-},
+  appBar: AppBar(
+  automaticallyImplyLeading: false,
+  elevation: 0,
+  backgroundColor: Colors.white,
 
 
+  titleSpacing: 0,
+  title: Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 16),
+    child: Row(
+      children: [
+        Image.asset(
+          'assets/slec_logo.png',
+          height: 34,
+          width: 34,
+          errorBuilder: (_, __, ___) =>
+              const Icon(Icons.school, color: Colors.deepPurple),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          'Student Portal',
+          style: GoogleFonts.inter(
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.3,
+            color: Colors.black,
+          ),
+        ),
+      ],
     ),
-  ],
+  ),
 ),
+
 
       backgroundColor: Colors.white, // ✅ Pure white background
       body: SafeArea(child: _pages[_selectedIndex]),
+
 
       // ✅ Clean, flat bottom navigation
       bottomNavigationBar: BottomNavigationBar(
@@ -82,11 +106,15 @@ class _StudentPortalScreenState extends State<StudentPortalScreen> {
   }
 
 
+
+
 Future<void> logout(BuildContext context) async {
   await FirebaseAuth.instance.signOut();
 
+
   final prefs = await SharedPreferences.getInstance();
   await prefs.clear();
+
 
   Navigator.of(context).pushAndRemoveUntil(
     MaterialPageRoute(builder: (_) => const StudentLoginScreen()),
@@ -94,4 +122,10 @@ Future<void> logout(BuildContext context) async {
   );
 }
 
+
 }
+
+
+
+
+

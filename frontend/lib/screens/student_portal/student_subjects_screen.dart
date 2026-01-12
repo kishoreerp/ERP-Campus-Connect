@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 
+
+
 class StudentSubjectsScreen extends StatelessWidget {
   const StudentSubjectsScreen({super.key});
+
+
 
 
   @override
@@ -45,11 +49,15 @@ class StudentSubjectsScreen extends StatelessWidget {
     ];
 
 
+
+
     // Separate arrears automatically
     final regularSubjects =
         allSubjects.where((sub) => sub['arrear'] == false).toList();
     final arrearSubjects =
         allSubjects.where((sub) => sub['arrear'] == true).toList();
+
+
 
 
     return Scaffold(
@@ -60,17 +68,22 @@ class StudentSubjectsScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(),
-              const SizedBox(height: 16),
+             
               _buildSemesterInfo(regularSubjects.length),
               const SizedBox(height: 16),
+
+
 
 
               // Regular Subjects
               ...regularSubjects.map((sub) => _buildSubjectCard(context, sub)),
 
 
+
+
               const SizedBox(height: 24),
+
+
 
 
               // Arrear Section (Dynamic)
@@ -80,35 +93,10 @@ class StudentSubjectsScreen extends StatelessWidget {
         ),
       ),
     );
-  }
+ }
 
 
-  // ---------------- HEADER ----------------
-  Widget _buildHeader() {
-    return Row(
-      children: [
-        Image.asset('assets/slec_logo.png', height: 38, width: 38,
-            errorBuilder: (_, __, ___) {
-          return const Icon(Icons.school, color: Colors.deepPurple);
-        }),
-        const SizedBox(width: 10),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Student Portal',
-                style: GoogleFonts.inter(
-                    fontWeight: FontWeight.bold, fontSize: 16)),
-            Text('Computer Science Engineering',
-                style:
-                    GoogleFonts.inter(fontSize: 12, color: Colors.grey[700])),
-          ],
-        ),
-      ],
-    );
-  }
-
-
-  // ---------------- SEMESTER INFO ----------------
+   // ---------------- SEMESTER INFO ----------------
   Widget _buildSemesterInfo(int count) {
     return Container(
       padding: const EdgeInsets.all(14),
@@ -155,6 +143,8 @@ class StudentSubjectsScreen extends StatelessWidget {
       ),
     );
   }
+
+
 
 
   // ---------------- SUBJECT CARD ----------------
@@ -225,6 +215,8 @@ class StudentSubjectsScreen extends StatelessWidget {
   }
 
 
+
+
   // ---------------- ARREAR SECTION (Dynamic) ----------------
   Widget _buildArrearSection(
       BuildContext context, List<Map<String, dynamic>> arrears) {
@@ -237,6 +229,8 @@ class StudentSubjectsScreen extends StatelessWidget {
                 fontWeight: FontWeight.w600,
                 fontSize: 15)),
         const SizedBox(height: 8),
+
+
 
 
         // If arrears exist
@@ -316,10 +310,14 @@ class StudentSubjectsScreen extends StatelessWidget {
   }
 
 
+
+
   // ---------------- SUBJECT DETAILS POPUP ----------------
   void _showSubjectDetailsDialog(
       BuildContext context, Map<String, dynamic> sub) {
     final bool isArrear = sub['arrear'] ?? false;
+
+
 
 
     showDialog(
@@ -361,6 +359,8 @@ class StudentSubjectsScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
+
+
 
 
                 if (!isArrear) ...[
@@ -439,6 +439,8 @@ class StudentSubjectsScreen extends StatelessWidget {
                 ],
 
 
+
+
                 const SizedBox(height: 18),
                 const Divider(),
                 const SizedBox(height: 10),
@@ -456,6 +458,8 @@ class StudentSubjectsScreen extends StatelessWidget {
       },
     );
   }
+
+
 
 
   // ---------------- HELPERS ----------------
@@ -483,6 +487,8 @@ class StudentSubjectsScreen extends StatelessWidget {
       ),
     );
   }
+
+
 
 
   Widget _materialTile(String title, String size) {
@@ -518,6 +524,16 @@ class StudentSubjectsScreen extends StatelessWidget {
     );
   }
 }
+
+
+
+
+
+
+
+
+
+
 
 
 

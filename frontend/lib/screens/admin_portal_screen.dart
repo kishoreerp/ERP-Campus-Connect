@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'staff_portal/staff_portal_screen.dart';
 import 'hod_portal/hod_portal_screen.dart';
+import 'timetable_portal/timetable_portal_screen.dart';
 
 import 'reset_password/admin_reset_email_screen.dart';
 
@@ -27,7 +28,7 @@ final TextEditingController emailController = TextEditingController();
 final TextEditingController passwordController = TextEditingController();
 
 
-  final roles = ['Principal', 'HOD', 'Staff', 'Clerk'];
+  final roles = ['Management','Principal','Admission','HOD','Staff', 'TimeTable', 'ExamCell'];
 
 Future<void> _handleLogin() async {
   try {
@@ -89,7 +90,55 @@ Future<void> _handleLogin() async {
           ),
         ),
       );
-    } else {
+    } 
+    else if (actualRole == 'TimeTable') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => TimetablePortalScreen(
+            username: userData['username'] ?? email,
+          ),
+        ),
+      );
+    }
+    else if (actualRole == 'ExamCell') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => HODPortalScreen(
+            username: userData['username'] ?? email,
+          ),
+        ),
+      );
+    }else if (actualRole == 'Admission') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => HODPortalScreen(
+            username: userData['username'] ?? email,
+          ),
+        ),
+      );
+    }else if (actualRole == 'Principal') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => HODPortalScreen(
+            username: userData['username'] ?? email,
+          ),
+        ),
+      );
+    }else if (actualRole == 'Management') {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => HODPortalScreen(
+            username: userData['username'] ?? email,
+          ),
+        ),
+      );
+    }
+    else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('$actualRole portal coming soon')),
       );

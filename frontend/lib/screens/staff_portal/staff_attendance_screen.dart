@@ -14,16 +14,15 @@ class StaffAttendanceScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _header(),
-              const SizedBox(height: 20),
+    
               Text("Hourly Attendance",
                   style: GoogleFonts.inter(
-                      fontSize: 17, fontWeight: FontWeight.w700)),
+                      fontSize: 16, fontWeight: FontWeight.w600,color: Colors.black)),
               Text("Mark attendance for each class hour",
-                  style: GoogleFonts.inter(color: Colors.grey[700])),
-              const SizedBox(height: 16),
+                  style: GoogleFonts.inter(fontSize: 13,color: const Color.fromARGB(255, 107, 107, 107))),
+              const SizedBox(height: 10),
               _infoBox(),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
               // Hourly Cards (keeps your design)
               _hourCardMarked(
@@ -99,37 +98,6 @@ class StaffAttendanceScreen extends StatelessWidget {
     );
   }
 
-  // ---------------- HEADER ----------------
-  Widget _header() => Row(
-        children: [
-          Container(
-            height: 34,
-            width: 34,
-            decoration: BoxDecoration(
-              color: const Color(0xFF0056D2),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            alignment: Alignment.center,
-            child: Text('SLEC',
-                style: GoogleFonts.inter(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 12)),
-          ),
-          const SizedBox(width: 10),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Staff Portal',
-                  style: GoogleFonts.inter(
-                      fontSize: 16, fontWeight: FontWeight.w700)),
-              Text('Computer Science',
-                  style:
-                      GoogleFonts.inter(color: Colors.grey[600], fontSize: 13)),
-            ],
-          ),
-        ],
-      );
 
   // ---------------- INFO BOX ----------------
   Widget _infoBox() => Container(

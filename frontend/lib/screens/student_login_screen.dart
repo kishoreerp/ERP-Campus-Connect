@@ -7,6 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/auth_service.dart';
 import '../../services/user_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../services/current_user_service.dart';
+
 
 
 
@@ -95,8 +97,12 @@ Future<void> handleStudentLogin() async {
       await prefs.clear();
     }
 
-    // ✅ SUCCESS
-   Navigator.pushReplacementNamed(context, '/student');
+  // ✅ LOAD USER INTO CACHE (VERY IMPORTANT)
+await CurrentUserService.loadUser();
+
+// ✅ SUCCESS
+Navigator.pushReplacementNamed(context, '/student');
+
 
 
   } catch (e) {

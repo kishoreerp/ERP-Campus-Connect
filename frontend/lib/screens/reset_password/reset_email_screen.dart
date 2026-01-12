@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:myapp/services/callable_otp.dart';
 import 'reset_otp_screen.dart';
 import '../../services/otp_service.dart';
 import 'package:cloud_functions/cloud_functions.dart';
@@ -24,6 +25,8 @@ class ResetEmailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextEditingController emailController = TextEditingController();
     final OtpService otpService = OtpService();
+    final CallableOtp callableOtp = CallableOtp();
+
 
 
     return Scaffold(
@@ -78,7 +81,10 @@ class ResetEmailScreen extends StatelessWidget {
   await otpService.saveOtp(email: email, otp: otp);
 
   // 🔥 CALLABLE FUNCTION
-  await callSendOtp(email, otp);
+  await callableOtp.sendOtp(
+       email: email,
+       otp: otp,
+  );
 
   ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("OTP sent to email")),
@@ -98,7 +104,6 @@ class ResetEmailScreen extends StatelessWidget {
    );
 
  }
-
 },
                           child: Text('Send OTP',
                               style: GoogleFonts.inter(

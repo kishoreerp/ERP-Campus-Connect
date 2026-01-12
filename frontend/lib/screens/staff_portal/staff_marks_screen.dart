@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'Internal_assessment_1_screen.dart';
 import 'internal_assessment2_screen.dart';
 import 'model_exam_screen.dart';
+import 'university_result_department_screen.dart';
 
 class StaffMarksScreen extends StatelessWidget {
   const StaffMarksScreen({super.key});
@@ -12,25 +13,33 @@ class StaffMarksScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        backgroundColor: Colors.grey[50],
-        elevation: 0,
-        centerTitle: false,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Academic Records',
-                style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w700, color: Colors.black)),
-            Text('Select assessment type to manage marks',
-                style: GoogleFonts.inter(
-                    fontSize: 13, color: Colors.grey[700])),
-          ],
+  automaticallyImplyLeading: false, // ✅ removes back button
+  backgroundColor: Colors.grey[50],
+  elevation: 0,
+  centerTitle: false,
+
+  title: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        'Academic Records',
+        style: GoogleFonts.inter(
+          fontSize: 16,           // 🔽 reduced size
+          fontWeight: FontWeight.w600,
+          color: Colors.black,
         ),
       ),
+      Text(
+        'Select assessment type to manage marks',
+        style: GoogleFonts.inter(
+          fontSize: 13,
+          color: Colors.grey[700],
+        ),
+      ),
+    ],
+  ),
+),
+
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         child: Column(
@@ -93,12 +102,14 @@ class StaffMarksScreen extends StatelessWidget {
               title: "University Result Download",
               subtitle: "View and download university exam results",
               onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) =>
-                            const PlaceholderScreen(title: "University Result Download")));
-              },
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const UniversityResultDepartmentScreen(),
+    ),
+  );
+},
+
             ),
           ],
         ),

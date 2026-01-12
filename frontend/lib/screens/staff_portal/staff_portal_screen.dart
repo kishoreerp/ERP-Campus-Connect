@@ -34,6 +34,39 @@ class _StaffPortalScreenState extends State<StaffPortalScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+
+      // ✅ COMMON HEADER (same style as Student Portal)
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        backgroundColor: Colors.white,
+        titleSpacing: 0,
+        title: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: [
+              Image.asset(
+                'assets/slec_logo.png',
+                height: 34,
+                width: 34,
+                errorBuilder: (_, __, ___) =>
+                    const Icon(Icons.school, color: Colors.blueAccent),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                'Staff Portal',
+                style: GoogleFonts.inter(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.3,
+                  color: Colors.black,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+
       body: SafeArea(child: _pages[_selectedIndex]),
 
       bottomNavigationBar: BottomNavigationBar(
@@ -61,4 +94,3 @@ class _StaffPortalScreenState extends State<StaffPortalScreen> {
     );
   }
 }
-

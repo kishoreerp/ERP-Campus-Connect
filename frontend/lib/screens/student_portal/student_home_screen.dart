@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../../services/current_user_service.dart';
+
+
+
 import 'student_notes_screen.dart';
 import 'student_events_screen.dart';
 import 'student_notifications_screen.dart';
@@ -10,8 +16,71 @@ import 'student_marks_screen.dart';
 
 
 
-class StudentHomeScreen extends StatelessWidget {
+
+
+
+
+class StudentHomeScreen extends StatefulWidget {
   const StudentHomeScreen({super.key});
+
+
+  @override
+State<StudentHomeScreen> createState() => _StudentHomeScreenState();
+}
+
+Map<String, dynamic>? studentData;
+
+List<Map<String, dynamic>> leaveRequests = [];
+bool leaveLoading = true;
+
+List<Map<String, dynamic>> recentUpdates = [];
+
+class _StudentHomeScreenState extends State<StudentHomeScreen> {
+
+
+
+
+
+@override
+void initState() {
+  super.initState();
+
+  studentData = CurrentUserService.getUser(); // ✅ CACHE
+  loadRecentUpdates();
+}
+
+
+
+
+Future<void> loadLeaveRequests() async {
+  final uid = FirebaseAuth.instance.currentUser!.uid;
+
+  final snapshot = await FirebaseFirestore.instance
+      .collection('leave_requests')
+      .where('studentId', isEqualTo: uid)
+      .get();
+
+  leaveRequests = snapshot.docs.map((d) => d.data()).toList();
+  leaveLoading = false;
+  setState(() {});
+}
+
+Future<void> loadRecentUpdates() async {
+  final snapshot = await FirebaseFirestore.instance
+      .collection('student_updates')
+      .orderBy('createdAt', descending: true)
+      .limit(5)
+      .get();
+
+  setState(() {
+    recentUpdates = snapshot.docs.map((d) => d.data()).toList();
+  });
+}
+
+
+
+
+
 
 
   @override
@@ -41,6 +110,8 @@ class StudentHomeScreen extends StatelessWidget {
   }
 
 
+
+
   // ---------------- HEADER ----------------
   Widget _buildHeader(BuildContext context) {
     return Container(
@@ -62,7 +133,11 @@ class StudentHomeScreen extends StatelessWidget {
             radius: 28,
             backgroundColor: Colors.deepPurple.shade100,
             child: Text(
-              'PD',
+              studentData?['username']
+                  ?.split(' ')
+                  .map((e) => e[0])
+                  .take(2)
+                  .join() ?? '',
               style: GoogleFonts.inter(
                 color: Colors.deepPurple,
                 fontWeight: FontWeight.bold,
@@ -76,19 +151,37 @@ class StudentHomeScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Kishore Kumar',
-                  style: GoogleFonts.inter(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                Text(
-                  '211222104010 • Final Year',
-                  style: GoogleFonts.inter(
-                    color: Colors.grey[700],
-                    fontSize: 13,
-                  ),
-                ),
+  studentData?['username'] ?? '',
+  style: GoogleFonts.inter(
+    fontWeight: FontWeight.bold,
+    fontSize: 16,
+  ),
+),
+
+
+const SizedBox(height: 2),
+
+
+Text(
+  studentData?['department'] ?? '',
+  style: GoogleFonts.inter(
+    color: Colors.grey[600],
+    fontSize: 13,
+    fontWeight: FontWeight.w500,
+  ),
+),
+
+
+const SizedBox(height: 2),
+Text(
+  '${studentData?['rollNo'] ?? ''} • ${studentData?['year'] ?? ''}',
+  style: GoogleFonts.inter(
+    color: Colors.grey[700],
+    fontSize: 13,
+  ),
+),
+
+
               ],
             ),
           ),
@@ -115,22 +208,28 @@ class StudentHomeScreen extends StatelessWidget {
   }
 
 
+
+
   // ---------------- STATS ----------------
   Widget _buildStatsRow() {
     return Row(
       children: [
         Expanded(
-          child: _infoCard('CGPA', '8.9', Icons.school_outlined,
+          child: _infoCard('CGPA', studentData?['cgpa']?.toString() ?? '--',
+          Icons.school_outlined,
               Colors.blue.shade50, Colors.blueAccent),
         ),
         const SizedBox(width: 12),
         Expanded(
-          child: _infoCard('Attendance', '93%', Icons.check_circle_outline,
+          child: _infoCard('Attendance', '${studentData?['attendance'] ?? '--'}%',
+          Icons.check_circle_outline,
               Colors.green.shade50, Colors.green),
         ),
       ],
     );
   }
+
+
 
 
   Widget _infoCard(String title, String value, IconData icon, Color bgColor, Color iconColor) {
@@ -159,6 +258,8 @@ class StudentHomeScreen extends StatelessWidget {
   }
 
 
+
+
   // ---------------- QUICK ACTIONS ----------------
   Widget _buildQuickActions(BuildContext context) {
     return Column(
@@ -169,6 +270,8 @@ class StudentHomeScreen extends StatelessWidget {
           style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 12),
+
+
 
 
         // Row 1
@@ -199,6 +302,8 @@ class StudentHomeScreen extends StatelessWidget {
         const SizedBox(height: 12),
 
 
+
+
         // Row 2
         Row(
           children: [
@@ -220,6 +325,8 @@ class StudentHomeScreen extends StatelessWidget {
       ],
     );
   }
+
+
 
 
   // ---------------- ACTION CARD (Fixed) ----------------
@@ -246,6 +353,8 @@ class StudentHomeScreen extends StatelessWidget {
       ),
     );
   }
+
+
 
 
   // ---------------- ACADEMIC SCHEDULE ----------------
@@ -286,6 +395,8 @@ class StudentHomeScreen extends StatelessWidget {
       ],
     );
   }
+
+
 
 
   // ---------------- TIMETABLE POPUP ----------------
@@ -344,6 +455,8 @@ class StudentHomeScreen extends StatelessWidget {
   }
 
 
+
+
   Widget _timetableOption(
     BuildContext context, {
     required IconData icon,
@@ -391,10 +504,13 @@ class StudentHomeScreen extends StatelessWidget {
   }
   // ---------------- LEAVE MANAGEMENT POPUP ----------------
 void _showLeaveManagementDialog(BuildContext context) {
+  loadLeaveRequests();
   final TextEditingController reasonController = TextEditingController();
   String? selectedLeaveType;
   final leaveTypes = ["Medical(Long Leave)","On Duty (OD)", "Personal","Permission"];
   int selectedTab = 0;
+
+
 
 
   showDialog(
@@ -433,6 +549,8 @@ void _showLeaveManagementDialog(BuildContext context) {
                   const SizedBox(height: 16),
 
 
+
+
                   // Tabs
                   Container(
                     decoration: BoxDecoration(
@@ -448,6 +566,8 @@ void _showLeaveManagementDialog(BuildContext context) {
                                selectedTab = 0;
                                });
                               },
+
+
 
 
                             child: Container(
@@ -485,6 +605,8 @@ void _showLeaveManagementDialog(BuildContext context) {
                               selectedTab = 1;
                               });
                               },
+
+
 
 
                             child: Container(
@@ -538,13 +660,17 @@ void _showLeaveManagementDialog(BuildContext context) {
                   const SizedBox(height: 16),
 
 
+
+
                   // Tab Views
                   if (selectedTab == 0) ...[
-                    _infoRow("Name", "John Doe"),
-                    _infoRow("Roll Number", "CS21B001"),
-                    _infoRow("Department", "Computer Science Engineering"),
-                    _infoRow("Year", "3rd Year"),
+                    _infoRow("Name", studentData?['name'] ?? ''),
+                    _infoRow("Roll Number", studentData?['rollNo'] ?? ''),
+                    _infoRow("Department", studentData?['department'] ?? ''),
+                    _infoRow("Year", studentData?['year'] ?? ''),
                     const SizedBox(height: 10),
+
+
 
 
                     // Leave type
@@ -580,6 +706,8 @@ void _showLeaveManagementDialog(BuildContext context) {
                     const SizedBox(height: 12),
 
 
+
+
                     // Reason
                     Text("Reason for Leave",
                         style: GoogleFonts.inter(
@@ -605,6 +733,8 @@ void _showLeaveManagementDialog(BuildContext context) {
                     const SizedBox(height: 18),
 
 
+
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -624,7 +754,15 @@ void _showLeaveManagementDialog(BuildContext context) {
                         const SizedBox(width: 10),
                         Expanded(
                           child: ElevatedButton.icon(
-  onPressed: () {
+  onPressed: () async {
+await FirebaseFirestore.instance.collection('leave_requests').add({
+    'studentId': FirebaseAuth.instance.currentUser!.uid,
+    'type': selectedLeaveType,
+    'reason': reasonController.text,
+    'date': Timestamp.now(),
+    'approvers': ['Class Incharge Staff', 'HOD'],
+    'status': ['pending', 'pending'],
+  });
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -654,24 +792,35 @@ void _showLeaveManagementDialog(BuildContext context) {
                         ),
                       ],
                     ),
-                  ] else ...[
-                    // REQUEST STATUS TAB
-                    _leaveCard(
-                      "Medical",
-                      "Fever and cold",
-                      "2025-10-08",
-                      ["Class Incharge Staff", "HOD"],
-                      ["approved", "approved"],
-                    ),
-                    const SizedBox(height: 12),
-                    _leaveCard(
-                      "OD",
-                      "College technical symposium participation",
-                      "2025-10-09",
-                      ["Class Incharge Staff", "HOD"],
-                      ["approved", "pending"],
-                    ),
-                  ],
+                  ]
+                  else ...[
+  if (leaveLoading)
+    const CircularProgressIndicator(),
+
+  if (!leaveLoading && leaveRequests.isEmpty)
+    Text(
+      "No leave requests found",
+      style: GoogleFonts.inter(color: Colors.grey[600]),
+    ),
+
+  if (!leaveLoading && leaveRequests.isNotEmpty)
+    Column(
+      children: leaveRequests.map((d) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: _leaveCard(
+            d['type'],
+            d['reason'],
+            d['date'].toDate().toString().split(' ')[0],
+            List<String>.from(d['approvers']),
+            List<String>.from(d['status']),
+          ),
+        );
+      }).toList(),
+    ),
+]
+
+
                 ],
               ),
             );
@@ -681,6 +830,8 @@ void _showLeaveManagementDialog(BuildContext context) {
     },
   );
 }
+
+
 
 
 // helper for student info rows
@@ -705,6 +856,8 @@ Widget _infoRow(String label, String value) {
     ),
   );
 }
+
+
 
 
 // helper for leave cards
@@ -774,6 +927,8 @@ Widget _leaveCard(String type, String reason, String date,
 }
 
 
+
+
 Widget _statusChip(String status) {
   final isApproved = status == "approved";
   return Container(
@@ -798,21 +953,50 @@ Widget _statusChip(String status) {
 
 
 
-  // ---------------- RECENT UPDATES ----------------
-  Widget _buildRecentUpdates() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Recent Updates', style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600)),
-        const SizedBox(height: 12),
-        _updateTile(Icons.assignment_late_outlined, 'Assignment Submission',
-            'Industrial Management assignment due on Jan 18'),
-        const SizedBox(height: 8),
-        _updateTile(Icons.schedule_outlined, 'Class Rescheduled',
-            'Project Report Writing class moved to 3:00 PM'),
-      ],
-    );
+
+
+
+
+ // ---------------- RECENT UPDATES ----------------
+Widget _buildRecentUpdates() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        'Recent Updates',
+        style: GoogleFonts.inter(
+            fontSize: 16, fontWeight: FontWeight.w600),
+      ),
+      const SizedBox(height: 12),
+
+      if (recentUpdates.isEmpty)
+        Text(
+          "No recent updates",
+          style: GoogleFonts.inter(color: Colors.grey[600]),
+        ),
+
+      if (recentUpdates.isNotEmpty)
+        Column(
+          children: recentUpdates.map((d) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: _updateTile(
+                Icons.info_outline,
+                d['title'],
+                d['message'],
+              ),
+            );
+          }).toList(),
+        ),
+    ],
+  );
+}
+
+
+
   }
+
+
 
 
   Widget _updateTile(IconData icon, String title, String subtitle) {
@@ -849,8 +1033,18 @@ Widget _statusChip(String status) {
     );
   }
  
-  void setState(String? Function() param0) {}
-}
+ 
+
+
+
+
+
+
+
+
+
+
+
 
 
 

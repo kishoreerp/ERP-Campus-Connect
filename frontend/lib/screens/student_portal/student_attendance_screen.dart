@@ -2,17 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:table_calendar/table_calendar.dart';
 
+
 class StudentAttendanceScreen extends StatefulWidget {
   const StudentAttendanceScreen({super.key});
+
 
   @override
   State<StudentAttendanceScreen> createState() =>
       _StudentAttendanceScreenState();
 }
 
+
 class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
   DateTime _focusedDay = DateTime(2025, 10, 12);
   DateTime? _selectedDay;
+
 
   final Map<DateTime, List<Map<String, dynamic>>> attendanceRecords = {
     DateTime(2025, 10, 12): [
@@ -25,6 +29,7 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
       {'subject': 'Web Development', 'status': 'Present'},
     ],
   };
+
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +64,7 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
       },
     ];
 
+
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: SafeArea(
@@ -66,9 +72,7 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(),
-              const SizedBox(height: 20),
+             children: [
               _buildOverallAttendance(context),
               const SizedBox(height: 20),
               ...attendanceData.map((data) => _buildSubjectAttendance(data)),
@@ -79,31 +83,8 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
     );
   }
 
-  // ---------------- HEADER ----------------
-  Widget _buildHeader() {
-    return Row(
-      children: [
-        Image.asset('assets/slec_logo.png',
-            height: 38,
-            width: 38,
-            errorBuilder: (_, __, ___) =>
-                const Icon(Icons.school, color: Colors.deepPurple)),
-        const SizedBox(width: 10),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Student Portal',
-                style: GoogleFonts.inter(
-                    fontWeight: FontWeight.bold, fontSize: 16)),
-            Text('Computer Science Engineering',
-                style:
-                    GoogleFonts.inter(fontSize: 12, color: Colors.grey[700])),
-          ],
-        ),
-      ],
-    );
-  }
 
+ 
   // ---------------- OVERALL ATTENDANCE ----------------
   Widget _buildOverallAttendance(BuildContext context) {
     return GestureDetector(
@@ -146,9 +127,11 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
     );
   }
 
+
   // ---------------- SUBJECT ATTENDANCE CARD ----------------
   Widget _buildSubjectAttendance(Map<String, dynamic> data) {
     final percentage = (data['percentage'] * 100).toInt();
+
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
@@ -217,11 +200,13 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
     );
   }
 
+
   // ---------------- ATTENDANCE CALENDAR POPUP ----------------
   void _showAttendanceCalendar(BuildContext context) {
     final presentDays = {1, 2, 3, 6, 7, 8, 9, 10};
     final absentDays = {4, 5, 11, 12};
     final holidays = {13, 20, 27};
+
 
     showDialog(
       context: context,
@@ -262,6 +247,7 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
                     ),
                     const SizedBox(height: 16),
 
+
                     TableCalendar(
                       firstDay: DateTime.utc(2025, 1, 1),
                       lastDay: DateTime.utc(2025, 12, 31),
@@ -290,6 +276,7 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
                           final dayNum = day.day;
                           Color? dotColor;
 
+
                           if (presentDays.contains(dayNum)) {
                             dotColor = Colors.green;
                           } else if (absentDays.contains(dayNum)) {
@@ -297,6 +284,7 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
                           } else if (holidays.contains(dayNum)) {
                             dotColor = Colors.orange;
                           }
+
 
                           return Container(
                             margin: const EdgeInsets.all(4),
@@ -351,11 +339,13 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
     );
   }
 
+
   // ---------------- DAY ATTENDANCE DETAILS ----------------
   void _showDayAttendanceDetails(BuildContext context, DateTime selectedDay) {
     final normalized =
         DateTime(selectedDay.year, selectedDay.month, selectedDay.day);
     final data = attendanceRecords[normalized];
+
 
     if (data == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -370,6 +360,7 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
       );
       return;
     }
+
 
     showModalBottomSheet(
       context: context,
@@ -416,6 +407,7 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
     );
   }
 
+
   // ---------------- LEGEND ITEM ----------------
   Widget _legendItem(String label, Color color) {
     return Row(
@@ -433,4 +425,10 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
     );
   }
 }
+
+
+
+
+
+
 

@@ -34,40 +34,8 @@ class StaffHomeScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Container(
-              height: 34,
-              width: 34,
-              decoration: BoxDecoration(
-                color: const Color(0xFF0056D2),
-                borderRadius: BorderRadius.circular(6),
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                'SLEC',
-                style: GoogleFonts.inter(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 12,
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Staff Portal',
-                    style: GoogleFonts.inter(
-                        fontSize: 16, fontWeight: FontWeight.w700)),
-                Text('Computer Science',
-                    style: GoogleFonts.inter(
-                        color: Colors.grey[600], fontSize: 13)),
-              ],
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
+
+      
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(16),

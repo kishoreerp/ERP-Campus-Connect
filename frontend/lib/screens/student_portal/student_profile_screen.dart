@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../services/current_user_service.dart';
+
 
 // ---------------- MAIN PROFILE SCREEN ----------------
 class StudentProfileScreen extends StatefulWidget {
   const StudentProfileScreen({super.key});
 
+
   @override
   State<StudentProfileScreen> createState() => _StudentProfileScreenState();
 }
+
 
 class _StudentProfileScreenState extends State<StudentProfileScreen> {
   // 🔹 Student data variables (Step 2)
@@ -27,6 +30,11 @@ int arrears = 0;
 String phone = '';
 String address = '';
 
+
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,8 +45,7 @@ String address = '';
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(context),
-              const SizedBox(height: 20),
+           
               _buildProfileCard(),
               const SizedBox(height: 20),
               _buildContactCard(),
@@ -50,26 +57,26 @@ String address = '';
       ),
     );
   }
-  Future<void> _loadStudentProfile() async {
-  final user = FirebaseAuth.instance.currentUser;
-  if (user == null) return;
+@override
+void initState() {
+  super.initState();
+  _loadFromCache();
+}
 
-  final doc = await FirebaseFirestore.instance
-      .collection('students')
-      .doc(user.uid)
-      .get();
 
-  final data = doc.data();
+Future<void> _loadFromCache() async {
+  final data = await CurrentUserService.getUser();
   if (data == null) return;
 
+
   setState(() {
-    name = data['name'] ?? '';
-    rollNumber = data['rollNumber'] ?? '';
+    name = data['username'] ?? '';
+    rollNumber = data['rollNo'] ?? '';
     email = data['email'] ?? '';
     department = data['department'] ?? '';
     year = data['year'] ?? '';
-    cgpa = data['cgpa'] ?? '';
-    attendance = data['attendance'] ?? '';
+    cgpa = data['cgpa']?.toString() ?? '';
+    attendance = data['attendance']?.toString() ?? '';
     semester = data['semester'] ?? '';
     subjects = data['subjects'] ?? 0;
     arrears = data['arrears'] ?? 0;
@@ -77,44 +84,6 @@ String address = '';
     address = data['address'] ?? '';
   });
 }
-
-
-  // ---------------- HEADER ----------------
-  Widget _buildHeader(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          children: [
-            Image.asset(
-              'assets/images/slec_logo.png',
-              height: 38,
-              width: 38,
-              errorBuilder: (_, __, ___) =>
-                  const Icon(Icons.school, color: Colors.deepPurple),
-            ),
-            const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Student Portal',
-                    style: GoogleFonts.inter(
-                        fontWeight: FontWeight.bold, fontSize: 16)),
-                Text('Computer Science Engineering',
-                    style: GoogleFonts.inter(
-                        fontSize: 12, color: Colors.grey[700])),
-              ],
-            ),
-          ],
-        ),
-        GestureDetector(
-          onTap: () => _showSettingsDialog(context),
-          child: const Icon(Icons.settings_outlined, color: Colors.grey),
-        ),
-      ],
-    );
-  }
-
   // ---------------- PROFILE CARD ----------------
   Widget _buildProfileCard() {
     return Container(
@@ -123,56 +92,86 @@ String address = '';
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 28,
-                backgroundColor: Colors.deepPurple.shade100,
-                child: Text('PD',
-                    style: GoogleFonts.inter(
-                        color: Colors.deepPurple,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18)),
-              ),
-              const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Kishore Kumar',
-                      style: GoogleFonts.inter(
-                          fontSize: 16, fontWeight: FontWeight.bold)),
-                  Text('211222104010',
-                      style: GoogleFonts.inter(
-                          fontSize: 13, color: Colors.grey[700])),
-                  Text('Computer Science Engineering\nFinal Year',
-                      style: GoogleFonts.inter(
-                          fontSize: 13, color: Colors.grey[700])),
-                ],
-              ),
-            ],
-          ),
+    Row(
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [
+    Row(
+      children: [
+        CircleAvatar(
+          radius: 28,
+          backgroundColor: Colors.deepPurple.shade100,
+          child: Text(
+  name.isNotEmpty
+      ? name.split(' ').map((e) => e[0]).take(2).join()
+      : '',
+  style: GoogleFonts.inter(
+    color: Colors.deepPurple,
+    fontWeight: FontWeight.bold,
+    fontSize: 18,
+  ),
+),
+
+
+        ),
+        const SizedBox(width: 12),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+  name,
+  style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold),
+),
+
+
+Text(
+  rollNumber,
+  style: GoogleFonts.inter(fontSize: 13, color: Colors.grey[700]),
+),
+
+
+Text(
+  '$department\n$year',
+  style: GoogleFonts.inter(fontSize: 13, color: Colors.grey[700]),
+),
+
+
+          ],
+        ),
+      ],
+    ),
+
+
+    // ✅ SETTINGS ICON (kept)
+    GestureDetector(
+      onTap: () => _showSettingsDialog(context),
+      child: const Icon(Icons.settings_outlined, color: Colors.grey),
+    ),
+  ],
+),
+
+
           const SizedBox(height: 16),
           Row(
             children: [
-              _infoBox('8.9', 'CGPA', Colors.blue.shade50),
+              _infoBox(cgpa, 'CGPA', Colors.blue.shade50),
               const SizedBox(width: 8),
-              _infoBox('93%', 'Attendance', Colors.green.shade50),
+             _infoBox('$attendance%', 'Attendance', Colors.green.shade50),
             ],
           ),
           const SizedBox(height: 10),
           Row(
             children: [
-              _infoBox('Sem 7', 'Semester', Colors.purple.shade50),
+              _infoBox(semester, 'Semester', Colors.purple.shade50),
               const SizedBox(width: 8),
-              _infoBox('4', 'Subjects', Colors.orange.shade50),
+              _infoBox(subjects.toString(), 'Subjects', Colors.orange.shade50),
               const SizedBox(width: 8),
-              _infoBox('0', 'Arrears', Colors.red.shade50),
+              _infoBox(arrears.toString(), 'Arrears', Colors.red.shade50),
             ],
           ),
         ],
       ),
     );
-  }
+ 
 }
   Widget _infoBox(String value, String label, Color bgColor) {
     return Expanded(
@@ -196,6 +195,7 @@ String address = '';
     );
   }
 
+
   // ---------------- CONTACT CARD ----------------
   Widget _buildContactCard() {
     return Container(
@@ -204,17 +204,18 @@ String address = '';
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _contactRow(Icons.email_outlined, 'Kishore1kumar4@gmail.com'),
+          _contactRow(Icons.email_outlined, email),
           const SizedBox(height: 10),
-          _contactRow(Icons.phone_outlined, '+91 8668088234'),
+          _contactRow(Icons.phone_outlined, phone),
           const SizedBox(height: 10),
-          _contactRow(Icons.computer_outlined, 'Computer Science Engineering'),
+          _contactRow(Icons.computer_outlined, department),
           const SizedBox(height: 10),
-          _contactRow(Icons.location_on_outlined, 'Anagaputhur, Chennai'),
+          _contactRow(Icons.location_on_outlined, address),
         ],
       ),
     );
   }
+
 
   Widget _contactRow(IconData icon, String text) {
     return Row(
@@ -229,7 +230,7 @@ String address = '';
       ],
     );
   }
-
+}
   // ---------------- LOGOUT SECTION ----------------
 Widget _buildLogoutSection(BuildContext context) {
   return Column(
@@ -238,7 +239,27 @@ Widget _buildLogoutSection(BuildContext context) {
       SizedBox(
         width: double.infinity,
         child: OutlinedButton.icon(
-          onPressed: () => Navigator.pop(context),
+       onPressed: () async {
+  // 1️⃣ Firebase logout
+  await FirebaseAuth.instance.signOut();
+
+  // 2️⃣ Clear cached user
+  CurrentUserService.clear();
+
+  // 3️⃣ Clear remember me
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.clear();
+
+  // 4️⃣ Go to home/login
+  Navigator.pushNamedAndRemoveUntil(
+    context,
+    '/home',
+    (route) => false,
+  );
+},
+
+
+
           icon: const Icon(Icons.logout_outlined, color: Colors.black87, size: 20),
           label: Text(
             'Logout',
@@ -262,6 +283,7 @@ Widget _buildLogoutSection(BuildContext context) {
   );
 }
 
+
   // ---------------- WHITE BOX DECORATION ----------------
 BoxDecoration _whiteBox() {
   return BoxDecoration(
@@ -284,26 +306,32 @@ void _showSettingsDialog(BuildContext context) {
   );
 }
 
+
 class _SettingsDialog extends StatefulWidget {
   const _SettingsDialog();
+
 
   @override
   State<_SettingsDialog> createState() => _SettingsDialogState();
 }
 
+
 class _SettingsDialogState extends State<_SettingsDialog> {
   bool _notificationsEnabled = true;
   bool _showChangePassword = false;
 
+
   final _currentController = TextEditingController();
   final _newController = TextEditingController();
   final _confirmController = TextEditingController();
+
 
   @override
   void initState() {
     super.initState();
     _loadPref();
   }
+
 
   Future<void> _loadPref() async {
     final prefs = await SharedPreferences.getInstance();
@@ -312,11 +340,13 @@ class _SettingsDialogState extends State<_SettingsDialog> {
     });
   }
 
+
   Future<void> _savePref(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('notificationsEnabled', value);
     setState(() => _notificationsEnabled = value);
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -345,6 +375,7 @@ class _SettingsDialogState extends State<_SettingsDialog> {
             Text('Manage your account settings and preferences',
                 style: GoogleFonts.inter(color: Colors.grey[700], fontSize: 13)),
             const SizedBox(height: 20),
+
 
             // Notifications switch
             Container(
@@ -386,8 +417,10 @@ class _SettingsDialogState extends State<_SettingsDialog> {
               ),
             ),
 
+
             const SizedBox(height: 12),
-  
+ 
+
 
 // ---------------- CHANGE PASSWORD SECTION ----------------
 GestureDetector(
@@ -438,6 +471,7 @@ GestureDetector(
           ],
         ),
 
+
         if (!_showChangePassword)
           Padding(
             padding: const EdgeInsets.only(left: 32, top: 4),
@@ -446,7 +480,9 @@ GestureDetector(
                     color: Colors.grey[700], fontSize: 12)),
           ),
 
+
         if (_showChangePassword) const SizedBox(height: 14),
+
 
         // Password Fields (only when expanded)
         if (_showChangePassword) ...[
@@ -458,6 +494,7 @@ GestureDetector(
           _textField("Confirm Password", "Confirm new password",
               _confirmController),
           const SizedBox(height: 14),
+
 
           // Update Password Button
           SizedBox(
@@ -481,12 +518,17 @@ GestureDetector(
   ),
 ),
 
+
+const SizedBox(height: 16),
+
+
             // Terms & Privacy Buttons
       _settingsButton(context, Icons.description_outlined, Colors.purple,
         'Terms and Conditions', 'Read our terms of service'),
             const SizedBox(height: 10),
       _settingsButton(context, Icons.privacy_tip_outlined, Colors.orange,
         'Privacy Policy', 'Learn how we protect your data'),
+
 
             const SizedBox(height: 26),
             Center(
@@ -502,6 +544,8 @@ GestureDetector(
       ),
     );
   }
+
+
 
 
   Widget _textField(String label, String hint, TextEditingController controller) {
@@ -533,6 +577,7 @@ GestureDetector(
     );
   }
 
+
   // ✅ Show popup after successful password update
   void _updatePasswordUI() {
     if (_newController.text.isEmpty ||
@@ -553,6 +598,7 @@ GestureDetector(
       _confirmController.clear();
     });
   }
+
 
   void _showPopupDialog(String message, bool success) {
     showDialog(
@@ -599,6 +645,7 @@ GestureDetector(
       },
     );
   }
+
 
 // ---------------- SETTINGS BUTTON WITH BOTTOM SHEET ----------------
 Widget _settingsButton(BuildContext context,
@@ -651,6 +698,7 @@ Widget _settingsButton(BuildContext context,
   );
 }
 
+
 // ---------------- BOTTOM SHEET INFO VIEW ----------------
 void _showBottomInfoSheet(BuildContext context,
     {required String title, required String content}) {
@@ -684,6 +732,7 @@ void _showBottomInfoSheet(BuildContext context,
                 ),
               ),
 
+
               // Header Row
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -698,6 +747,7 @@ void _showBottomInfoSheet(BuildContext context,
                 ],
               ),
               const SizedBox(height: 12),
+
 
               // Scrollable text area
               ConstrainedBox(
@@ -714,6 +764,7 @@ void _showBottomInfoSheet(BuildContext context,
                 ),
               ),
               const SizedBox(height: 20),
+
 
               // Close button
               SizedBox(
@@ -740,4 +791,6 @@ void _showBottomInfoSheet(BuildContext context,
   );
 } //<-- closes _showBottomInfoSheet method
 
+
 }
+
