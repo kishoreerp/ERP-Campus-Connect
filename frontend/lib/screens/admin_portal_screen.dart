@@ -4,6 +4,7 @@ import '../../services/auth_service.dart';
 import '../../services/user_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../services/current_user_service.dart';
 
 
 
@@ -58,6 +59,8 @@ Future<void> _handleLogin() async {
     // 🔎 FETCH USER DATA
     final userData =
         await UserService().getUserByUid(user.uid);
+        await CurrentUserService.loadUser();
+
 
     if (userData == null) {
       throw 'User record not found';

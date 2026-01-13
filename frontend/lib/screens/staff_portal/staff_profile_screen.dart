@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../services/current_user_service.dart';
+
 
 class StaffProfileScreen extends StatefulWidget {
   const StaffProfileScreen({super.key});
@@ -9,6 +11,8 @@ class StaffProfileScreen extends StatefulWidget {
 }
 
 class _StaffProfileScreenState extends State<StaffProfileScreen> {
+Map<String, dynamic>? userData;
+
 
   String status = "Present";
 
@@ -23,6 +27,11 @@ Color get statusColor {
     default:
       return Colors.green;
   }
+}
+@override
+void initState() {
+  super.initState();
+  userData = CurrentUserService.getUser();
 }
 
 IconData get statusIcon {
@@ -91,17 +100,26 @@ const SizedBox(height: 12),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Dr. Sarah Johnson",
-                style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-            Text("staff12345",
-                style: GoogleFonts.inter(
-                    fontSize: 13, color: Colors.grey)),
-            Text("Computer Science",
-                style: GoogleFonts.inter(
-                    fontSize: 13, color: Colors.grey)),
-            Text("Head of Department",
-                style: GoogleFonts.inter(
-                    fontSize: 13, color: Colors.grey)),
+            Text(
+  userData?['username'] ?? '',
+  style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+),
+
+Text(
+  userData?['staffId'] ?? '',
+  style: GoogleFonts.inter(fontSize: 13, color: Colors.grey),
+),
+
+Text(
+  userData?['department'] ?? '',
+  style: GoogleFonts.inter(fontSize: 13, color: Colors.grey),
+),
+
+Text(
+  userData?['designation'] ?? '',
+  style: GoogleFonts.inter(fontSize: 13, color: Colors.grey),
+),
+
           ],
         ),
       ],
@@ -176,15 +194,15 @@ const SizedBox(height: 14),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: Colors.grey.shade200),
                 ),
-                child: const Column(
-                  children: [
-                    _Detail(Icons.email_outlined, "sarah.johnson@slec.edu"),
-                    _Detail(Icons.phone_outlined, "+1 234-567-8900"),
-                    _Detail(Icons.school_outlined, "Computer Science"),
-                    _Detail(Icons.location_on_outlined,
-                        "123 College Street, City, State 12345"),
-                  ],
-                ),
+                child: Column(
+  children: [
+    _Detail(Icons.email_outlined, userData?['email'] ?? ''),
+    _Detail(Icons.phone_outlined, userData?['phone'] ?? ''),
+    _Detail(Icons.school_outlined, userData?['department'] ?? ''),
+    _Detail(Icons.location_on_outlined, userData?['address'] ?? ''),
+  ],
+),
+
               ),
 
               const SizedBox(height: 24),
@@ -234,6 +252,7 @@ SizedBox(
       ),
     );
   }
+
 
   // ================= STATUS POPUP =================
 void _showStatusPopup() {
