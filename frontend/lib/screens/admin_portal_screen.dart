@@ -23,6 +23,10 @@ class AdminPortalScreen extends StatefulWidget {
 class _AdminPortalScreenState extends State<AdminPortalScreen> {
   String? selectedRole;
 
+
+  bool _isPasswordVisible = false;
+
+
 final TextEditingController emailController = TextEditingController();
 
 final TextEditingController passwordController = TextEditingController();
@@ -298,27 +302,45 @@ Future<void> _handleLogin() async {
     );
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String hint,
-    required IconData icon,
-    bool obscure = false,
-  }) {
-    return TextField(
-      controller: controller,
-      obscureText: obscure,
-      decoration: InputDecoration(
-        prefixIcon: Icon(icon),
-        hintText: hint,
-        filled: true,
-        fillColor: Colors.grey[100],
-        border: OutlineInputBorder(
-          borderSide: BorderSide.none,
-          borderRadius: BorderRadius.circular(10),
-        ),
+ Widget _buildTextField({
+  required TextEditingController controller,
+  required String hint,
+  required IconData icon,
+  bool obscure = false,
+}) {
+  return TextField(
+    controller: controller,
+    obscureText: obscure ? !_isPasswordVisible : false,
+    decoration: InputDecoration(
+      prefixIcon: Icon(icon),
+      hintText: hint,
+      filled: true,
+      fillColor: Colors.grey[100],
+      border: OutlineInputBorder(
+        borderSide: BorderSide.none,
+        borderRadius: BorderRadius.circular(10),
       ),
-    );
-  }
+
+      // 👁 EYE ICON ONLY FOR PASSWORD
+      suffixIcon: obscure
+          ? IconButton(
+              icon: Icon(
+                _isPasswordVisible
+                    ? Icons.visibility_outlined 
+                   : Icons.visibility_off_outlined,
+                color: Colors.grey[700],
+              ),
+              onPressed: () {
+                setState(() {
+                  _isPasswordVisible = !_isPasswordVisible;
+                });
+              },
+            )
+          : null,
+    ),
+  );
+}
+
 
   BoxDecoration _cardStyle() => BoxDecoration(
         color: Colors.white,
