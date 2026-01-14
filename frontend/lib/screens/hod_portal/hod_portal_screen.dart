@@ -10,8 +10,8 @@ import 'hod_profile_screen.dart';
 
 class HODPortalScreen extends StatefulWidget {
   final String username;
-  const HODPortalScreen({super.key, required this.username});
-
+ 
+ const HODPortalScreen({super.key, required this.username});
 
   @override
   State<HODPortalScreen> createState() => _HODPortalScreenState();
@@ -22,10 +22,9 @@ class _HODPortalScreenState extends State<HODPortalScreen> {
   int _selectedIndex = 0;
 
 
-  late final List<Widget> _pages;
+   late final List<Widget> _pages;
 
-
-  @override
+@override
   void initState() {
     super.initState();
     _pages = [
@@ -34,25 +33,58 @@ class _HODPortalScreenState extends State<HODPortalScreen> {
       const HODMarksScreen(),
       const HODProfileScreen(),
     ];
-  }
-
+}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+
+      // ✅ COMMON HEADER (same as Staff Portal)
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        elevation: 0,
+        backgroundColor: Colors.white,
+        titleSpacing: 0,
+        title: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: [
+              Image.asset(
+                'assets/slec_logo.png',
+                height: 34,
+                width: 34,
+                errorBuilder: (_, __, ___) =>
+                    const Icon(Icons.school, color: Colors.blueAccent),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                'HOD Portal',
+                style: GoogleFonts.inter(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.3,
+                  color: Colors.black,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+
       body: SafeArea(child: _pages[_selectedIndex]),
+
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (index) => setState(() => _selectedIndex = index),
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
-        selectedItemColor: Colors.purpleAccent,
+        selectedItemColor: Colors.blueAccent,
         unselectedItemColor: Colors.grey,
         elevation: 0,
         selectedLabelStyle: GoogleFonts.inter(
           fontWeight: FontWeight.w600,
-          color: Colors.purpleAccent,
+          color: Colors.blueAccent,
         ),
         unselectedLabelStyle: GoogleFonts.inter(color: Colors.grey),
         items: const [
@@ -68,7 +100,5 @@ class _HODPortalScreenState extends State<HODPortalScreen> {
       ),
     );
   }
-}
 
-
-
+ }

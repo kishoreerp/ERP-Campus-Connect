@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'examcell_home_screen.dart';
-import 'examcell_result_screen.dart';
-import 'examcell_profile_screen.dart';
+
 import 'exam_details_dialog.dart';
 import 'edit_exam_dialog.dart';
 import 'schedule_exam_dialog.dart';
@@ -16,44 +14,7 @@ class ExamCellExamScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[100],
 
-      // ---------------- APP BAR ----------------
-     appBar: AppBar(
-  automaticallyImplyLeading: false, // ✅ THIS REMOVES BACK ARROW
-  elevation: 0,
-  backgroundColor: Colors.white,
-  titleSpacing: 0,
-  title: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: const [
-      Text(
-        'Exam Cell Admin',
-        style: TextStyle(
-          color: Color(0xFF7C3AED),
-          fontWeight: FontWeight.bold,
-          fontSize: 18,
-        ),
-      ),
-      SizedBox(height: 2),
-      Text(
-        'SLEC Admin Portal',
-        style: TextStyle(
-          fontSize: 12,
-          color: Colors.grey,
-        ),
-      ),
-    ],
-  ),
-  actions: const [
-    Padding(
-      padding: EdgeInsets.only(right: 16),
-      child: CircleAvatar(
-        backgroundColor: Color.fromARGB(255, 187, 182, 196),
-        child: Icon(Icons.person, color: Colors.white),
-      ),
-    ),
-  ],
-),
-
+      
 
       // ---------------- BODY ----------------
       body: Padding(
@@ -105,54 +66,7 @@ class ExamCellExamScreen extends StatelessWidget {
         ),
       ),
 
-      // ---------------- BOTTOM NAV ----------------
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 1,
-        selectedItemColor: const Color(0xFF7C3AED),
-        unselectedItemColor: Colors.grey,
-        type: BottomNavigationBarType.fixed,
-        onTap: (index) {
-          if (index == 0) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const ExamCellHomeScreen(),
-              ),
-            );
-          }
-           else if (index == 1) {
-      return;
-    } else if (index == 2) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const ExamCellResultScreen()),
-      );
-    } else if (index == 3) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const ExamCellProfileScreen()),
-      );
-    }
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.menu_book),
-            label: 'Exam',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.description),
-            label: 'Result',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-      ),
+      
     );
   }
 

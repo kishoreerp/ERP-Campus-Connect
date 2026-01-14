@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../services/current_user_service.dart';
 
-class HODProfileScreen extends StatefulWidget {
+
+  class HODProfileScreen extends StatefulWidget {
   const HODProfileScreen({super.key});
 
   @override
@@ -9,6 +11,8 @@ class HODProfileScreen extends StatefulWidget {
 }
 
 class _HODProfileScreenState extends State<HODProfileScreen> {
+Map<String, dynamic>? userData;
+
 
   String status = "Present";
 
@@ -23,6 +27,11 @@ Color get statusColor {
     default:
       return Colors.green;
   }
+}
+@override
+void initState() {
+  super.initState();
+  userData = CurrentUserService.getUser();
 }
 
 IconData get statusIcon {
@@ -50,31 +59,21 @@ IconData get statusIcon {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ================= HEADER =================
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Profile",
-                    style: GoogleFonts.inter(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.settings_outlined),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        barrierColor: Colors.black.withOpacity(0.45),
-                        builder: (_) => const _SettingsDialog(),
-                      );
-                    },
-                  ),
-                ],
-              ),
 
-              const SizedBox(height: 16),
+              // ================= PROFILE TITLE =================
+Text(
+  "Profile",
+  style: GoogleFonts.inter(
+    fontSize: 16,
+    fontWeight: FontWeight.w600,
+    color: Colors.grey[800],
+  ),
+),
+
+
+const SizedBox(height: 12),
+
+             
 
               // ================= PROFILE CARD =================
               Container(
@@ -84,39 +83,65 @@ IconData get statusIcon {
                   border: Border.all(color: Colors.grey.shade200),
                 ),
                 child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 28,
-                      backgroundColor: const Color(0xFFF3E8FF),
-                      child: const Icon(
-                        Icons.person_outline,
-                        color: Colors.purpleAccent,
-                        size: 30,
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Dr. Sarah Johnson",
-                            style: GoogleFonts.inter(
-                                fontWeight: FontWeight.w600)),
-                        Text("HOD12345",
-                            style: GoogleFonts.inter(
-                                fontSize: 13, color: Colors.grey)),
-                        Text("Computer Science",
-                            style: GoogleFonts.inter(
-                                fontSize: 13, color: Colors.grey)),
-                        Text("Head of Department",
-                            style: GoogleFonts.inter(
-                                fontSize: 13, color: Colors.grey)),
-                      ],
-                    ),
-                  ],
-                ),
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [
+    Row(
+      children: [
+        CircleAvatar(
+          radius: 28,
+          backgroundColor: const Color(0xFFF3E8FF),
+          child: const Icon(
+            Icons.person_outline,
+            color: Colors.purpleAccent,
+            size: 30,
+          ),
+        ),
+        const SizedBox(width: 14),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+  userData?['username'] ?? '',
+  style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+),
+
+Text(
+  userData?['staffId'] ?? '',
+  style: GoogleFonts.inter(fontSize: 13, color: Colors.grey),
+),
+
+Text(
+  userData?['department'] ?? '',
+  style: GoogleFonts.inter(fontSize: 13, color: Colors.grey),
+),
+
+Text(
+  userData?['designation'] ?? '',
+  style: GoogleFonts.inter(fontSize: 13, color: Colors.grey),
+),
+
+          ],
+        ),
+      ],
+    ),
+
+    // ✅ Settings icon stays
+    IconButton(
+      icon: const Icon(Icons.settings_outlined, color: Colors.grey),
+      onPressed: () {
+        showDialog(
+          context: context,
+          barrierColor: Colors.black.withOpacity(0.45),
+          builder: (_) => const _SettingsDialog(),
+        );
+      },
+    ),
+  ],
+),
+
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
 
 // ================= STATUS =================
 InkWell(
@@ -161,7 +186,7 @@ InkWell(
   ),
 ),
 
-
+const SizedBox(height: 14),
               // ================= DETAILS =================
               Container(
                 padding: const EdgeInsets.all(16),
@@ -169,49 +194,65 @@ InkWell(
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: Colors.grey.shade200),
                 ),
-                child: const Column(
-                  children: [
-                    _Detail(Icons.email_outlined, "sarah.johnson@slec.edu"),
-                    _Detail(Icons.phone_outlined, "+1 234-567-8900"),
-                    _Detail(Icons.school_outlined, "Computer Science"),
-                    _Detail(Icons.location_on_outlined,
-                        "123 College Street, City, State 12345"),
-                  ],
-                ),
+                child: Column(
+  children: [
+    _Detail(Icons.email_outlined, userData?['email'] ?? ''),
+    _Detail(Icons.phone_outlined, userData?['phone'] ?? ''),
+    _Detail(Icons.school_outlined, userData?['department'] ?? ''),
+    _Detail(Icons.location_on_outlined, userData?['address'] ?? ''),
+  ],
+),
+
               ),
 
               const SizedBox(height: 24),
 
               // ================= LOGOUT =================
 
-              
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  icon: const Icon(Icons.logout),
-                  label: const Text("Logout"),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                  ),
-                 onPressed: () {
-  showDialog(
-    context: context,
-    barrierDismissible: true,
-    barrierColor: Colors.black.withOpacity(0.45),
-    builder: (_) => const LogoutConfirmDialog(),
-  );
-},
+              const SizedBox(height: 24),
 
-                ),
-              ),
+SizedBox(
+  width: double.infinity,
+  child: OutlinedButton.icon(
+    icon: const Icon(
+      Icons.logout_outlined,
+      color: Color.fromARGB(255, 47, 44, 52),
+      size: 20,
+    ),
+    label: Text(
+      "Logout",
+      style: GoogleFonts.inter(
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        color: const Color.fromARGB(255, 47, 44, 52),
+      ),
+    ),
+    style: OutlinedButton.styleFrom(
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      side: BorderSide(color: const Color.fromARGB(255, 83, 83, 83)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      backgroundColor: const Color.fromARGB(255, 83, 83, 83).withOpacity(0.04),
+    ),
+    onPressed: () {
+      showDialog(
+        context: context,
+        barrierDismissible: true,
+        barrierColor: Colors.black.withOpacity(0.45),
+        builder: (_) => const LogoutConfirmDialog(),
+      );
+    },
+  ),
+),
+
             ],
           ),
         ),
       ),
     );
   }
+
 
   // ================= STATUS POPUP =================
 void _showStatusPopup() {

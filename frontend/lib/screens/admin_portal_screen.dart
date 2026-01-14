@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../services/auth_service.dart';
 import '../../services/user_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/current_user_service.dart';
 
@@ -11,6 +11,7 @@ import '../../services/current_user_service.dart';
 import 'staff_portal/staff_portal_screen.dart';
 import 'hod_portal/hod_portal_screen.dart';
 import 'timetable_portal/timetable_portal_screen.dart';
+import 'examcell_portal/examcell_portal_screen.dart';
 
 import 'reset_password/admin_reset_email_screen.dart';
 
@@ -112,7 +113,7 @@ Future<void> _handleLogin() async {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => HODPortalScreen(
+          builder: (_) => ExamCellPortalScreen(
             username: userData['username'] ?? email,
           ),
         ),

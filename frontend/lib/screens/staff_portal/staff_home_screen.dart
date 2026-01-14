@@ -15,7 +15,7 @@ class StaffHomeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(),
+              _buildHeader(), 
               const SizedBox(height: 20),
               _buildQuickActions(),
               const SizedBox(height: 24),

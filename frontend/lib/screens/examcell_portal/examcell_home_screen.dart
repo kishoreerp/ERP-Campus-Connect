@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'examcell_profile_screen.dart';
-import 'examcell_result_screen.dart';
-import 'examcell_exam_screen.dart';
+
 import 'announcements_dialog.dart';
 import 'notifications_dialog.dart';
 
@@ -14,7 +12,7 @@ class ExamCellHomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: _buildAppBar(),
+     
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -27,49 +25,10 @@ class ExamCellHomeScreen extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: _bottomNav(context),
+     
     );
   }
 
-  // ---------------- APP BAR ----------------
-  AppBar _buildAppBar() {
-    return AppBar(
-       automaticallyImplyLeading: false,
-      backgroundColor: Colors.white,
-      elevation: 0,
-      titleSpacing: 16,
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Text(
-            'Exam Cell Admin',
-            style: TextStyle(
-              color: Color(0xFF7C3AED),
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
-          ),
-          SizedBox(height: 2),
-          Text(
-            'SLEC Admin Portal',
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey,
-            ),
-          ),
-        ],
-      ),
-      actions: const [
-        Padding(
-          padding: EdgeInsets.only(right: 16),
-          child: CircleAvatar(
-            backgroundColor: Color(0xFF7C3AED),
-            child: Icon(Icons.person, color: Colors.white),
-          ),
-        ),
-      ],
-    );
-  }
 
   // ---------------- WELCOME CARD ----------------
   Widget _welcomeCard() {
@@ -225,42 +184,8 @@ Widget _quickActionsCard(BuildContext context) {
 }
 
 
-  // ---------------- BOTTOM NAV ----------------
 
- Widget _bottomNav(BuildContext context) {
-  return BottomNavigationBar(
-    currentIndex: 0,
-    selectedItemColor: const Color(0xFF7C3AED),
-    unselectedItemColor: Colors.grey,
-    type: BottomNavigationBarType.fixed,
-    onTap: (index) {
-      if (index == 0) return;
-
-      if (index == 1) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const ExamCellExamScreen()),
-        );
-      } else if (index == 2) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const ExamCellResultScreen()),
-        );
-      } else if (index == 3) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const ExamCellProfileScreen()),
-        );
-      }
-    },
-    items: const [
-      BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-      BottomNavigationBarItem(icon: Icon(Icons.menu_book), label: 'Exam'),
-      BottomNavigationBarItem(icon: Icon(Icons.description), label: 'Result'),
-      BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
-    ],
-  );
   
 }
 
-}
+
