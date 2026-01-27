@@ -1,33 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:myapp/services/callable_otp.dart';
-import 'reset_otp_screen.dart';
 import '../../services/otp_service.dart';
-import 'package:cloud_functions/cloud_functions.dart';
-
-
+import 'reset_otp_screen.dart';
 
 class ResetEmailScreen extends StatelessWidget {
   const ResetEmailScreen({super.key});
-
-
-  Future<void> callSendOtp(String email, String otp) async {
-    final HttpsCallable callable = FirebaseFunctions.instance.httpsCallable('sendOtp');
-
-    final result = await callable.call({
-      "email": email,
-      "otp": otp,
-    });
-  }
-
 
   @override
   Widget build(BuildContext context) {
     final TextEditingController emailController = TextEditingController();
     final OtpService otpService = OtpService();
-    final CallableOtp callableOtp = CallableOtp();
-
-
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -44,15 +26,23 @@ class ResetEmailScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Enter Your Email',
-                          style: GoogleFonts.inter(
-                              fontWeight: FontWeight.bold, fontSize: 16)),
+                      Text(
+                        'Enter Your Email',
+                        style: GoogleFonts.inter(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
                       const SizedBox(height: 6),
                       Text(
                         "We'll send you a verification code to reset your password",
-                        style: GoogleFonts.inter(color: Colors.grey[700], fontSize: 13),
+                        style: GoogleFonts.inter(
+                          color: Colors.grey[700],
+                          fontSize: 13,
+                        ),
                       ),
                       const SizedBox(height: 16),
+
                       TextField(
                         controller: emailController,
                         decoration: InputDecoration(
@@ -66,59 +56,79 @@ class ResetEmailScreen extends StatelessWidget {
                           ),
                         ),
                       ),
+
                       const SizedBox(height: 16),
+
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
                           style: _buttonStyle(),
                           onPressed: () async {
- try {
+                            try {
+                              final email =
+                                  emailController.text.trim();
 
-  final email = emailController.text.trim();
+                              if (email.isEmpty) {
+                                throw 'Enter email address';
+                              }
 
-  final otp = otpService.generateOtp();
+                              final otp = otpService.generateOtp();
 
-  await otpService.saveOtp(email: email, otp: otp);
+                              await otpService.saveOtp(
+                                email: email,
+                                otp: otp,
+                              );
 
-  // 🔥 CALLABLE FUNCTION
-  await callableOtp.sendOtp(
-       email: email,
-       otp: otp,
-  );
+                              await otpService.sendOtpEmail(
+                                email: email,
+                                otp: otp,
+                              );
 
-  ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("OTP sent to email")),
-  );
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('OTP sent to your email'),
+                                ),
+                              );
 
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => ResetOTPScreen(email: email),
-    ),
-  );
-
- } catch(e) {
-
-   ScaffoldMessenger.of(context).showSnackBar(
-       SnackBar(content: Text(e.toString())),
-   );
-
- }
-},
-                          child: Text('Send OTP',
-                              style: GoogleFonts.inter(
-                                  color: Colors.white, fontWeight: FontWeight.w600)),
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      ResetOTPScreen(email: email),
+                                ),
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(e.toString()),
+                                ),
+                              );
+                            }
+                          },
+                          child: Text(
+                            'Send OTP',
+                            style: GoogleFonts.inter(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
                       ),
+
                       const SizedBox(height: 10),
+
                       GestureDetector(
                         onTap: () => Navigator.pop(context),
                         child: Row(
                           children: [
                             const Icon(Icons.arrow_back, size: 16),
                             const SizedBox(width: 4),
-                            Text('Back to Login',
-                                style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+                            Text(
+                              'Back to Login',
+                              style: GoogleFonts.inter(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -135,27 +145,34 @@ class ResetEmailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
-    return Column(
-      children: [
-        const SizedBox(height: 40),
-        Container(
-          height: 56,
-          width: 56,
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.blue,
+  Widget _buildHeader() => Column(
+        children: [
+          const SizedBox(height: 40),
+          Container(
+            height: 56,
+            width: 56,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.blue,
+            ),
+            child:
+                const Icon(Icons.lock_outline, color: Colors.white, size: 30),
           ),
-          child: const Icon(Icons.lock_outline, color: Colors.white, size: 30),
-        ),
-        const SizedBox(height: 14),
-        Text('Reset Password',
-            style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 18)),
-        Text('Student Portal', style: GoogleFonts.inter(color: Colors.grey[700])),
-        const SizedBox(height: 20),
-      ],
-    );
-  }
+          const SizedBox(height: 14),
+          Text(
+            'Reset Password',
+            style: GoogleFonts.inter(
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+          ),
+          Text(
+            'Student Portal',
+            style: GoogleFonts.inter(color: Colors.grey[700]),
+          ),
+          const SizedBox(height: 20),
+        ],
+      );
 
   BoxDecoration _boxStyle() => BoxDecoration(
         color: Colors.white,
@@ -172,24 +189,25 @@ class ResetEmailScreen extends StatelessWidget {
   ButtonStyle _buttonStyle() => ElevatedButton.styleFrom(
         backgroundColor: Colors.black,
         padding: const EdgeInsets.symmetric(vertical: 12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
       );
 
-  Widget _dotIndicator(int activeIndex) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(
-        3,
-        (index) => Container(
-          margin: const EdgeInsets.symmetric(horizontal: 4),
-          width: 8,
-          height: 8,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: index == activeIndex ? Colors.blueAccent : Colors.grey[300],
+  Widget _dotIndicator(int activeIndex) => Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: List.generate(
+          3,
+          (index) => Container(
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color:
+                  index == activeIndex ? Colors.blueAccent : Colors.grey[300],
+            ),
           ),
         ),
-      ),
-    );
-  }
+      );
 }

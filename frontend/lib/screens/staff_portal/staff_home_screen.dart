@@ -1,5 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'staff_notes_screen.dart';
+import 'staff_notes_subject_screen.dart';
+import 'staff_events_screen.dart';
+import 'staff_notifications_screen.dart';
+import 'staff_announcement_screen.dart';
+import 'staff_timetable_screen.dart';
+import 'staff_request_leave_screen.dart';
+
+
+
 
 class StaffHomeScreen extends StatelessWidget {
   final String username;
@@ -15,9 +25,9 @@ class StaffHomeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(), 
+              _buildHeader(),
               const SizedBox(height: 20),
-              _buildQuickActions(),
+              _buildQuickActions(context),
               const SizedBox(height: 24),
               _buildSchedule(),
               const SizedBox(height: 24),
@@ -34,8 +44,8 @@ class StaffHomeScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
-      
+        
+        const SizedBox(height: 2),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(16),
@@ -88,66 +98,127 @@ class StaffHomeScreen extends StatelessWidget {
   }
 
   // ---------------- QUICK ACTIONS ----------------
-  Widget _buildQuickActions() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Quick Actions',
-            style:
-                GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 16)),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(child: _quickAction(Icons.note_alt_outlined, 'Notes')),
-            const SizedBox(width: 10),
-            Expanded(child: _quickAction(Icons.event_outlined, 'Events')),
-            const SizedBox(width: 10),
-            Expanded(
-                child:
-                    _quickAction(Icons.notifications_outlined, 'Notifications')),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(child: _quickAction(Icons.campaign_outlined, 'Announcement')),
-            const SizedBox(width: 10),
-            Expanded(
-                child:
-                    _quickAction(Icons.calendar_month_outlined, 'Time table')),
-            const SizedBox(width: 10),
-            Expanded(
-                child:
-                    _quickAction(Icons.exit_to_app_outlined, 'Request Leave')),
-          ],
-        ),
-      ],
-    );
-  }
+ Widget _buildQuickActions(BuildContext context) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        'Quick Actions',
+        style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 16),
+      ),
+      const SizedBox(height: 12),
 
-  Widget _quickAction(IconData icon, String title) {
-    return Container(
+      Row(
+        children: [
+          Expanded(
+            child: _quickAction(
+              context,
+              Icons.note_alt_outlined,
+              'Notes',
+              const StaffNotesScreen(),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: _quickAction(
+              context,
+              Icons.event_outlined,
+              'Events',
+              const StaffEventsScreen(), // or null if not ready
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: _quickAction(
+              context,
+              Icons.notifications_outlined,
+              'Notifications',
+              const StaffNotificationsScreen(), // or null
+            ),
+          ),
+        ],
+      ),
+
+      const SizedBox(height: 12),
+
+      Row(
+        children: [
+          Expanded(
+            child: _quickAction(
+              context,
+              Icons.campaign_outlined,
+              'Announcement',
+              const StaffAnnouncementScreen(), // or null
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: _quickAction(
+              context,
+              Icons.calendar_month_outlined,
+              'Time table',
+              const StaffTimeTableScreen(), // or null
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: _quickAction(
+              context,
+              Icons.exit_to_app_outlined,
+              'Request Leave',
+              StaffRequestLeaveScreen(), // or null
+            ),
+          ),
+        ],
+      ),
+    ],
+  );
+}
+
+
+  Widget _quickAction(
+  BuildContext context,
+  IconData icon,
+  String title,
+  Widget? screen,
+) {
+  return InkWell(
+    borderRadius: BorderRadius.circular(12),
+    onTap: () {
+      if (screen != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => screen),
+        );
+      }
+    },
+    child: Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 6,
-              offset: const Offset(0, 3))
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
         ],
       ),
       child: Column(
         children: [
           Icon(icon, color: Colors.black87, size: 26),
           const SizedBox(height: 6),
-          Text(title,
-              style: GoogleFonts.inter(fontSize: 13, color: Colors.black87)),
+          Text(
+            title,
+            style: GoogleFonts.inter(fontSize: 13, color: Colors.black87),
+          ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   // ---------------- SCHEDULE ----------------
   Widget _buildSchedule() {

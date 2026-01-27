@@ -3,15 +3,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 
 class OtpService {
-  final _db = FirebaseFirestore.instance;
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  // 🔢 Generate 6-digit OTP
   String generateOtp() {
-    final random = Random();
-    return (100000 + random.nextInt(900000)).toString();
+    return (100000 + Random().nextInt(900000)).toString();
   }
 
-  // 💾 Save OTP in Firestore
   Future<void> saveOtp({
     required String email,
     required String otp,
@@ -26,35 +23,34 @@ class OtpService {
     });
   }
 
-  // 📩 SEND OTP EMAIL (BACKEND CALL)
   Future<void> sendOtpEmail({
     required String email,
     required String otp,
   }) async {
- final url = Uri.parse(
- 'https://asia-south1-erp-campus-connect.cloudfunctions.net/sendOtpEmail'
-);
-
-
-
-
     final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
+      Uri.parse('https://api.emailjs.com/api/v1.0/email/send'),
+      headers: {
+        'Content-Type': 'application/json',
+        'origin': 'http://localhost',
+      },
       body: '''
-      {
-        "email": "$email",
-        "otp": "$otp"
-      }
-      ''',
+{
+"service_id": "service_a9h7x28",
+  "template_id": "template_u8udh0g",
+  "user_id": "Zhc5JbJO-QrMNTNwa",
+  "template_params": {
+    "email": "$email",
+    "passcode": "$otp"
+  }
+}
+''',
     );
 
     if (response.statusCode != 200) {
-      throw 'Failed to send OTP email';
+      throw 'Email failed: ${response.body}';
     }
   }
 
-  // ✅ VERIFY OTP
   Future<void> verifyOtp({
     required String email,
     required String enteredOtp,
@@ -66,13 +62,8 @@ class OtpService {
     final data = doc.data()!;
     final expiresAt = (data['expiresAt'] as Timestamp).toDate();
 
-    if (DateTime.now().isAfter(expiresAt)) {
-      throw 'OTP expired';
-    }
-
-    if (data['otp'] != enteredOtp) {
-      throw 'Invalid OTP';
-    }
+    if (DateTime.now().isAfter(expiresAt)) throw 'OTP expired';
+    if (data['otp'] != enteredOtp) throw 'Invalid OTP';
 
     await _db.collection('email_otps').doc(email).update({
       'verified': true,
