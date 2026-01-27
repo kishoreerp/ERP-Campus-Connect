@@ -19,3 +19,4 @@ Thumbs.db
 # Firebase secrets
 **/google-services.json
 **/firebase_options.dart
+macos/Flutter/GeneratedPluginRegistrant.*
