@@ -118,7 +118,46 @@ class ResetNewScreen extends StatelessWidget {
                         width: double.infinity,
                         child: ElevatedButton(
                           style: _buttonStyle(),
-                          onPressed: handleReset,
+                          onPressed: () async {
+  try {
+    final p1 = pass1.text.trim();
+    final p2 = pass2.text.trim();
+
+    if (p1.length < 6) {
+      throw 'Password must be at least 6 characters';
+    }
+    if (p1 != p2) {
+      throw 'Passwords do not match';
+    }
+
+    final response = await http.post(
+      Uri.parse(
+        "https://asia-south1-YOUR_PROJECT_ID.cloudfunctions.net/resetPasswordWithOtp",
+      ),
+      headers: {'Content-Type': 'application/json'},
+      body: '''
+      {
+        "email": "$email",
+        "newPassword": "$p1"
+      }
+      ''',
+    );
+
+    if (response.statusCode != 200) {
+      throw 'Password reset failed';
+    }
+
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const ResetSuccessScreen()),
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(e.toString())));
+  }
+},
+
+
                           child: Text(
                             'Reset Password',
                             style: GoogleFonts.inter(

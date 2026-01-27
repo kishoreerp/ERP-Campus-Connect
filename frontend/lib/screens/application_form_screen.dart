@@ -247,7 +247,7 @@ class _FilePickerState extends State<_FilePicker> {
   String fileName = 'No file chosen';
 
   Future<void> _pickFile() async {
-    final result = await FilePicker.platform.pickFiles(
+    final result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
       withData: true,

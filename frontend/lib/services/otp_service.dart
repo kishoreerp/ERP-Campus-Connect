@@ -1,6 +1,8 @@
 import 'dart:math';
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
+
 
 class OtpService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -22,34 +24,34 @@ class OtpService {
       ),
     });
   }
+Future<void> sendOtpEmail({
+  required String email,
+  required String otp,
+}) async {
+  final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
 
-  Future<void> sendOtpEmail({
-    required String email,
-    required String otp,
-  }) async {
-    final response = await http.post(
-      Uri.parse('https://api.emailjs.com/api/v1.0/email/send'),
-      headers: {
-        'Content-Type': 'application/json',
-        'origin': 'http://localhost',
-      },
-      body: '''
-{
-"service_id": "service_a9h7x28",
+  final response = await http.post(
+    url,
+    headers: {
+      'Content-Type': 'application/json',
+      'origin': 'http://localhost',
+    },
+    body: jsonEncode({
+     "service_id": "service_a9h7x28",
   "template_id": "template_u8udh0g",
   "user_id": "Zhc5JbJO-QrMNTNwa",
-  "template_params": {
-    "email": "$email",
-    "passcode": "$otp"
+      "template_params": {
+        "email": email,
+        "otp": otp,
+      }
+    }),
+  );
+
+  if (response.statusCode != 200) {
+    throw 'EmailJS failed: ${response.body}';
   }
 }
-''',
-    );
 
-    if (response.statusCode != 200) {
-      throw 'Email failed: ${response.body}';
-    }
-  }
 
   Future<void> verifyOtp({
     required String email,
