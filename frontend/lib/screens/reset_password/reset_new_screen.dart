@@ -132,7 +132,7 @@ class ResetNewScreen extends StatelessWidget {
 
     final response = await http.post(
       Uri.parse(
-        "https://asia-south1-YOUR_PROJECT_ID.cloudfunctions.net/resetPasswordWithOtp",
+        "https://asia-south1-erp-campus-connect-c8425.cloudfunctions.net/resetPasswordWithOtp",
       ),
       headers: {'Content-Type': 'application/json'},
       body: '''

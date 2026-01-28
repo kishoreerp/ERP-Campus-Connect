@@ -45,39 +45,43 @@ exports.sendOtpEmail = functions.https.onCall(async (data, context) => {
   }
 });
 
-exports.resetPasswordWithOtp = functions.https.onRequest(
-  async (req, res) => {
-    try {
-      const { email, newPassword } = req.body;
+const cors = require("cors")({ origin: true });
 
-      if (!email || !newPassword) {
-        return res.status(400).json({ error: "Missing data" });
+exports.resetPasswordWithOtp = functions
+  .region("asia-south1")
+  .https.onRequest((req, res) => {
+    cors(req, res, async () => {
+      try {
+        const { email, newPassword } = req.body;
+
+        if (!email || !newPassword) {
+          return res.status(400).json({ error: "Missing data" });
+        }
+
+        // 🔎 Check OTP verification
+        const otpDoc = await admin
+          .firestore()
+          .collection("email_otps")
+          .doc(email)
+          .get();
+
+        if (!otpDoc.exists || otpDoc.data().verified !== true) {
+          return res.status(403).json({ error: "OTP not verified" });
+        }
+
+        // 🔐 Update password
+        const user = await admin.auth().getUserByEmail(email);
+        await admin.auth().updateUser(user.uid, {
+          password: newPassword,
+        });
+
+        // 🧹 Cleanup OTP
+        await admin.firestore().collection("email_otps").doc(email).delete();
+
+        return res.json({ success: true });
+      } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: err.message });
       }
-
-      // 🔎 Check OTP verification
-      const otpDoc = await admin
-        .firestore()
-        .collection("email_otps")
-        .doc(email)
-        .get();
-
-      if (!otpDoc.exists || otpDoc.data().verified !== true) {
-        return res.status(403).json({ error: "OTP not verified" });
-      }
-
-      // 🔐 Update password using Admin SDK
-      const user = await admin.auth().getUserByEmail(email);
-      await admin.auth().updateUser(user.uid, {
-        password: newPassword,
-      });
-
-      // 🧹 Cleanup OTP
-      await admin.firestore().collection("email_otps").doc(email).delete();
-
-      return res.json({ success: true });
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ error: err.message });
-    }
-  }
-);
+    });
+  });
