@@ -10,52 +10,10 @@ class AdmissionHomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[100],
 
-      // ================= APP BAR =================
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        automaticallyImplyLeading: false,
-        titleSpacing: 12,
-        title: Row(
-          children: const [
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: Color(0xFF2563EB),
-              child: Text(
-                'SLEC',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Admission Admin',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
-                  ),
-                ),
-                Text(
-                  'Admin Panel',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 11,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+     
 
       // ================= BODY =================
+      
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
