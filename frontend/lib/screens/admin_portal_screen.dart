@@ -12,7 +12,7 @@ import 'staff_portal/staff_portal_screen.dart';
 import 'hod_portal/hod_portal_screen.dart';
 import 'timetable_portal/timetable_portal_screen.dart';
 import 'examcell_portal/examcell_portal_screen.dart';
-
+import 'admission_portal/admission_portal_screen.dart';
 import 'reset_password/admin_reset_email_screen.dart';
 
 class AdminPortalScreen extends StatefulWidget {
@@ -122,7 +122,7 @@ Future<void> _handleLogin() async {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => HODPortalScreen(
+          builder: (_) => AdmissionPortalScreen(
             username: userData['username'] ?? email,
           ),
         ),
