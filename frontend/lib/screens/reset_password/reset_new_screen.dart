@@ -126,36 +126,29 @@ class ResetNewScreen extends StatelessWidget {
     if (p1.length < 6) {
       throw 'Password must be at least 6 characters';
     }
+
     if (p1 != p2) {
       throw 'Passwords do not match';
     }
 
-    final response = await http.post(
-      Uri.parse(
-        "https://asia-south1-erp-campus-connect-c8425.cloudfunctions.net/resetPasswordWithOtp",
-      ),
-      headers: {'Content-Type': 'application/json'},
-      body: '''
-      {
-        "email": "$email",
-        "newPassword": "$p1"
-      }
-      ''',
+    // ✅ FIREBASE SECURE PASSWORD RESET
+    await FirebaseAuth.instance.sendPasswordResetEmail(
+      email: email,
     );
 
-    if (response.statusCode != 200) {
-      throw 'Password reset failed';
-    }
-
+    // ✅ SUCCESS
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => const ResetSuccessScreen()),
+      MaterialPageRoute(
+        builder: (_) => const ResetSuccessScreen(),
+      ),
     );
   } catch (e) {
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(e.toString())));
   }
 },
+
 
 
                           child: Text(

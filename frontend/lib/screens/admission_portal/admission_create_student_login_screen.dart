@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+
+
+
 
 class AdmissionCreateStudentLoginScreen extends StatefulWidget {
   const AdmissionCreateStudentLoginScreen({super.key});
@@ -10,6 +16,19 @@ class AdmissionCreateStudentLoginScreen extends StatefulWidget {
 
 class _AdmissionCreateStudentLoginScreenState
     extends State<AdmissionCreateStudentLoginScreen> {
+
+      String _generateTempPassword() {
+  return 'Slec@${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}';
+}
+
+
+        // 🔑 Controllers
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController rollController = TextEditingController();
+
+
 
   String? _selectedDepartment;
   String? _selectedYear;
@@ -109,9 +128,22 @@ class _AdmissionCreateStudentLoginScreenState
               ),
               child: Column(
                 children: [
-                  _inputField('Student Name *', 'Enter student name'),
-                  _inputField('Email Address *', 'student@slec.edu.in'),
-                  _inputField('Phone Number *', '+91-XXXXX-XXXXX'),
+                 _inputField(
+  'Student Name *',
+  'Enter student name',
+  controller: nameController,
+),
+_inputField(
+  'Email Address *',
+  'student@slec.edu.in',
+  controller: emailController,
+),
+_inputField(
+  'Phone Number *',
+  '+91-XXXXX-XXXXX',
+  controller: phoneController,
+),
+
 
                   _dropdownField(
                     label: 'Department *',
@@ -131,12 +163,13 @@ class _AdmissionCreateStudentLoginScreenState
                         setState(() => _selectedYear = val),
                   ),
 
-                  _inputField('Roll Number *', 'Enter roll number'),
                   _inputField(
-                    'Create Password *',
-                    'Enter password for student',
-                    helper: 'Create a secure password for the student login',
-                  ),
+  'Roll Number *',
+  'Enter roll number',
+  controller: rollController,
+),
+
+
 
                   const SizedBox(height: 20),
 
@@ -155,7 +188,7 @@ class _AdmissionCreateStudentLoginScreenState
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: _createStudentLogin,
                     ),
                   ),
                 ],
@@ -168,35 +201,45 @@ class _AdmissionCreateStudentLoginScreenState
   }
 
   // ================= INPUT FIELD =================
-  Widget _inputField(String label, String hint, {String? helper}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
-          const SizedBox(height: 6),
-          TextField(
-            decoration: InputDecoration(
-              hintText: hint,
-              filled: true,
-              fillColor: Colors.grey.shade100,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none,
-              ),
+  Widget _inputField(
+  String label,
+  String hint, {
+  String? helper,
+  TextEditingController? controller,
+}) {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 14),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+        const SizedBox(height: 6),
+        TextField(
+  controller: controller,
+  obscureText: label.contains('Password'),
+
+          decoration: InputDecoration(
+            hintText: hint,
+            filled: true,
+            fillColor: Colors.grey.shade100,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide.none,
             ),
           ),
-          if (helper != null)
-            Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: Text(helper,
-                  style: const TextStyle(fontSize: 11, color: Colors.grey)),
+        ),
+        if (helper != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              helper,
+              style: const TextStyle(fontSize: 11, color: Colors.grey),
             ),
-        ],
-      ),
-    );
-  }
+          ),
+      ],
+    ),
+  );
+}
 
   // ================= DROPDOWN FIELD =================
   Widget _dropdownField({
@@ -238,4 +281,73 @@ class _AdmissionCreateStudentLoginScreenState
       ),
     );
   }
+Future<void> _createStudentLogin() async {
+  try {
+    if (nameController.text.isEmpty ||
+        emailController.text.isEmpty ||
+        rollController.text.isEmpty ||
+        _selectedDepartment == null ||
+        _selectedYear == null) {
+      throw 'Please fill all required fields';
+    }
+
+    final email = emailController.text.trim();
+    final tempPassword = _generateTempPassword();
+
+    // 🔐 Create SECOND Firebase App (so admin stays logged in)
+    FirebaseApp secondaryApp = await Firebase.initializeApp(
+      name: 'Secondary',
+      options: Firebase.app().options,
+    );
+
+    FirebaseAuth secondaryAuth =
+        FirebaseAuth.instanceFor(app: secondaryApp);
+
+    // 1️⃣ CREATE AUTH USER (THIS MAKES IT APPEAR IN AUTHENTICATION)
+    UserCredential cred =
+        await secondaryAuth.createUserWithEmailAndPassword(
+      email: email,
+      password: tempPassword,
+    );
+
+    final uid = cred.user!.uid;
+
+    // 2️⃣ SAVE STUDENT PROFILE IN FIRESTORE
+    await FirebaseFirestore.instance.collection('users').doc(uid).set({
+      'username': nameController.text.trim(),
+      'email': email,
+      'phone': phoneController.text.trim(),
+      'rollNo': rollController.text.trim(),
+      'department': _selectedDepartment,
+      'year': _selectedYear,
+      'role': 'student',
+      'isActive': true,
+      'createdAt': Timestamp.now(),
+    });
+
+    // 3️⃣ SEND PASSWORD SET EMAIL
+    await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+
+    // 4️⃣ CLEAN UP SECOND APP
+    await secondaryAuth.signOut();
+    await secondaryApp.delete();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Student login created. Password setup email sent.',
+        ),
+        backgroundColor: Colors.green,
+      ),
+    );
+
+    Navigator.pop(context);
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(e.toString())),
+    );
+  }
+}
+
+
 }
