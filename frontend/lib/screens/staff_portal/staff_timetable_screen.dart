@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+
 class StaffTimeTableScreen extends StatefulWidget {
   const StaffTimeTableScreen({super.key});
+
 
   @override
   State<StaffTimeTableScreen> createState() => _StaffTimeTableScreenState();
 }
 
+
 class _StaffTimeTableScreenState extends State<StaffTimeTableScreen> {
   bool isWeekTimetable = true;
+
 
   @override
   Widget build(BuildContext context) {
@@ -43,10 +47,13 @@ class _StaffTimeTableScreenState extends State<StaffTimeTableScreen> {
         children: [
           const SizedBox(height: 12),
 
+
           // TOGGLE BUTTONS
           _buildToggle(),
 
+
           const SizedBox(height: 12),
+
 
           Expanded(
             child: isWeekTimetable
@@ -57,6 +64,7 @@ class _StaffTimeTableScreenState extends State<StaffTimeTableScreen> {
       ),
     );
   }
+
 
   // ---------------- TOGGLE ----------------
   Widget _buildToggle() {
@@ -77,6 +85,7 @@ class _StaffTimeTableScreenState extends State<StaffTimeTableScreen> {
       ),
     );
   }
+
 
   Widget _toggleButton(String title, bool value) {
     final selected = isWeekTimetable == value;
@@ -102,18 +111,21 @@ class _StaffTimeTableScreenState extends State<StaffTimeTableScreen> {
     );
   }
 
+
   // ---------------- WEEK TIMETABLE ----------------
   Widget _buildWeekTimetable() {
     final days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
+
     final tableData = {
-      'Monday': ['DS-2Y', 'ALG-3Y', '☕', 'DB-FY', 'WD-1Y', '🍽', 'DS Lab'],
-      'Tuesday': ['ALG-3Y', 'DS-2Y', '☕', 'WD-1Y', '-', '🍽', 'ALG Lab'],
-      'Wednesday': ['WD-1Y', '-', '☕', 'DS-2Y', 'ALG-3Y', '🍽', 'DB Lab'],
-      'Thursday': ['DB-FY', 'WD-1Y', '☕', 'ALG-3Y', '-', '🍽', '-'],
-      'Friday': ['-', 'DB-FY', '☕', 'WD-1Y', 'DS-2Y', '🍽', '-'],
-      'Saturday': ['DS-2Y', 'ALG-3Y', '☕', 'DB-FY', '-', '🍽', '-'],
+      'Monday': ['DS-2Y', 'ALG-3Y', '☕', 'DB-FY', 'WD-1Y', '🍽', 'DS Lab', 'DS Lab','-'],
+      'Tuesday': ['ALG-3Y', 'DS-2Y', '☕', 'WD-1Y', '-', '🍽', 'ALG Lab','ALG Lab','-'],
+      'Wednesday': ['WD-1Y', '-', '☕', 'DS-2Y', 'ALG-3Y', '🍽', 'DB Lab','WD Lab','-'],
+      'Thursday': ['DB-FY', 'WD-1Y', '☕', 'ALG-3Y', '-', '🍽', '-','DB Lab','-'],
+      'Friday': ['-', 'DB-FY', '☕', 'WD-1Y', 'DS-2Y', '🍽', '-','-','-'],
+      'Saturday': ['DS-2Y', 'ALG-3Y', '☕', 'DB-FY', '-', '🍽', '-','-','-'],
     };
+
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -130,6 +142,8 @@ class _StaffTimeTableScreenState extends State<StaffTimeTableScreen> {
           DataColumn(label: Text('4th')),
           DataColumn(label: Text('Lunch')),
           DataColumn(label: Text('5th')),
+          DataColumn(label: Text('6th')),
+          DataColumn(label: Text('7th')),
         ],
         rows: days.map((day) {
           final row = tableData[day]!;
@@ -143,6 +157,7 @@ class _StaffTimeTableScreenState extends State<StaffTimeTableScreen> {
       ),
     );
   }
+
 
   // ---------------- EXAM TIMETABLE ----------------
   Widget _buildExamTimetable() {
@@ -182,6 +197,7 @@ class _StaffTimeTableScreenState extends State<StaffTimeTableScreen> {
   }
 }
 
+
 // ---------------- EXAM CARD ----------------
 class _ExamCard extends StatelessWidget {
   final String subject;
@@ -190,6 +206,7 @@ class _ExamCard extends StatelessWidget {
   final String time;
   final String hall;
 
+
   const _ExamCard({
     required this.subject,
     required this.year,
@@ -197,6 +214,7 @@ class _ExamCard extends StatelessWidget {
     required this.time,
     required this.hall,
   });
+
 
   @override
   Widget build(BuildContext context) {
@@ -243,6 +261,7 @@ class _ExamCard extends StatelessWidget {
       ),
     );
   }
+
 
   Widget _infoRow(IconData icon, String text) {
     return Padding(

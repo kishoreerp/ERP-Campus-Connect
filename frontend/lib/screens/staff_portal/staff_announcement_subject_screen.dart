@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+
 class StaffAnnouncementSubjectScreen extends StatefulWidget {
   final String subject;
   final String code;
   final String year;
+
 
   const StaffAnnouncementSubjectScreen({
     super.key,
@@ -13,15 +15,35 @@ class StaffAnnouncementSubjectScreen extends StatefulWidget {
     required this.year,
   });
 
+
   @override
   State<StaffAnnouncementSubjectScreen> createState() =>
       _StaffAnnouncementSubjectScreenState();
 }
 
+
 class _StaffAnnouncementSubjectScreenState
     extends State<StaffAnnouncementSubjectScreen> {
   String? selectedType;
   final TextEditingController contentController = TextEditingController();
+
+
+  /// -------- ANNOUNCEMENT LIST (UI ONLY) --------
+  final List<Map<String, String>> announcements = [
+    {
+      'tag': 'Assignment',
+      'title': 'Submit assignment on Binary Trees by Friday',
+      'date': '2024-01-15',
+      'time': '10:00 AM',
+    },
+    {
+      'tag': 'Class Test',
+      'title': 'Class test on Linked Lists and Stacks on Monday',
+      'date': '2024-01-12',
+      'time': '09:30 AM',
+    },
+  ];
+
 
   @override
   Widget build(BuildContext context) {
@@ -34,26 +56,24 @@ class _StaffAnnouncementSubjectScreenState
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              widget.subject,
-              style: GoogleFonts.inter(
-                fontWeight: FontWeight.w700,
-                color: Colors.black,
-              ),
-            ),
-            Text(
-              '${widget.code} • ${widget.year}',
-              style: GoogleFonts.inter(fontSize: 12, color: Colors.grey),
-            ),
+            Text(widget.subject,
+                style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w700, color: Colors.black)),
+            Text('${widget.code} • ${widget.year}',
+                style: GoogleFonts.inter(fontSize: 12, color: Colors.grey)),
           ],
         ),
       ),
+
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ---------- MAKE ANNOUNCEMENT ----------
+
+
+            /// ---------- MAKE ANNOUNCEMENT ----------
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -68,9 +88,11 @@ class _StaffAnnouncementSubjectScreenState
                       style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
                   const SizedBox(height: 12),
 
+
                   Text('Announcement Type',
                       style: GoogleFonts.inter(fontSize: 13)),
                   const SizedBox(height: 6),
+
 
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -82,29 +104,23 @@ class _StaffAnnouncementSubjectScreenState
                       child: DropdownButton<String>(
                         hint: const Text('Select type'),
                         value: selectedType,
-                       items: const [
-  DropdownMenuItem(
-    value: 'Assignment',
-    child: Text('Assignment'),
-  ),
-  DropdownMenuItem(
-    value: 'Class Test',
-    child: Text('Class Test'),
-  ),
-  DropdownMenuItem(
-    value: 'CW Work',
-    child: Text('CW Work'),
-  ),
-  DropdownMenuItem(
-    value: 'HW Work',
-    child: Text('HW Work'),
-  ),
-  DropdownMenuItem(
-    value: 'Other',
-    child: Text('Other'),
-  ),
-],
-
+                        items: const [
+                          DropdownMenuItem(
+                              value: 'Assignment',
+                              child: Text('Assignment')),
+                          DropdownMenuItem(
+                              value: 'Class Test',
+                              child: Text('Class Test')),
+                          DropdownMenuItem(
+                              value: 'CW Work',
+                              child: Text('CW Work')),
+                          DropdownMenuItem(
+                              value: 'HW Work',
+                              child: Text('HW Work')),
+                          DropdownMenuItem(
+                              value: 'Other',
+                              child: Text('Other')),
+                        ],
                         onChanged: (val) {
                           setState(() => selectedType = val);
                         },
@@ -112,11 +128,14 @@ class _StaffAnnouncementSubjectScreenState
                     ),
                   ),
 
+
                   const SizedBox(height: 12),
+
 
                   Text('Announcement Content',
                       style: GoogleFonts.inter(fontSize: 13)),
                   const SizedBox(height: 6),
+
 
                   Container(
                     padding: const EdgeInsets.all(12),
@@ -134,7 +153,9 @@ class _StaffAnnouncementSubjectScreenState
                     ),
                   ),
 
+
                   const SizedBox(height: 14),
+
 
                   SizedBox(
                     width: double.infinity,
@@ -149,8 +170,9 @@ class _StaffAnnouncementSubjectScreenState
                       icon: const Icon(Icons.send),
                       label: const Text('Make Announcement'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.purple,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        backgroundColor: const Color.fromARGB(255, 242, 239, 242),
+                        padding:
+                            const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -161,38 +183,51 @@ class _StaffAnnouncementSubjectScreenState
               ),
             ),
 
+
             const SizedBox(height: 20),
 
-            // ---------- PREVIOUS ANNOUNCEMENTS ----------
-            Text(
-              'Previous Announcements',
-              style: GoogleFonts.inter(fontWeight: FontWeight.w600),
-            ),
+
+            /// ---------- PREVIOUS ANNOUNCEMENTS ----------
+            Text('Previous Announcements',
+                style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
             const SizedBox(height: 10),
 
-            _announcementTile(
-              tag: 'Assignment',
-              title: 'Submit assignment on Binary Trees by Friday',
-              date: '2024-01-15',
-              time: '10:00 AM',
-            ),
-            _announcementTile(
-              tag: 'Class Test',
-              title: 'Class test on Linked Lists and Stacks on Monday',
-              date: '2024-01-12',
-              time: '09:30 AM',
-            ),
+
+            if (announcements.isEmpty)
+              Text('No announcements',
+                  style: GoogleFonts.inter(color: Colors.grey)),
+
+
+            ...announcements.asMap().entries.map((entry) {
+              final index = entry.key;
+              final item = entry.value;
+
+
+              return _announcementTile(
+                tag: item['tag']!,
+                title: item['title']!,
+                date: item['date']!,
+                time: item['time']!,
+                onDelete: () {
+                  setState(() {
+                    announcements.removeAt(index);
+                  });
+                },
+              );
+            }).toList(),
           ],
         ),
       ),
     );
   }
 
+
   Widget _announcementTile({
     required String tag,
     required String title,
     required String date,
     required String time,
+    required VoidCallback onDelete,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -209,19 +244,21 @@ class _StaffAnnouncementSubjectScreenState
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: Colors.orange.shade50,
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: Text(
-                  tag,
-                  style: GoogleFonts.inter(
-                      fontSize: 12, color: Colors.orange),
-                ),
+                child: Text(tag,
+                    style: GoogleFonts.inter(
+                        fontSize: 12, color: Colors.orange)),
               ),
-              const Icon(Icons.delete_outline, color: Colors.red),
+              InkWell(
+                onTap: onDelete,
+                child: const Icon(Icons.delete_outline,
+                    color: Colors.red),
+              ),
             ],
           ),
           const SizedBox(height: 8),

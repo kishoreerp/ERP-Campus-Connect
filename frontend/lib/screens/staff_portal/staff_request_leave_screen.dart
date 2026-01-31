@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+
+import 'staff_leave_request_screen.dart';
+import 'staff_requested_leave_screen.dart';
+
+
 class StaffRequestLeaveScreen extends StatelessWidget {
-  const StaffRequestLeaveScreen({super.key});
+  const StaffRequestLeaveScreen({Key? key}) : super(key: key);
+
 
   @override
   Widget build(BuildContext context) {
@@ -22,30 +28,32 @@ class StaffRequestLeaveScreen extends StatelessWidget {
         child: Column(
           children: [
             _leaveCard(
-              context,
-              title: 'Apply Leave',
+              title: 'Leave Request',
               subtitle: 'Submit a new leave request',
               icon: Icons.add_circle_outline,
               onTap: () {
-                showModalBottomSheet(
-                  context: context,
-                  isScrollControlled: true,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(16)),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                   builder: (_) => LeaveRequestScreen(),
+
+
+
+
                   ),
-                  builder: (_) => const StaffLeaveManagementSheet(),
                 );
               },
             ),
             _leaveCard(
-              context,
-              title: 'Leave History',
-              subtitle: 'View previously applied leaves',
+              title: 'Requested Leave',
+              subtitle: 'View Your Leave Request History',
               icon: Icons.history,
               onTap: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Leave history coming soon')),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const RequestedLeaveScreen(),
+                  ),
                 );
               },
             ),
@@ -55,8 +63,8 @@ class StaffRequestLeaveScreen extends StatelessWidget {
     );
   }
 
-  Widget _leaveCard(
-    BuildContext context, {
+
+  Widget _leaveCard({
     required String title,
     required String subtitle,
     required IconData icon,
@@ -72,88 +80,18 @@ class StaffRequestLeaveScreen extends StatelessWidget {
       child: ListTile(
         onTap: onTap,
         leading: Icon(icon, color: Colors.blue),
-        title: Text(title,
-            style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-        subtitle: Text(subtitle,
-            style: GoogleFonts.inter(fontSize: 13)),
+        title: Text(
+          title,
+          style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: GoogleFonts.inter(fontSize: 13),
+        ),
         trailing: const Icon(Icons.chevron_right),
       ),
     );
   }
 }
 
-// ---------------- BOTTOM SHEET ----------------
-class StaffLeaveManagementSheet extends StatelessWidget {
-  const StaffLeaveManagementSheet({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        top: 16,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Apply Leave',
-            style: GoogleFonts.inter(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 16),
-
-          TextField(
-            decoration: const InputDecoration(
-              labelText: 'Leave Reason',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          TextField(
-            decoration: const InputDecoration(
-              labelText: 'From Date',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          TextField(
-            decoration: const InputDecoration(
-              labelText: 'To Date',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Leave request submitted')),
-                );
-              },
-              child: Text(
-                'Submit',
-                style: GoogleFonts.inter(
-                    fontWeight: FontWeight.w600, color: Colors.white),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
