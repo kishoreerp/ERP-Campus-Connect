@@ -119,11 +119,11 @@ class ResetNewScreen extends StatelessWidget {
                         child: ElevatedButton(
                           style: _buttonStyle(),
                           onPressed: () async {
-  try {
-    final p1 = pass1.text.trim();
-    final p2 = pass2.text.trim();
+                            try {
+                                   final p1 = pass1.text.trim();
+                                   final p2 = pass2.text.trim();
 
-    if (p1.length < 6) {
+                                     if (p1.length < 6) {
       throw 'Password must be at least 6 characters';
     }
 
@@ -148,9 +148,6 @@ class ResetNewScreen extends StatelessWidget {
         .showSnackBar(SnackBar(content: Text(e.toString())));
   }
 },
-
-
-
                           child: Text(
                             'Reset Password',
                             style: GoogleFonts.inter(

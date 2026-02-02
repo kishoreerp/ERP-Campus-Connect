@@ -81,6 +81,12 @@ Future<void> handleStudentLogin() async {
       throw 'Not a student account';
     }
 
+// 🔒 STATUS CHECK (VERY IMPORTANT)
+if (userData['status'] != 'active') {
+  await FirebaseAuth.instance.signOut();
+  throw 'Your account is not active. Please contact admission office.';
+}
+
     // 🔹 REGULATION CHECK ✅
     if (userData['regulation'] != selectedRegulation) {
       throw 'Invalid regulation selected';

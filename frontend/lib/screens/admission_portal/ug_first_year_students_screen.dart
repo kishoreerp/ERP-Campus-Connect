@@ -1,7 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'student_model.dart';
 import 'student_details_pdf_view.dart';
-
 
 class UgFirstYearStudentsScreen extends StatelessWidget {
   const UgFirstYearStudentsScreen({super.key});
@@ -11,7 +10,6 @@ class UgFirstYearStudentsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
 
-      // ================= APP BAR =================
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
@@ -19,87 +17,92 @@ class UgFirstYearStudentsScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        titleSpacing: 12,
-        title: Column(
+        title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text(
-              'UG Programs - 1st Year',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
+          children: [
+            Text('UG Programs - 1st Year',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             SizedBox(height: 2),
-            Text(
-              '5 Students',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
-            ),
+            Text('Students',
+                style: TextStyle(fontSize: 12, color: Colors.grey)),
           ],
         ),
       ),
 
-      // ================= BODY =================
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: const [
-          _StudentCard(
-            name: 'Rahul Sharma',
-            email: 'rahul.sharma@slec.edu.in',
-            phone: '+91-98765-43210',
-            studentId: 'SLEC20240001',
-            rollNumber: 'IT2024001',
-          ),
-          _StudentCard(
-            name: 'Vikram Reddy',
-            email: 'vikram.reddy@slec.edu.in',
-            phone: '+91-98765-43214',
-            studentId: 'SLEC20240005',
-            rollNumber: 'CSECS2024005',
-          ),
-          _StudentCard(
-            name: 'Arjun Menon',
-            email: 'arjun.menon@slec.edu.in',
-            phone: '+91-98765-43218',
-            studentId: 'SLEC20240009',
-            rollNumber: 'AIDS2024009',
-          ),
-          _StudentCard(
-            name:'Ravi Shankar',
-            email:'shankar@slec.edu.in',
-            phone:'+91-98765-43228',
-            studentId:'SLEC20240019',
-            rollNumber:'CSE2024019',
-          ),
-           _StudentCard(
-            name:'Suresh Kumar',
-            email:'suresh.kumar@slec.edu.in',
-            phone:'+91-98765-43232',
-            studentId:'SLEC20240023',
-            rollNumber:'ECE2024023'
-          ),
-        ],
+      // ✅ CORRECT BODY
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .where('program', isEqualTo: 'UG')
+            .where('year', isEqualTo: '1st Year')
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(child: Text('No students found'));
+          }
+
+          return ListView(
+            padding: const EdgeInsets.all(16),
+            children: snapshot.data!.docs.map((doc) {
+              final data = doc.data() as Map<String, dynamic>;
+
+              return StudentCard(
+                uid: doc.id,
+                name: data['username'] ?? '',
+                email: data['email'] ?? '',
+                phone: data['phone'] ?? '',
+                studentId: data['studentId'] ?? '',
+                rollNumber: data['rollNo'] ?? '',
+                status: data['status'] ?? 'active',
+              );
+
+       
+
+            }).toList(),
+          );
+        },
       ),
     );
   }
 }
 
+
 // ================= STUDENT CARD =================
-class _StudentCard extends StatelessWidget {
+class StudentCard extends StatelessWidget {
+  final String uid;
   final String name;
   final String email;
   final String phone;
   final String studentId;
   final String rollNumber;
+  final String status;
 
-  const _StudentCard({
+  const StudentCard({
+    required this.uid,
     required this.name,
     required this.email,
     required this.phone,
     required this.studentId,
     required this.rollNumber,
+    required this.status,
   });
+
+Color _statusColor(String status) {
+  switch (status) {
+    case 'active':
+      return Colors.green;
+    case 'discontinued':
+    case 'transfer':
+    case 'passed_out':
+      return Colors.red;
+    default:
+      return Colors.grey;
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -135,21 +138,21 @@ class _StudentCard extends StatelessWidget {
                 ],
               ),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.green.shade100,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Text(
-                  'Active',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.green,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
+  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+  decoration: BoxDecoration(
+    color: _statusColor(status).withOpacity(0.1),
+    borderRadius: BorderRadius.circular(20),
+  ),
+  child: Text(
+    status.toUpperCase(),
+    style: TextStyle(
+      fontSize: 12,
+      color: _statusColor(status),
+      fontWeight: FontWeight.w600,
+    ),
+  ),
+),
+
             ],
           ),
 
@@ -171,25 +174,33 @@ class _StudentCard extends StatelessWidget {
             children: [
               Expanded(
                 child: DropdownButtonFormField<String>(
-                  value: 'Active',
-                  items: const [
-                    DropdownMenuItem(value: 'Active', child: Text('Active')),
-                    DropdownMenuItem(value: 'Discontinued', child: Text('Discontinued')),
-                    DropdownMenuItem(value: 'Transfer', child: Text('Transfer')),
-                    DropdownMenuItem(value: 'Passed Out', child: Text('Passed Out')),    
-                  ],
-                  onChanged: (_) {},
-                  decoration: InputDecoration(
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 12),
-                    filled: true,
-                    fillColor: Colors.grey.shade100,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                ),
+  value: status,
+  items: const [
+    DropdownMenuItem(value: 'active', child: Text('Active')),
+    DropdownMenuItem(value: 'discontinued', child: Text('Discontinued')),
+    DropdownMenuItem(value: 'transfer', child: Text('Transfer')),
+    DropdownMenuItem(value: 'passed_out', child: Text('Passed Out')),
+  ],
+  decoration: InputDecoration(
+  filled: true,
+  fillColor: Colors.grey.shade100,
+  border: OutlineInputBorder(
+    borderRadius: BorderRadius.circular(10),
+    borderSide: BorderSide.none,
+  ),
+),
+
+  onChanged: (value) async {
+  if (value == null) return;
+
+  await FirebaseFirestore.instance
+      .collection('users')
+      .doc(uid)
+      .update({'status': value});
+},
+
+)
+
               ),
               const SizedBox(width: 12),
               OutlinedButton.icon(

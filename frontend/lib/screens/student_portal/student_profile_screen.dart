@@ -44,8 +44,7 @@ String address = '';
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-           
+            children: [           
               _buildProfileCard(),
               const SizedBox(height: 20),
               _buildContactCard(),
@@ -60,6 +59,11 @@ String address = '';
 @override
 void initState() {
   super.initState();
+  _loadUser();
+}
+
+Future<void> _loadUser() async {
+  await CurrentUserService.loadUser(); // 🔥 REQUIRED
   _loadFromCache();
 }
 

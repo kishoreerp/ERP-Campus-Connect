@@ -1,9 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CurrentUserService {
-  static Map<String, dynamic>? _userData;
+  static Map<String, dynamic>? _user;
 
   static Future<void> loadUser() async {
     final user = FirebaseAuth.instance.currentUser;
@@ -15,15 +14,16 @@ class CurrentUserService {
         .get();
 
     if (doc.exists) {
-      _userData = doc.data();
+      _user = doc.data();
+      print('USER LOADED: $_user'); // 🔍 DEBUG
     }
   }
 
   static Map<String, dynamic>? getUser() {
-    return _userData;
+    return _user;
   }
 
   static void clear() {
-    _userData = null;
+    _user = null;
   }
 }

@@ -27,6 +27,16 @@ class _AdmissionCreateStudentLoginScreenState
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController rollController = TextEditingController();
+  final TextEditingController addressController = TextEditingController();
+
+String? _selectedRegulation;
+
+final List<String> _regulations = [
+  '2017',
+  '2021',
+  '2025',
+];
+
 
 
 
@@ -162,11 +172,25 @@ _inputField(
                     onChanged: (val) =>
                         setState(() => _selectedYear = val),
                   ),
+                  _dropdownField(
+                     label: 'Regulation *',
+                     hint: 'Select regulation',
+                      value: _selectedRegulation,
+  items: _regulations,
+  onChanged: (val) =>
+      setState(() => _selectedRegulation = val),
+),
+
 
                   _inputField(
   'Roll Number *',
   'Enter roll number',
   controller: rollController,
+),
+_inputField(
+  'Address',
+  'Enter student address',
+  controller: addressController,
 ),
 
 
@@ -284,21 +308,24 @@ _inputField(
 Future<void> _createStudentLogin() async {
   try {
     if (nameController.text.isEmpty ||
-        emailController.text.isEmpty ||
-        rollController.text.isEmpty ||
-        _selectedDepartment == null ||
-        _selectedYear == null) {
-      throw 'Please fill all required fields';
-    }
+    emailController.text.isEmpty ||
+    rollController.text.isEmpty ||
+    _selectedDepartment == null ||
+    _selectedYear == null ||
+    _selectedRegulation == null) {
+  throw 'Please fill all required fields';
+}
+
 
     final email = emailController.text.trim();
     final tempPassword = _generateTempPassword();
 
     // 🔐 Create SECOND Firebase App (so admin stays logged in)
     FirebaseApp secondaryApp = await Firebase.initializeApp(
-      name: 'Secondary',
-      options: Firebase.app().options,
-    );
+  name: 'Secondary-${DateTime.now().millisecondsSinceEpoch}',
+  options: Firebase.app().options,
+);
+
 
     FirebaseAuth secondaryAuth =
         FirebaseAuth.instanceFor(app: secondaryApp);
@@ -312,18 +339,39 @@ Future<void> _createStudentLogin() async {
 
     final uid = cred.user!.uid;
 
-    // 2️⃣ SAVE STUDENT PROFILE IN FIRESTORE
-    await FirebaseFirestore.instance.collection('users').doc(uid).set({
-      'username': nameController.text.trim(),
-      'email': email,
-      'phone': phoneController.text.trim(),
-      'rollNo': rollController.text.trim(),
-      'department': _selectedDepartment,
-      'year': _selectedYear,
-      'role': 'student',
-      'isActive': true,
-      'createdAt': Timestamp.now(),
-    });
+   // Decide program automatically
+String program =
+    _selectedDepartment == 'MBA' || _selectedDepartment == 'ME CSE'
+        ? 'PG'
+        : 'UG';
+
+await FirebaseFirestore.instance.collection('users').doc(uid).set({
+  'studentId': 'SLEC${DateTime.now().year}${rollController.text.trim()}',
+  'username': nameController.text.trim(),
+  'email': email,
+  'phone': phoneController.text.trim(),
+  'rollNo': rollController.text.trim(),
+  'department': _selectedDepartment,
+  'program': program,
+  'year': _selectedYear,
+  'regulation': _selectedRegulation,
+  'role': 'student',
+  'address': addressController.text.trim(),
+
+  // Academic defaults
+  'cgpa': 0.0,
+  'attendance': 0,
+  'semester': '',
+  'subjects': 0,
+  'arrears': 0,
+
+  // Access control
+  'status': 'active',
+
+  'createdAt': Timestamp.now(),
+});
+
+
 
     // 3️⃣ SEND PASSWORD SET EMAIL
     await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
