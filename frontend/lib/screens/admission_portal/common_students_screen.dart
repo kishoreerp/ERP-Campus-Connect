@@ -2,8 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'student_details_pdf_view.dart';
 
-class UgFirstYearStudentsScreen extends StatelessWidget {
-  const UgFirstYearStudentsScreen({super.key});
+class CommonStudentsScreen extends StatelessWidget {
+  final String program; // UG / PG
+  final String year;    // 1st Year / 2nd Year / Final Year
+
+  const CommonStudentsScreen({
+    super.key,
+    required this.program,
+    required this.year,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,24 +24,31 @@ class UgFirstYearStudentsScreen extends StatelessWidget {
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('UG Programs - 1st Year',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            SizedBox(height: 2),
-            Text('Students',
-                style: TextStyle(fontSize: 12, color: Colors.grey)),
+            Text(
+              '$program Programs - $year',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 2),
+            const Text(
+              'Students',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
           ],
         ),
       ),
 
-      // ✅ CORRECT BODY
+      // ✅ SAME QUERY – JUST DYNAMIC
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('users')
-            .where('program', isEqualTo: 'UG')
-            .where('year', isEqualTo: '1st Year')
+            .where('program', isEqualTo: program)
+            .where('year', isEqualTo: year)
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -59,9 +73,6 @@ class UgFirstYearStudentsScreen extends StatelessWidget {
                 rollNumber: data['rollNo'] ?? '',
                 status: data['status'] ?? 'active',
               );
-
-       
-
             }).toList(),
           );
         },
@@ -69,6 +80,7 @@ class UgFirstYearStudentsScreen extends StatelessWidget {
     );
   }
 }
+
 
 
 // ================= STUDENT CARD =================
@@ -204,26 +216,20 @@ Color _statusColor(String status) {
               ),
               const SizedBox(width: 12),
               OutlinedButton.icon(
-                icon: const Icon(Icons.remove_red_eye, size: 18),
-                label: const Text('View Details'),
-                onPressed: () {
-                  Navigator.push(
+  icon: const Icon(Icons.remove_red_eye, size: 18),
+  label: const Text('View Details'),
+  onPressed: () {
+    Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => StudentDetailsPdfView(student:'student', 
-         name: 'Pooja Sharma',
-  email: 'pooja.sharma@slec.edu.in',
-  admissionNumber: 'ADM2024014',
-  department: 'MBA',
-  studentPhone: '+91-98765-43223',
-  parentPhone: '+91-97654-32114',
-  address:
-      'BTM Layout,\nBangalore, Karnataka - 560076',),
+        builder: (_) => StudentDetailsPdfView(
+          studentUid: uid, // ✅ PASS REAL STUDENT UID
+        ),
       ),
     );
-                  // Navigate to student detail screen
-                },
-              ),
+  },
+),
+
             ],
           ),
         ],

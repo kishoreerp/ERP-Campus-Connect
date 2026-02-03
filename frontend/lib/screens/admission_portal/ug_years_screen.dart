@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'ug_first_year_students_screen.dart';
-import 'ug_Second_year_students_screen.dart';
-import 'ug_Third_year_students_screen.dart';
-import 'ug_final_year_students_screen.dart';
+import 'common_students_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 
 
 
@@ -84,56 +83,33 @@ class UgYearsScreen extends StatelessWidget {
             const SizedBox(height: 20),
 
             _yearCard(
-              title: '1st Year',
-              count: '5 Students',
-              onTap: () {  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => const UgFirstYearStudentsScreen(),
-    ),
-  );
-                // Navigate to 1st year student list
-              },
-            ),
+  context: context,
+  title: '1st Year',
+  program: 'UG',
+  year: '1st Year',
+),
 
-            _yearCard(
-              title: '2nd Year',
-              count: '5 Students',
-              onTap: () {
-                 Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => const UgSecondYearStudentsScreen(),
-    ),
-  );
-              },
-            ),
+_yearCard(
+  context: context,
+  title: '2nd Year',
+  program: 'UG',
+  year: '2nd Year',
+),
 
-            _yearCard(
-              title: '3rd Year',
-              count: '5 Students',
-              onTap: () {
-                 Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => const UgThirdYearStudentsScreen(),
-    ),
-  );
-              },
-            ),
+_yearCard(
+  context: context,
+  title: '3rd Year',
+  program: 'UG',
+  year: '3rd Year',
+),
 
-            _yearCard(
-              title: 'Final Year',
-              count: '5 Students',
-              onTap: () {
-                 Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => const  UgFinalYearStudentsScreen(),
-    ),
-  );
-              },
-            ),
+_yearCard(
+  context: context,
+  title: 'Final Year',
+  program: 'UG',
+  year: 'Final Year',
+),
+
           ],
         ),
       ),
@@ -141,47 +117,72 @@ class UgYearsScreen extends StatelessWidget {
   }
 
   // ================= YEAR CARD =================
-  Widget _yearCard({
-    required String title,
-    required String count,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade200),
-          color: Colors.white,
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    count,
-                    style: const TextStyle(color: Colors.grey),
-                  ),
-                ],
-              ),
+ Widget _yearCard({
+  required BuildContext context,
+  required String title,
+  required String program,
+  required String year,
+}) {
+  return StreamBuilder<QuerySnapshot>(
+    stream: FirebaseFirestore.instance
+        .collection('users')
+        .where('program', isEqualTo: program)
+        .where('year', isEqualTo: year)
+        .snapshots(),
+    builder: (context, snapshot) {
+      int studentCount = 0;
+
+      if (snapshot.hasData) {
+        studentCount = snapshot.data!.docs.length;
+      }
+
+      return InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) =>
+                  CommonStudentsScreen(program: program, year: year),
             ),
-            const Icon(Icons.chevron_right, color: Colors.grey),
-          ],
+          );
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.grey.shade200),
+            color: Colors.white,
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '$studentCount Students',
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right, color: Colors.grey),
+            ],
+          ),
         ),
-      ),
-    );
-  }
+      );
+    },
+  );
+}
+
 }

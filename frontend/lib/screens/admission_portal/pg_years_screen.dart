@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'pg_first_year_students_screen.dart';
-import 'pg_second_year_students_screen.dart';
+import 'common_students_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+
 
 class PgYearsScreen extends StatelessWidget {
   const PgYearsScreen({super.key});
@@ -79,30 +81,19 @@ class PgYearsScreen extends StatelessWidget {
             const SizedBox(height: 20),
 
             _yearCard(
-              title: '1st Year',
-              students: '4 Students',
-              onTap: () {Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => const PgFirstYearStudentsScreen(),
-    ),
-  );
-                // Navigate to PG 1st year students list
-              },
-            ),
+  context: context,
+  title: '1st Year',
+  program: 'PG',
+  year: '1st Year',
+),
 
-            _yearCard(
-              title: '2nd Year',
-              students: '2 Students',
-              onTap: () {
-                Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => const PgSecondYearStudentsScreen(),
-    ),
-  );// Navigate to PG 2nd year students list
-              },
-            ),
+_yearCard(
+  context: context,
+  title: '2nd Year',
+  program: 'PG',
+  year: '2nd Year',
+),
+
           ],
         ),
       ),
@@ -111,46 +102,71 @@ class PgYearsScreen extends StatelessWidget {
 
   // ================= YEAR CARD =================
   Widget _yearCard({
-    required String title,
-    required String students,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade200),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    students,
-                    style: const TextStyle(color: Colors.grey),
-                  ),
-                ],
-              ),
+  required BuildContext context,
+  required String title,
+  required String program,
+  required String year,
+}) {
+  return StreamBuilder<QuerySnapshot>(
+    stream: FirebaseFirestore.instance
+        .collection('users')
+        .where('program', isEqualTo: program)
+        .where('year', isEqualTo: year)
+        .snapshots(),
+    builder: (context, snapshot) {
+      int studentCount = 0;
+
+      if (snapshot.hasData) {
+        studentCount = snapshot.data!.docs.length;
+      }
+
+      return InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) =>
+                  CommonStudentsScreen(program: program, year: year),
             ),
-            const Icon(Icons.chevron_right, color: Colors.grey),
-          ],
+          );
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.grey.shade200),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '$studentCount Students',
+                      style: const TextStyle(color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right, color: Colors.grey),
+            ],
+          ),
         ),
-      ),
-    );
-  }
+      );
+    },
+  );
+}
+
 }
