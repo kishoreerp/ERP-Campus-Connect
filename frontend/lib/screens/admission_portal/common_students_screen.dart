@@ -4,52 +4,65 @@ import 'student_details_pdf_view.dart';
 
 class CommonStudentsScreen extends StatelessWidget {
   final String program; // UG / PG
-  final String year;    // 1st Year / 2nd Year / Final Year
+  final String year; 
+  final String department;   // 1st Year / 2nd Year / Final Year
 
-  const CommonStudentsScreen({
-    super.key,
-    required this.program,
-    required this.year,
-  });
+ const CommonStudentsScreen({
+  super.key,
+  required this.program,
+  required this.year,
+  required this.department,
+});
+
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
+Widget build(BuildContext context) {
 
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '$program Programs - $year',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 2),
-            const Text(
-              'Students',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
-            ),
-          ],
-        ),
+  // ✅ DEBUG PRINTS (PASTE HERE)
+  debugPrint('PROGRAM: $program');
+  debugPrint('YEAR: $year');
+  debugPrint('DEPARTMENT: $department');
+
+  return Scaffold(
+    backgroundColor: Colors.white,
+    appBar: AppBar(
+      elevation: 0,
+      backgroundColor: Colors.white,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back, color: Colors.black),
+        onPressed: () => Navigator.pop(context),
       ),
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '$program - $year',
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            department,
+            style: const TextStyle(fontSize: 12, color: Colors.grey),
+          ),
+        ],
+      ),
+    ),
+
 
       // ✅ SAME QUERY – JUST DYNAMIC
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
-            .collection('users')
-            .where('program', isEqualTo: program)
-            .where('year', isEqualTo: year)
-            .snapshots(),
+    .collection('users')
+    .where('role', isEqualTo: 'student')
+    .where('program', isEqualTo: program)
+    .where('year', isEqualTo: year)
+    .where('department', isEqualTo: department)
+    .where('status', isEqualTo: 'active')
+
+    .snapshots(),
+
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

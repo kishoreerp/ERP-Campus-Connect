@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'ug_years_screen.dart';
 import 'pg_years_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+
+
 class AdmissionViewAllStudentsScreen extends StatelessWidget {
   const AdmissionViewAllStudentsScreen({super.key});
 
@@ -20,27 +24,13 @@ class AdmissionViewAllStudentsScreen extends StatelessWidget {
         titleSpacing: 12,
         title: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-              decoration: BoxDecoration(
-                color: const Color(0xFF2563EB),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Text(
-                'SLEC',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
+            
+            
             const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Admission Admin',
+                  'View All Students',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -48,7 +38,7 @@ class AdmissionViewAllStudentsScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Admin Panel',
+                  'Select program type',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey,
@@ -66,27 +56,29 @@ class AdmissionViewAllStudentsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'View All Students',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 4),
-            const Text(
-              'Select program type',
-              style: TextStyle(color: Colors.grey),
-            ),
-            const SizedBox(height: 20),
+           
+            const SizedBox(height: 5),
+StreamBuilder<QuerySnapshot>(
+  stream: FirebaseFirestore.instance
+      .collection('users')
+      .where('role', isEqualTo: 'student')
+      .where('program', isEqualTo: 'UG')
+      .snapshots(),
+  builder: (context, snapshot) {
+    final count = snapshot.hasData ? snapshot.data!.docs.length : 0;
 
-          _programCard(
-  title: 'UG Programs',
-  subtitle: 'Undergraduate Students',
-  count: '20 Students',
-  onTap: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const UgYearsScreen(),
-      ),
+    return _programCard(
+      title: 'UG Programs',
+      subtitle: 'Undergraduate Students',
+      count: '$count Students',
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const UgYearsScreen(),
+          ),
+        );
+      },
     );
   },
 ),
@@ -94,20 +86,34 @@ class AdmissionViewAllStudentsScreen extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            _programCard(
-              title: 'PG Programs',
-              subtitle: 'Postgraduate Students',
-              count: '6 Students',
-              onTap: () {
-                Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => const PgYearsScreen(),
-    ),
-  );
+           StreamBuilder<QuerySnapshot>(
+  stream: FirebaseFirestore.instance
+      .collection('users')
+      .where('role', isEqualTo: 'student')
+      .where('program', isEqualTo: 'PG')
+      .snapshots(),
+  builder: (context, snapshot) {
+    final count = snapshot.hasData ? snapshot.data!.docs.length : 0;
+
+    return _programCard(
+      title: 'PG Programs',
+      subtitle: 'Postgraduate Students',
+      count: '$count Students',
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const PgYearsScreen(),
+          ),
+        );
+      },
+    );
+  },
+),
+
                 // Navigate to PG students list
-              },
-            ),
+              
+            
           ],
         ),
       ),

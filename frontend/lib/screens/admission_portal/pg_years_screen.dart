@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'common_students_screen.dart';
+import 'pg_departments_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 
@@ -23,27 +23,11 @@ class PgYearsScreen extends StatelessWidget {
         titleSpacing: 12,
         title: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-              decoration: BoxDecoration(
-                color: const Color(0xFF2563EB),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Text(
-                'SLEC',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
             const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Admission Admin',
+                  'PG Programs',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -51,7 +35,7 @@ class PgYearsScreen extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'Admin Panel',
+                  'Select a year',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey,
@@ -69,16 +53,8 @@ class PgYearsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'PG Programs',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 4),
-            const Text(
-              'Select a year',
-              style: TextStyle(color: Colors.grey),
-            ),
-            const SizedBox(height: 20),
+           
+            const SizedBox(height: 5),
 
             _yearCard(
   context: context,
@@ -122,13 +98,16 @@ _yearCard(
 
       return InkWell(
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) =>
-                  CommonStudentsScreen(program: program, year: year),
-            ),
-          );
+   Navigator.push(
+  context,
+   MaterialPageRoute(
+          builder: (_) => PgDepartmentsScreen(
+            year: year, // ✅ PASS REAL YEAR
+          ),
+   ),
+);
+
+
         },
         borderRadius: BorderRadius.circular(16),
         child: Container(
