@@ -197,40 +197,14 @@ Color _statusColor(String status) {
           // -------- ACTIONS --------
           Row(
             children: [
-              Expanded(
-                child: DropdownButtonFormField<String>(
-  value: status,
-  items: const [
-    DropdownMenuItem(value: 'active', child: Text('Active')),
-    DropdownMenuItem(value: 'discontinued', child: Text('Discontinued')),
-    DropdownMenuItem(value: 'transfer', child: Text('Transfer')),
-    DropdownMenuItem(value: 'passed_out', child: Text('Passed Out')),
-  ],
-  decoration: InputDecoration(
-  filled: true,
-  fillColor: Colors.grey.shade100,
-  border: OutlineInputBorder(
-    borderRadius: BorderRadius.circular(10),
-    borderSide: BorderSide.none,
-  ),
-),
-
-  onChanged: (value) async {
-  if (value == null) return;
-
-  await FirebaseFirestore.instance
-      .collection('users')
-      .doc(uid)
-      .update({'status': value});
-},
-
-)
-
-              ),
-              const SizedBox(width: 12),
+              
               OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color.fromARGB(255, 72, 72, 73),
+                ),
   icon: const Icon(Icons.remove_red_eye, size: 18),
   label: const Text('View Details'),
+  
   onPressed: () {
     Navigator.push(
       context,

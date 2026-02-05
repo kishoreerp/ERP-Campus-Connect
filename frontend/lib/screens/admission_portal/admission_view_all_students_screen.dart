@@ -2,11 +2,22 @@ import 'package:flutter/material.dart';
 import 'ug_years_screen.dart';
 import 'pg_years_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'student_details_pdf_view.dart';
 
 
 
-class AdmissionViewAllStudentsScreen extends StatelessWidget {
+class AdmissionViewAllStudentsScreen extends StatefulWidget {
   const AdmissionViewAllStudentsScreen({super.key});
+
+  @override
+  State<AdmissionViewAllStudentsScreen> createState() =>
+      _AdmissionViewAllStudentsScreenState();
+}
+class _AdmissionViewAllStudentsScreenState
+    extends State<AdmissionViewAllStudentsScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  String searchText = '';
+
 
   @override
   Widget build(BuildContext context) {
@@ -51,65 +62,204 @@ class AdmissionViewAllStudentsScreen extends StatelessWidget {
       ),
 
       // ================= BODY =================
-      body: Padding(
+      body:
+       Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+          children: [TextField(
+  controller: _searchController,
+  decoration: InputDecoration(
+    hintText: 'Search by student name or roll number',
+    prefixIcon: const Icon(Icons.search),
+    filled: true,
+    fillColor: Colors.grey.shade100,
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide.none,
+    ),
+  ),
+  onChanged: (value) {
+    setState(() {
+      searchText = value.trim();
+    });
+  },
+),
+const SizedBox(height: 16),
+
            
-            const SizedBox(height: 5),
-StreamBuilder<QuerySnapshot>(
-  stream: FirebaseFirestore.instance
-      .collection('users')
-      .where('role', isEqualTo: 'student')
-      .where('program', isEqualTo: 'UG')
-      .snapshots(),
-  builder: (context, snapshot) {
-    final count = snapshot.hasData ? snapshot.data!.docs.length : 0;
+            
+if (searchText.isNotEmpty)
+  StreamBuilder<QuerySnapshot>(
+    stream: FirebaseFirestore.instance
+        .collection('users')
+        .where('role', isEqualTo: 'student')
+        .snapshots(),
+    builder: (context, snapshot) {
+      if (!snapshot.hasData) {
+        return const Center(child: CircularProgressIndicator());
+      }
 
-    return _programCard(
-      title: 'UG Programs',
-      subtitle: 'Undergraduate Students',
-      count: '$count Students',
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const UgYearsScreen(),
-          ),
-        );
-      },
+      final results = snapshot.data!.docs.where((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        final name =
+            (data['username'] ?? '').toString().toLowerCase();
+        final roll =
+            (data['rollNo'] ?? '').toString().toLowerCase();
+
+        return name.contains(searchText.toLowerCase()) ||
+            roll.contains(searchText.toLowerCase());
+      }).toList();
+
+      if (results.isEmpty) {
+        return Column(
+  children: const [
+    SizedBox(height: 40),
+    Icon(Icons.search_off, size: 48, color: Colors.grey),
+    SizedBox(height: 8),
+    Text(
+      'No students found',
+      style: TextStyle(color: Colors.grey),
+    ),
+  ],
+);
+
+      }
+
+      return AnimatedSwitcher(
+  duration: const Duration(milliseconds: 250),
+  child: ListView.builder(
+    key: ValueKey(results.length),
+        shrinkWrap: true,
+        itemCount: results.length,
+        itemBuilder: (context, index) {
+          final doc = results[index];
+          final data = doc.data() as Map<String, dynamic>;
+
+         return InkWell(
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => StudentDetailsPdfView(studentUid: doc.id),
+      ),
     );
   },
-),
-
-
-            const SizedBox(height: 16),
-
-           StreamBuilder<QuerySnapshot>(
-  stream: FirebaseFirestore.instance
-      .collection('users')
-      .where('role', isEqualTo: 'student')
-      .where('program', isEqualTo: 'PG')
-      .snapshots(),
-  builder: (context, snapshot) {
-    final count = snapshot.hasData ? snapshot.data!.docs.length : 0;
-
-    return _programCard(
-      title: 'PG Programs',
-      subtitle: 'Postgraduate Students',
-      count: '$count Students',
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const PgYearsScreen(),
+  borderRadius: BorderRadius.circular(14),
+  child: Container(
+    margin: const EdgeInsets.only(bottom: 12),
+    padding: const EdgeInsets.all(14),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(14),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.04),
+          blurRadius: 8,
+          offset: const Offset(0, 4),
+        ),
+      ],
+    ),
+    child: Row(
+      children: [
+        CircleAvatar(
+          radius: 22,
+          backgroundColor: const Color(0xFFEFF6FF),
+          child: const Icon(Icons.person, color: Color(0xFF2563EB)),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                data['username'] ?? '',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Roll No: ${data['rollNo'] ?? ''}',
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey,
+                ),
+              ),
+            ],
           ),
-        );
-      },
-    );
-  },
-),
+        ),
+        const Icon(Icons.chevron_right, color: Colors.grey),
+      ],
+    ),
+  ),
+);
+
+        },
+  ),  
+      );
+    },
+  )
+else
+  Column(
+    children: [
+      StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .where('role', isEqualTo: 'student')
+            .where('program', isEqualTo: 'UG')
+            .snapshots(),
+        builder: (context, snapshot) {
+          final count =
+              snapshot.hasData ? snapshot.data!.docs.length : 0;
+
+          return _programCard(
+            title: 'UG Programs',
+            subtitle: 'Undergraduate Students',
+            count: '$count Students',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const UgYearsScreen(),
+                ),
+              );
+            },
+          );
+        },
+      ),
+
+      const SizedBox(height: 16),
+
+      StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .where('role', isEqualTo: 'student')
+            .where('program', isEqualTo: 'PG')
+            .snapshots(),
+        builder: (context, snapshot) {
+          final count =
+              snapshot.hasData ? snapshot.data!.docs.length : 0;
+
+          return _programCard(
+            title: 'PG Programs',
+            subtitle: 'Postgraduate Students',
+            count: '$count Students',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const PgYearsScreen(),
+                ),
+              );
+            },
+          );
+        },
+      ),
+    ],
+  ),
+
 
                 // Navigate to PG students list
               
