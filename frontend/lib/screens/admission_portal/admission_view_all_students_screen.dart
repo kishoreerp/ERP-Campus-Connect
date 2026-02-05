@@ -97,8 +97,15 @@ if (searchText.isNotEmpty)
         .snapshots(),
     builder: (context, snapshot) {
       if (!snapshot.hasData) {
-        return const Center(child: CircularProgressIndicator());
-      }
+  return ListView.builder(
+    shrinkWrap: true,
+    itemCount: 5,
+    itemBuilder: (context, index) {
+      return _skeletonCard();
+    },
+  );
+}
+
 
       final results = snapshot.data!.docs.where((doc) {
         final data = doc.data() as Map<String, dynamic>;
@@ -136,7 +143,10 @@ if (searchText.isNotEmpty)
           final doc = results[index];
           final data = doc.data() as Map<String, dynamic>;
 
-         return InkWell(
+  final String program = data['program'] ?? '';
+final String year = data['year'] ?? '';
+
+return InkWell(
   onTap: () {
     Navigator.push(
       context,
@@ -168,6 +178,8 @@ if (searchText.isNotEmpty)
           child: const Icon(Icons.person, color: Color(0xFF2563EB)),
         ),
         const SizedBox(width: 14),
+
+        // -------- STUDENT INFO --------
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,14 +199,35 @@ if (searchText.isNotEmpty)
                   color: Colors.grey,
                 ),
               ),
+              const SizedBox(height: 6),
+
+              // -------- BADGE --------
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEFF6FF),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  '$program • $year',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF2563EB),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
+
         const Icon(Icons.chevron_right, color: Colors.grey),
       ],
     ),
   ),
 );
+
 
         },
   ),  
@@ -330,4 +363,51 @@ else
       ),
     );
   }
+  Widget _skeletonCard() {
+  return Container(
+    margin: const EdgeInsets.only(bottom: 12),
+    padding: const EdgeInsets.all(14),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(14),
+    ),
+    child: Row(
+      children: [
+        Container(
+          height: 44,
+          width: 44,
+          decoration: BoxDecoration(
+            color: Colors.grey.shade300,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _skeletonLine(width: 120),
+              const SizedBox(height: 8),
+              _skeletonLine(width: 160),
+              const SizedBox(height: 8),
+              _skeletonLine(width: 80, height: 16),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _skeletonLine({double width = double.infinity, double height = 12}) {
+  return Container(
+    height: height,
+    width: width,
+    decoration: BoxDecoration(
+      color: Colors.grey.shade300,
+      borderRadius: BorderRadius.circular(6),
+    ),
+  );
+}
+
 }

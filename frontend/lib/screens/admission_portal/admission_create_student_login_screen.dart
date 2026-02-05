@@ -67,33 +67,22 @@ final List<String> _regulations = [
 
       // ================= APP BAR =================
       appBar: AppBar(
-        automaticallyImplyLeading: false,
         elevation: 0,
         backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
         titleSpacing: 12,
         title: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-              decoration: BoxDecoration(
-                color: const Color(0xFF2563EB),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Text(
-                'SLEC',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                ),
-              ),
-            ),
-            const SizedBox(width: 10),
+            
+            
             const Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Admission Admin',
+                  'Create Student Login ID',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -101,7 +90,7 @@ final List<String> _regulations = [
                   ),
                 ),
                 Text(
-                  'Admin Panel',
+                  'Enter student details to generate login credentials',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey,
@@ -113,22 +102,19 @@ final List<String> _regulations = [
         ),
       ),
 
+
       // ================= BODY =================
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+           const SizedBox(height: 4),
             const Text(
-              'Create Student Login ID',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              'student details ',
+              style: TextStyle(color: Color.fromARGB(255, 176, 176, 176)),
             ),
-            const SizedBox(height: 4),
-            const Text(
-              'Enter student details to generate login credentials',
-              style: TextStyle(color: Colors.grey),
-            ),
-            const SizedBox(height: 16),
+            
 
             Container(
               padding: const EdgeInsets.all(16),
@@ -142,6 +128,7 @@ final List<String> _regulations = [
   'Student Name *',
   'Enter student name',
   controller: nameController,
+  
 ),
 _inputField(
   'Email Address *',
@@ -208,6 +195,7 @@ _inputField(
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.grey.shade400,
+                        foregroundColor: const Color.fromARGB(255, 22, 22, 22),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),

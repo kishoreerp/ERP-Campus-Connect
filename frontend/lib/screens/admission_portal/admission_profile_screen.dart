@@ -3,15 +3,15 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../services/current_user_service.dart';
 
 
-class ExamCellProfileScreen extends StatefulWidget {
-  const ExamCellProfileScreen({super.key});
+class AdmissionProfileScreen extends StatefulWidget {
+  const AdmissionProfileScreen({super.key});
 
   @override
-  State<ExamCellProfileScreen> createState() => _ExamCellProfileScreenState();
+  State<AdmissionProfileScreen> createState() => _AdmissionProfileScreenState();
 }
 
-class _ExamCellProfileScreenState extends State<ExamCellProfileScreen> {
-  Map<String, dynamic>? userData;
+class _AdmissionProfileScreenState extends State<AdmissionProfileScreen> {
+Map<String, dynamic>? userData;
 
 
   String status = "Present";
@@ -106,7 +106,7 @@ const SizedBox(height: 12),
 ),
 
 Text(
-  userData?['Id'] ?? '',
+  userData?['staffId'] ?? '',
   style: GoogleFonts.inter(fontSize: 13, color: Colors.grey),
 ),
 

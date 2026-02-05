@@ -395,11 +395,20 @@ class _SettingsDialogState extends State<_SettingsDialog> {
                       ),
                     ),
                     Switch(
-                      value: notifications,
-                      activeColor: Colors.black,
-                      onChanged: (v) =>
-                          setState(() => notifications = v),
-                    ),
+  value: notifications,
+  activeColor: Colors.black,
+  activeTrackColor: Colors.black.withOpacity(0.35),
+
+  inactiveThumbColor: Colors.grey.shade600,
+  inactiveTrackColor: Colors.grey.shade300,
+
+  onChanged: (v) {
+    setState(() {
+      notifications = v;
+    });
+  },
+),
+
                   ],
                 ),
               ),

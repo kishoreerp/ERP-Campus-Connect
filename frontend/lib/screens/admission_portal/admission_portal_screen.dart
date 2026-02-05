@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'admission_home_screen.dart';
 import 'admission_student_screen.dart';
 import 'admission_screen.dart';
+import 'admission_profile_screen.dart';
 
 class AdmissionPortalScreen extends StatefulWidget {
   final String username;
@@ -30,6 +31,7 @@ class _AdmissionPortalScreenState extends State<AdmissionPortalScreen> {
       AdmissionHomeScreen(),
       AdmissionScreen(),
       AdmissionStudentScreen(),
+      AdmissionProfileScreen(),
       Center(child: Text('Profile')), // replace later if needed
     ];
   }

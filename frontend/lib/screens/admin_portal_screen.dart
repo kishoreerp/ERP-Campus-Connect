@@ -197,25 +197,11 @@ Future<void> _handleLogin() async {
                       ),
 
                       const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Password',
-                              style:
-                                  GoogleFonts.inter(fontWeight: FontWeight.w600)),
-                          GestureDetector(
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => const AdminResetEmailScreen()),
-                            ),
-                            child: Text('Forgot Password?',
-                                style: GoogleFonts.inter(
-                                    color: Colors.blue[700],
-                                    fontWeight: FontWeight.w600)),
-                          ),
-                        ],
-                      ),
+                      Text(
+  'Password',
+  style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+),
+
                       const SizedBox(height: 6),
                       _buildTextField(
                         controller: passwordController,
@@ -223,7 +209,32 @@ Future<void> _handleLogin() async {
                         icon: Icons.lock_outline,
                         obscure: true,
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 8),
+
+Align(
+  alignment: Alignment.centerRight,
+  child: GestureDetector(
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const AdminResetEmailScreen(),
+        ),
+      );
+    },
+    child: Text(
+      'Forgot Password?',
+      style: GoogleFonts.inter(
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+        color: Colors.blue[700],
+      ),
+    ),
+  ),
+),
+
+const SizedBox(height: 2),
+
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
