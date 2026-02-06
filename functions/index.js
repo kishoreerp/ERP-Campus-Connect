@@ -85,3 +85,29 @@ exports.resetPasswordWithOtp = functions
       }
     });
   });
+
+  // ================= DELETE STUDENT (AUTH + FIRESTORE) =================
+
+exports.deleteStudentUser = functions.firestore
+  .document("delete_requests/{uid}")
+  .onCreate(async (snap, context) => {
+    const uid = context.params.uid;
+
+    try {
+      console.log("Delete request received for UID:", uid);
+
+      // 🔐 Delete from Firebase Authentication
+      await admin.auth().deleteUser(uid);
+
+      // 🗄 Delete from Firestore
+      await admin.firestore().collection("users").doc(uid).delete();
+
+      // 🧹 Remove delete request document
+      await snap.ref.delete();
+
+      console.log("Student deleted successfully:", uid);
+    } catch (error) {
+      console.error("Error deleting student:", error);
+    }
+  });
+
