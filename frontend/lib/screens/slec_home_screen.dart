@@ -12,10 +12,14 @@ class SlecHomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: SafeArea(
+  child: Column(
+    children: [
+      const _HeaderSection(), // 🔒 FIXED (NO SCROLL)
+
+      Expanded(
         child: SingleChildScrollView(
           child: Column(
             children: const [
-              _HeaderSection(),
               SizedBox(height: 20),
               _WelcomeSection(),
               SizedBox(height: 16),
@@ -28,6 +32,10 @@ class SlecHomeScreen extends StatelessWidget {
           ),
         ),
       ),
+    ],
+  ),
+),
+
     );
   }
 }

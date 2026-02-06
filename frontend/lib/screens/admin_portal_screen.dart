@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../services/current_user_service.dart';
 
 
-
+import 'management_portal/management_portal_screen.dart';
 import 'staff_portal/staff_portal_screen.dart';
 import 'hod_portal/hod_portal_screen.dart';
 import 'timetable_portal/timetable_portal_screen.dart';
@@ -140,7 +140,7 @@ Future<void> _handleLogin() async {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => HODPortalScreen(
+          builder: (_) => ManagementPortalScreen(
             username: userData['username'] ?? email,
           ),
         ),
@@ -152,13 +152,9 @@ Future<void> _handleLogin() async {
       );
     }
   } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(e.toString())),
-    );
-  }
+  showErrorPopup(context, e.toString());
 }
-
-
+}
 
   @override
   Widget build(BuildContext context) {
@@ -225,7 +221,7 @@ Align(
     child: Text(
       'Forgot Password?',
       style: GoogleFonts.inter(
-        fontSize: 13,
+        fontSize: 14,
         fontWeight: FontWeight.w600,
         color: Colors.blue[700],
       ),
@@ -233,7 +229,7 @@ Align(
   ),
 ),
 
-const SizedBox(height: 2),
+const SizedBox(height: 4),
 
                       SizedBox(
                         width: double.infinity,
@@ -297,25 +293,109 @@ const SizedBox(height: 2),
     );
   }
 
-  Widget _buildDropdown() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: BorderRadius.circular(10),
+ Widget _buildDropdown() {
+  return DropdownButtonFormField<String>(
+    value: selectedRole,
+    items: roles.map((role) {
+      return DropdownMenuItem<String>(
+        value: role,
+        child: Text(
+          role,
+          style: GoogleFonts.inter(fontWeight: FontWeight.w500),
+        ),
+      );
+    }).toList(),
+    onChanged: (val) => setState(() => selectedRole = val),
+    icon: const Icon(Icons.keyboard_arrow_down_rounded),
+    decoration: InputDecoration(
+      prefixIcon: const Icon(Icons.admin_panel_settings_outlined),
+      hintText: 'Select your role',
+      hintStyle: GoogleFonts.inter(color: Colors.grey[600]),
+      filled: true,
+      fillColor: Colors.grey[100],
+      contentPadding: const EdgeInsets.symmetric(vertical: 14),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
       ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: selectedRole,
-          hint: Text('Select your role', style: GoogleFonts.inter()),
-          items: roles.map((role) {
-            return DropdownMenuItem(value: role, child: Text(role));
-          }).toList(),
-          onChanged: (val) => setState(() => selectedRole = val),
+    ),
+    dropdownColor: Colors.white,
+    borderRadius: BorderRadius.circular(14),
+    style: GoogleFonts.inter(color: Colors.black),
+  );
+}
+
+  void showErrorPopup(BuildContext context, String message) {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // ❌ ICON
+            Container(
+              height: 56,
+              width: 56,
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.error_outline,
+                color: Colors.red,
+                size: 32,
+              ),
+            ),
+            const SizedBox(height: 14),
+
+            // TITLE
+            Text(
+              'Login Failed',
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 8),
+
+            // MESSAGE
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                color: Colors.grey[700],
+              ),
+            ),
+
+            const SizedBox(height: 18),
+
+            // BUTTON
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                onPressed: () => Navigator.pop(context),
+                child: Text('OK', style: GoogleFonts.inter(color: Colors.white)),
+              ),
+            ),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
  Widget _buildTextField({
   required TextEditingController controller,

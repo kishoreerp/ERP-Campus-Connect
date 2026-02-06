@@ -10,13 +10,10 @@ class HODAttendanceScreen extends StatelessWidget {
       backgroundColor: Colors.white,
 
       // ================= APP BAR =================
-      appBar: AppBar(
+     appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
+        automaticallyImplyLeading: false,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -30,10 +27,7 @@ class HODAttendanceScreen extends StatelessWidget {
             ),
             Text(
               "Choose an option to manage attendance",
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                color: Colors.grey,
-              ),
+              style: GoogleFonts.inter(fontSize: 12, color: Colors.grey),
             ),
           ],
         ),
