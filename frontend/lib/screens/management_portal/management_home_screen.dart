@@ -21,40 +21,57 @@ class ManagementHomeScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
 
-              // ================= HEADER =================
-              Row(
-                children: [
-                  const CircleAvatar(
-                    radius: 18,
-                    backgroundColor: Colors.blue,
-                    child: Text(
-                      "SLEC",
-                      style: TextStyle(color: Colors.white, fontSize: 11),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
+// ================= HEADER  =================
+Row(
+  children: [
+    Container(
+      height: 34,
+      width: 34,
+      decoration: BoxDecoration(
+        color: Colors.teal,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        'SLEC',
+        style: GoogleFonts.inter(
+          color: Colors.white,
+          fontWeight: FontWeight.w700,
+          fontSize: 12,
+        ),
+      ),
+    ),
+    const SizedBox(width: 10),
 
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Admin Panel",
-                          style: GoogleFonts.inter(
-                              fontWeight: FontWeight.w600)),
-                      Text("Management Admin",
-                          style: GoogleFonts.inter(
-                              fontSize: 12,
-                              color: Colors.grey)),
-                    ],
-                  ),
+    Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Management Portal',
+          style: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        Text(
+          'St. Lourdes Engineering College',
+          style: GoogleFonts.inter(
+            color: Colors.grey[600],
+            fontSize: 13,
+          ),
+        ),
+      ],
+    ),
 
-                  const Spacer(),
-                  const Icon(Icons.notifications_none),
-                  const SizedBox(width: 6),
-                  const Text("EW"),
-                ],
-              ),
+    const Spacer(),
 
-              const SizedBox(height: 22),
+    IconButton(
+      icon: const Icon(Icons.notifications_outlined),
+      onPressed: () {},
+    ),
+  ],
+),
+
 
               // ================= TITLE =================
               Row(

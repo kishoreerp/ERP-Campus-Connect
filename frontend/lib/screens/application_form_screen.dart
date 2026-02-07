@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 
 class ApplicationFormScreen extends StatefulWidget {
   const ApplicationFormScreen({super.key});
+
+
 
   @override
   State<ApplicationFormScreen> createState() => _ApplicationFormScreenState();
@@ -14,6 +17,19 @@ class _ApplicationFormScreenState extends State<ApplicationFormScreen> {
   String? gender;
   String? course;
   String? education;
+
+  final TextEditingController firstNameCtrl = TextEditingController();
+final TextEditingController lastNameCtrl = TextEditingController();
+final TextEditingController emailCtrl = TextEditingController();
+final TextEditingController phoneCtrl = TextEditingController();
+final TextEditingController dobCtrl = TextEditingController();
+final TextEditingController addressCtrl = TextEditingController();
+final TextEditingController stateCtrl = TextEditingController();
+final TextEditingController pincodeCtrl = TextEditingController();
+
+final TextEditingController boardCtrl = TextEditingController();
+final TextEditingController yearCtrl = TextEditingController();
+final TextEditingController percentageCtrl = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -46,20 +62,20 @@ class _ApplicationFormScreenState extends State<ApplicationFormScreen> {
               title: 'Personal Information',
               subtitle: 'Provide your personal details',
               children: [
-                _input('First Name *'),
-                _input('Last Name *'),
-                _input('Email Address *'),
-                _input('Phone Number *'),
-                _input('Date of Birth *', hint: 'dd-mm-yyyy'),
+                _input('First Name *', firstNameCtrl),
+                _input('Last Name *', lastNameCtrl),
+                _input('Email Address *', emailCtrl),
+                _input('Phone Number *', phoneCtrl),
+                _input('Date of Birth *', dobCtrl, hint: 'dd-mm-yyyy'),
                 _dropdown(
                   label: 'Gender *',
                   value: gender,
                   items: const ['Male', 'Female', 'Other'],
                   onChanged: (v) => setState(() => gender = v),
                 ),
-                _input('Address *', maxLines: 3),
-                _input('State *'),
-                _input('Pincode *'),
+                _input('Address *', addressCtrl, maxLines: 3),
+                _input('State *', stateCtrl),
+                _input('Pincode *', pincodeCtrl),
               ],
             ),
 
@@ -86,9 +102,10 @@ class _ApplicationFormScreenState extends State<ApplicationFormScreen> {
                   items: const ['12th', 'Diploma'],
                   onChanged: (v) => setState(() => education = v),
                 ),
-                _input('Board / University *'),
-                _input('Year of Passing *'),
-                _input('Percentage / CGPA *'),
+               _input('Board / University *', boardCtrl),
+               _input('Year of Passing *', yearCtrl),
+               _input('Percentage / CGPA *', percentageCtrl),
+
               ],
             ),
 
@@ -111,24 +128,23 @@ class _ApplicationFormScreenState extends State<ApplicationFormScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Application Submitted')),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF2563EB),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: Text(
-                  'Submit Application',
-                  style: GoogleFonts.inter(
-                      fontWeight: FontWeight.w700, color: Colors.white),
-                ),
-              ),
+  onPressed: _submitApplication,
+  style: ElevatedButton.styleFrom(
+    backgroundColor: const Color(0xFF2563EB),
+    padding: const EdgeInsets.symmetric(vertical: 14),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(10),
+    ),
+  ),
+  child: Text(
+    'Submit Application',
+    style: GoogleFonts.inter(
+      fontWeight: FontWeight.w700,
+      color: Colors.white,
+    ),
+  ),
+),
+
             ),
 
             const SizedBox(height: 12),
@@ -143,6 +159,62 @@ class _ApplicationFormScreenState extends State<ApplicationFormScreen> {
       ),
     );
   }
+  
+  Future<void> _submitApplication() async {
+  try {
+    if (firstNameCtrl.text.isEmpty ||
+        lastNameCtrl.text.isEmpty ||
+        emailCtrl.text.isEmpty ||
+        phoneCtrl.text.isEmpty ||
+        gender == null ||
+        course == null ||
+        education == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all required fields')),
+      );
+      return;
+    }
+
+    await FirebaseFirestore.instance
+        .collection('admission_forms')
+        .add({
+      'firstName': firstNameCtrl.text.trim(),
+      'lastName': lastNameCtrl.text.trim(),
+      'email': emailCtrl.text.trim(),
+      'phone': phoneCtrl.text.trim(),
+      'dob': dobCtrl.text.trim(),
+      'gender': gender,
+      'address': addressCtrl.text.trim(),
+      'state': stateCtrl.text.trim(),
+      'pincode': pincodeCtrl.text.trim(),
+
+      'course': course,
+      'education': education,
+      'board': boardCtrl.text.trim(),
+      'passingYear': yearCtrl.text.trim(),
+      'percentage': percentageCtrl.text.trim(),
+
+      'status': 'pending',
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Application submitted successfully'),
+      ),
+    );
+
+    Navigator.pop(context);
+  } catch (e) {
+    debugPrint('SUBMIT ERROR: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error: $e')),
+    );
+  }
+}
+
 
   // ---------- Helpers ----------
 
@@ -176,29 +248,35 @@ class _ApplicationFormScreenState extends State<ApplicationFormScreen> {
     );
   }
 
-  Widget _input(String label, {String? hint, int maxLines = 1}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label,
-            style: GoogleFonts.inter(
-                fontSize: 12, fontWeight: FontWeight.w600)),
-        const SizedBox(height: 6),
-        TextField(
-          maxLines: maxLines,
-          decoration: InputDecoration(
-            hintText: hint,
-            filled: true,
-            fillColor: Colors.grey[100],
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
-              borderSide: BorderSide.none,
-            ),
+Widget _input(
+  String label,
+  TextEditingController controller, {
+  String? hint,
+  int maxLines = 1,
+}) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(label,
+          style: GoogleFonts.inter(
+              fontSize: 12, fontWeight: FontWeight.w600)),
+      const SizedBox(height: 6),
+      TextField(
+        controller: controller, // ✅ FIX
+        maxLines: maxLines,
+        decoration: InputDecoration(
+          hintText: hint,
+          filled: true,
+          fillColor: Colors.grey[100],
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
           ),
         ),
-      ],
-    );
-  }
+      ),
+    ],
+  );
+}
 
   Widget _dropdown({
     required String label,
@@ -248,10 +326,11 @@ class _FilePickerState extends State<_FilePicker> {
 
   Future<void> _pickFile() async {
     final result = await FilePicker.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
-      withData: true,
-    );
+  type: FileType.custom,
+  allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
+  withData: true,
+);
+
 
     if (result != null && result.files.isNotEmpty) {
       setState(() {
