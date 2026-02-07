@@ -73,6 +73,7 @@ class StudentDetailsPdfView extends StatelessWidget {
                               'Complete student information and documents',
                               style: TextStyle(
                                 fontSize: 12,
+                                
                                 color: Colors.grey,
                               ),
                             ),

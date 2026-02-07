@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+
 class StaffAttendanceScreen extends StatelessWidget {
   const StaffAttendanceScreen({super.key});
+
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +16,7 @@ class StaffAttendanceScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-    
+   
               Text("Hourly Attendance",
                   style: GoogleFonts.inter(
                       fontSize: 16, fontWeight: FontWeight.w600,color: Colors.black)),
@@ -23,6 +25,7 @@ class StaffAttendanceScreen extends StatelessWidget {
               const SizedBox(height: 10),
               _infoBox(),
               const SizedBox(height: 16),
+
 
               // Hourly Cards (keeps your design)
               _hourCardMarked(
@@ -99,6 +102,8 @@ class StaffAttendanceScreen extends StatelessWidget {
   }
 
 
+
+
   // ---------------- INFO BOX ----------------
   Widget _infoBox() => Container(
         padding: const EdgeInsets.all(14),
@@ -121,6 +126,7 @@ class StaffAttendanceScreen extends StatelessWidget {
           ],
         ),
       );
+
 
   // ---------------- CARD FACTORIES (they require context to show dialogs) ----------------
   Widget _hourCardMarked(BuildContext context,
@@ -157,6 +163,7 @@ class StaffAttendanceScreen extends StatelessWidget {
         it: it,
       );
 
+
   Widget _hourCardPending(BuildContext context,
           {required String hour,
           required String time,
@@ -185,6 +192,7 @@ class StaffAttendanceScreen extends StatelessWidget {
         it: it,
       );
 
+
   Widget _hourCardUpcoming(
           {required String hour,
           required String time,
@@ -208,6 +216,7 @@ class StaffAttendanceScreen extends StatelessWidget {
         textColor: Colors.white,
         showStats: false,
       );
+
 
   // ------------------- BREAK CARD -------------------
   Widget _breakCard(String title, String time, String tag) {
@@ -248,6 +257,7 @@ class StaffAttendanceScreen extends StatelessWidget {
       ),
     );
   }
+
 
   // ---------------- CARD TEMPLATE ----------------
   Widget _hourCardTemplate({
@@ -353,8 +363,10 @@ class StaffAttendanceScreen extends StatelessWidget {
                       }
                     };
 
+
               // choose icon color for white button
               final iconColor = (buttonColor == Colors.white) ? Colors.black87 : Colors.white;
+
 
               return ElevatedButton.icon(
                 onPressed: btnOnPressed,
@@ -377,6 +389,7 @@ class StaffAttendanceScreen extends StatelessWidget {
     );
   }
 
+
   // ---------------------- HELPERS ----------------------
   Widget _deptChip(String text) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -388,11 +401,13 @@ class StaffAttendanceScreen extends StatelessWidget {
         child: Text(text, style: GoogleFonts.inter(fontSize: 12, color: Colors.black87)),
       );
 
+
   Widget _statusChip(String text, Color color) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
         decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
         child: Text(text, style: GoogleFonts.inter(color: color, fontWeight: FontWeight.w600, fontSize: 12)),
       );
+
 
   Widget _summaryItem(String label, String value, Color color) {
     return Column(
@@ -404,7 +419,9 @@ class StaffAttendanceScreen extends StatelessWidget {
     );
   }
 
+
   // ---------------------- DIALOGS ----------------------
+
 
   // View Attendance dialog (matches your screenshots)
   void _showViewAttendanceDialog(BuildContext context) {
@@ -444,6 +461,7 @@ class StaffAttendanceScreen extends StatelessWidget {
               'Riya Verma'
             ][index % 12];
 
+
       return {
         'name': name,
         'roll': isIT ? 'IT${(index - 29).toString().padLeft(3, '0')}' : 'CSE${(index + 1).toString().padLeft(3, '0')}',
@@ -451,6 +469,7 @@ class StaffAttendanceScreen extends StatelessWidget {
         'status': index >= 42 ? 'Absent' : 'Present',
       };
     });
+
 
     showDialog(
       context: context,
@@ -478,6 +497,7 @@ class StaffAttendanceScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
 
+
               // Summary card
               Container(
                 padding: const EdgeInsets.all(12),
@@ -494,8 +514,10 @@ class StaffAttendanceScreen extends StatelessWidget {
               ),
               const SizedBox(height: 14),
 
+
               Text("Student List", style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 15)),
               const SizedBox(height: 10),
+
 
               // Student list scroll area
               Expanded(
@@ -537,6 +559,7 @@ class StaffAttendanceScreen extends StatelessWidget {
       ),
     );
   }
+
 
   // Mark Attendance dialog (interactive, toggles present/absent)
   void _showMarkAttendanceDialog(BuildContext context,
@@ -600,6 +623,7 @@ class StaffAttendanceScreen extends StatelessWidget {
               'Dipti V'
             ][index % 30]; // fallback
 
+
       return {
         'name': name,
         'roll': isIT ? 'IT${(index - 29).toString().padLeft(3, '0')}' : 'CSE${(index + 1).toString().padLeft(3, '0')}',
@@ -608,6 +632,7 @@ class StaffAttendanceScreen extends StatelessWidget {
       };
     });
 
+
     showDialog(
       context: context,
       builder: (context) {
@@ -615,11 +640,13 @@ class StaffAttendanceScreen extends StatelessWidget {
           int presentCount = students.where((s) => s['present']).length;
           int absentCount = students.length - presentCount;
 
+
           void markAll(bool val) {
             setState(() {
               for (var s in students) s['present'] = val;
             });
           }
+
 
           return Dialog(
             insetPadding: const EdgeInsets.all(16),
@@ -642,6 +669,7 @@ class StaffAttendanceScreen extends StatelessWidget {
                   ]),
                   const SizedBox(height: 12),
 
+
                   // summary
                   Container(
                     padding: const EdgeInsets.all(12),
@@ -661,6 +689,7 @@ class StaffAttendanceScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
+
                   // mark all buttons
                   Row(children: [
                     Expanded(
@@ -679,8 +708,10 @@ class StaffAttendanceScreen extends StatelessWidget {
                   ]),
                   const SizedBox(height: 12),
 
+
                   Text("Student List", style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 15)),
                   const SizedBox(height: 8),
+
 
                   // list
                   Expanded(
@@ -725,6 +756,7 @@ class StaffAttendanceScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
+
                   // submit
                   SizedBox(
                     width: double.infinity,
@@ -747,5 +779,3 @@ class StaffAttendanceScreen extends StatelessWidget {
     );
   }
 }
-
-
