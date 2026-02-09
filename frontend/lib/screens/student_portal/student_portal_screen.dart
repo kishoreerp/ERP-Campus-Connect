@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:myapp/screens/student_login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../main.dart'; // for AuthGate
+
 
 
 

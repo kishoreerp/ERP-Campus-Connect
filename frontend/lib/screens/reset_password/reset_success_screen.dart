@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../student_login_screen.dart';
-import '../student_portal/student_portal_screen.dart';
+
 
 class ResetSuccessScreen extends StatelessWidget {
   const ResetSuccessScreen({super.key});

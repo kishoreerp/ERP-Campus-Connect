@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/screens/admission_portal/ug_departments_screen.dart';
-import 'ug_departments_screen.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 
