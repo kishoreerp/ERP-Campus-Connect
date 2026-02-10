@@ -20,3 +20,8 @@ Thumbs.db
 **/google-services.json
 **/firebase_options.dart
 macos/Flutter/GeneratedPluginRegistrant.*
+
+# Flutter generated (platform)
+linux/flutter/
+windows/flutter/
+macos/Flutter/GeneratedPluginRegistrant.swift
