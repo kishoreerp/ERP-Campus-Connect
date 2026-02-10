@@ -29,15 +29,12 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
   bool _isPasswordVisible = false;
 
 
-final TextEditingController emailController = TextEditingController();
-
-final TextEditingController passwordController = TextEditingController();
-
-
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
   final roles = ['Management','Principal','Admission','HOD','Staff', 'TimeTable', 'ExamCell'];
 
-Future<void> _handleLogin() async {
-  try {
+  Future<void> _handleLogin() async {
+   try {
     if (selectedRole == null ||
         emailController.text.isEmpty ||
         passwordController.text.isEmpty) {
@@ -193,11 +190,7 @@ Future<void> _handleLogin() async {
                       ),
 
                       const SizedBox(height: 16),
-                      Text(
-  'Password',
-  style: GoogleFonts.inter(fontWeight: FontWeight.w600),
-),
-
+                      Text('Password',style: GoogleFonts.inter(fontWeight: FontWeight.w600),),
                       const SizedBox(height: 6),
                       _buildTextField(
                         controller: passwordController,
@@ -206,31 +199,27 @@ Future<void> _handleLogin() async {
                         obscure: true,
                       ),
                       const SizedBox(height: 8),
-
-Align(
-  alignment: Alignment.centerRight,
-  child: GestureDetector(
-    onTap: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const AdminResetEmailScreen(),
-        ),
-      );
-    },
-    child: Text(
-      'Forgot Password?',
-      style: GoogleFonts.inter(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: Colors.blue[700],
-      ),
-    ),
-  ),
-),
-
-const SizedBox(height: 4),
-
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                           context,
+                            MaterialPageRoute(
+                        builder: (_) => const AdminResetEmailScreen(),),
+                          );
+                        },
+                        child: Text(
+                         'Forgot Password?',
+                         style: GoogleFonts.inter(
+                         fontSize: 14,
+                         fontWeight: FontWeight.w600,
+                         color: Colors.blue[700],
+                          ),
+                        ),
+                     ),
+                  ),
+                  const SizedBox(height: 4),
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
