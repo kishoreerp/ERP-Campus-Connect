@@ -41,12 +41,12 @@ class SlecHomeScreen extends StatelessWidget {
 }
 
 // ---------------- HEADER ----------------
-class _HeaderSection extends StatelessWidget {
-  const _HeaderSection();
+  class _HeaderSection extends StatelessWidget {
+    const _HeaderSection();
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
+    @override
+    Widget build(BuildContext context) {
+      return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
       decoration: const BoxDecoration(
@@ -54,20 +54,20 @@ class _HeaderSection extends StatelessWidget {
           colors: [Color(0xFF1565C0), Color(0xFF0D47A1)],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-        ),
+          ),
         borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(28),
-          bottomRight: Radius.circular(28),
+        bottomLeft: Radius.circular(28),
+        bottomRight: Radius.circular(28),
         ),
       ),
-      child: Column(
+        child: Column(
         children: [
           Container(
             height: 54,
             width: 54,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
-              shape: BoxShape.circle,
+            color: Colors.white.withOpacity(0.15),
+            shape: BoxShape.circle,
             ),
             child: const Icon(Icons.school, color: Colors.white, size: 30),
           ),
@@ -114,19 +114,19 @@ class _HeaderSection extends StatelessWidget {
 class _WelcomeSection extends StatelessWidget {
   const _WelcomeSection();
 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        children: [
-          Text('Welcome to SLEC Portal',
+      @override
+      Widget build(BuildContext context) {
+        return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+          children: [
+            Text('Welcome to SLEC Portal',
               style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 6),
-          Text('Choose your access point to get started',
+            const SizedBox(height: 6),
+            Text('Choose your access point to get started',
               style: GoogleFonts.inter(color: Colors.grey[600])),
-          const SizedBox(height: 20),
-          Wrap(
+            const SizedBox(height: 20),
+            Wrap(
             spacing: 12,
             runSpacing: 12,
             alignment: WrapAlignment.center,
@@ -143,13 +143,13 @@ class _WelcomeSection extends StatelessWidget {
   }
 }
 
-class _StatCard extends StatelessWidget {
-  final String value, label;
-  final Color color;
-  const _StatCard({required this.value, required this.label, required this.color});
+  class _StatCard extends StatelessWidget {
+      final String value, label;
+      final Color color;
+      const _StatCard({required this.value, required this.label, required this.color});
 
-  @override
-  Widget build(BuildContext context) {
+   @override
+    Widget build(BuildContext context) {
     return Container(
       width: 160,
       padding: const EdgeInsets.symmetric(vertical: 14),

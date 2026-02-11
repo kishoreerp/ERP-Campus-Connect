@@ -21,6 +21,7 @@ class _ApplicationFormScreenState extends State<ApplicationFormScreen> {
 String? degree;    // B.E / B.Tech / M.E / MBA
 String? preferredCourse;
 
+int currentStep = 0;
 
   final TextEditingController firstNameCtrl = TextEditingController();
 final TextEditingController lastNameCtrl = TextEditingController();
@@ -67,8 +68,34 @@ final TextEditingController incomeCertNoCtrl = TextEditingController();
 
 final TextEditingController nativityCertNoCtrl = TextEditingController();
 
+
+// Academic dynamic controllers
+
+final TextEditingController school12Ctrl = TextEditingController();
+final TextEditingController board12Ctrl = TextEditingController();
+final TextEditingController year12Ctrl = TextEditingController();
+final TextEditingController mark12Ctrl = TextEditingController();
+
+final TextEditingController school10Ctrl = TextEditingController();
+final TextEditingController board10Ctrl = TextEditingController();
+final TextEditingController year10Ctrl = TextEditingController();
+final TextEditingController mark10Ctrl = TextEditingController();
+
+final TextEditingController collegeCtrl = TextEditingController();
+final TextEditingController universityCtrl = TextEditingController();
+final TextEditingController degreeYearCtrl = TextEditingController();
+final TextEditingController degreePercentCtrl = TextEditingController();
+
+PlatformFile? previousEducationFile;
+
 bool isFirstGraduate = false;
 bool hasNativityCert = false;
+bool show12thDetails = false;
+bool show10thDetails = false;
+
+double percent12 = 0;
+double percent10 = 0;
+
 
 PlatformFile? communityCertFile;
 PlatformFile? firstGraduateCertFile;
@@ -99,261 +126,613 @@ PlatformFile? nativityCertFile;
           ],
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            _section(
-  title: 'Program Selection',
-  subtitle: 'Choose program and course',
-  children: [
-    // PROGRAM
-    _dropdown(
-      label: 'Program *',
-      value: program,
-      items: const ['UG', 'PG'],
-      onChanged: (v) {
-        setState(() {
-          program = v;
-          degree = null;
-          preferredCourse = null;
-        });
-      },
-    ),
+     body: Stepper(
+  type: StepperType.vertical,
+  currentStep: currentStep,
+  onStepContinue: () {
+    if (currentStep < 4) {
+      setState(() => currentStep++);
+    } else {
+      _submitApplication();
+    }
+  },
+  onStepCancel: () {
+    if (currentStep > 0) {
+      setState(() => currentStep--);
+    }
+  },
+  controlsBuilder: (context, details) {
 
-    // DEGREE
-    if (program != null)
-      _dropdown(
-        label: 'Degree *',
-        value: degree,
-        items: program == 'UG'
-            ? ['B.E', 'B.Tech']
-            : ['M.E', 'MBA'],
-        onChanged: (v) {
+  // ❌ Hide buttons in Preview step
+  if (currentStep == 4) {
+    return const SizedBox(); 
+  }
+
+  return Padding(
+    padding: const EdgeInsets.only(top: 20),
+    child: Row(
+      children: [
+        ElevatedButton(
+          onPressed: details.onStepContinue,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.black,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 12,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+          child: const Text(
+            'Next',
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
+        ),
+        const SizedBox(width: 12),
+        if (currentStep > 0)
+          TextButton(
+            onPressed: details.onStepCancel,
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.black,
+            ),
+            child: const Text(
+              'Back',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
+      ],
+    ),
+  );
+},
+
+
+  steps: [
+Step(
+  title: const Text('Program & Personal Info'),
+  isActive: currentStep >= 0,
+  content: Column(
+    children: [
+      _section(
+        title: 'Program Selection',
+        subtitle: 'Choose program and course',
+        children: [
+          // PROGRAM
+          _dropdown(
+            label: 'Program *',
+            value: program,
+            items: const ['UG', 'PG'],
+            onChanged: (v) {
+              setState(() {
+                program = v;
+                degree = null;
+                preferredCourse = null;
+              });
+            },
+          ),
+
+          // DEGREE
+          if (program != null)
+            _dropdown(
+              label: 'Degree *',
+              value: degree,
+              items: program == 'UG'
+                  ? ['B.E', 'B.Tech']
+                  : ['M.E', 'MBA'],
+              onChanged: (v) {
+                setState(() {
+                  degree = v;
+                  preferredCourse = null;
+                });
+              },
+            ),
+
+          // COURSE
+          if (program != null && degree != null)
+            _dropdown(
+              label: 'Preferred Course *',
+              value: preferredCourse,
+              items: courseMap[program]![degree]!,
+              onChanged: (v) => setState(() => preferredCourse = v),
+            ),
+        ],
+      ),
+      const SizedBox(height: 12),
+      _section(
+        title: 'Personal Information',
+        subtitle: 'Provide applicant personal details',
+        children: [
+          _input('Name of the Applicant *', fullNameCtrl),
+          _input('Date of Birth *', dobCtrl, hint: 'dd-mm-yyyy'),
+          _dropdown(
+            label: 'Gender *',
+            value: gender,
+            items: const ['Male', 'Female', 'Other'],
+            onChanged: (v) => setState(() => gender = v),
+          ),
+          _dropdown(
+            label: 'Blood Group *',
+            value: bloodGroupCtrl.text.isEmpty ? null : bloodGroupCtrl.text,
+            items: const ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'],
+            onChanged: (v) => bloodGroupCtrl.text = v ?? '',
+          ),
+          _input(
+            'Aadhaar Number *',
+            aadhaarCtrl,
+            hint: '12 digit Aadhaar number',
+          ),
+          _input('Email Address *', emailCtrl),
+          _input('Phone Number *', phoneCtrl),
+        ],
+      ),
+      const SizedBox(height: 1),
+    ],
+  ),
+),
+Step(
+  title: const Text('Parents & Address'),
+  isActive: currentStep >= 1,
+  content: Column(
+    children: [
+      _section(
+        title: 'Parents / Guardian Information',
+        subtitle: 'Provide parent or guardian contact details',
+        children: [
+          _input('Father Name *', fatherNameCtrl),
+          _input('Father Mobile Number *', fatherMobileCtrl),
+          _input('Mother Name *', motherNameCtrl),
+          _input('Mother Mobile Number *', motherMobileCtrl),
+          _input('Guardian Name (if applicable)', guardianNameCtrl),
+          _input('Guardian Mobile Number', guardianMobileCtrl),
+        ],
+      ),
+      const SizedBox(height: 12),
+      _section(
+        title: 'Address Information',
+        subtitle: 'Permanent residential address',
+        children: [
+          _input('Door No *', doorNoCtrl),
+          _input('Street / Road *', streetCtrl),
+          _input('Village / Town *', villageCtrl),
+          _input('Post *', postCtrl),
+          _input('City *', cityCtrl),
+          _input('Taluk *', talukCtrl),
+          _input('District *', districtCtrl),
+          _input('State *', stateCtrl),
+          _input('Pincode *', pincodeCtrl),
+        ],
+      ),
+      const SizedBox(height: 1),
+    ],
+  ),
+),
+Step(
+  title: const Text('Academic Details'),
+  isActive: currentStep >= 2,
+  content: Column(
+    children: [
+      _section(
+        title: 'Academic Information',
+        subtitle: 'Provide your academic background',
+        children: [
+          // 🔽 Previous Education Dropdown
+          _dropdown(
+            label: 'Previous Education *',
+            value: education,
+            items: program == 'PG'
+                ? [
+                    '12th',
+                    'Diploma',
+                    'B.E',
+                    'B.Tech',
+                    'B.Sc',
+                    'B.Com',
+                    'BBA',
+                    'Other Degree'
+                  ]
+                : ['12th', 'Diploma'],
+            onChanged: (v) {
+              setState(() {
+                education = v;
+
+                if (education == '12th') {
+                  show12thDetails = true;
+                  show10thDetails = true;
+                } else {
+                  show12thDetails = false;
+                  show10thDetails = true;
+                }
+              });
+            },
+          ),
+          const SizedBox(height: 15),
+
+          // ==============================
+          // ✅ CASE 1: IF 12TH SELECTED
+          // ==============================
+          if (education == '12th') ...[
+            _input('12th School Name *', school12Ctrl),
+            _input('12th Board *', board12Ctrl),
+            _input('12th Year of Passing *', year12Ctrl),
+            Row(
+              children: [
+                Expanded(
+                  child: _input(
+                    '12th Mark (Out of 600) *',
+                    mark12Ctrl,
+                    onChanged: (val) {
+                      setState(() {
+                        percent12 =
+                            (double.tryParse(val) ?? 0) / 600 * 100;
+                      });
+                    },
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    percent12 > 0
+                        ? '${percent12.toStringAsFixed(2)} %'
+                        : 'Percentage',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            _input('10th School Name *', school10Ctrl),
+            _input('10th Board *', board10Ctrl),
+            _input('10th Year of Passing *', year10Ctrl),
+            Row(
+              children: [
+                Expanded(
+                  child: _input(
+                    '10th Mark (Out of 500) *',
+                    mark10Ctrl,
+                    onChanged: (val) {
+                      setState(() {
+                        percent10 =
+                            (double.tryParse(val) ?? 0) / 500 * 100;
+                      });
+                    },
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    percent10 > 0
+                        ? '${percent10.toStringAsFixed(2)} %'
+                        : 'Percentage',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+          ],
+
+          // ==============================
+          // ✅ CASE 2: OTHER THAN 12TH
+          // ==============================
+          if (education != null && education != '12th') ...[
+            _input('$education Institution Name *', collegeCtrl),
+            _input('University *', universityCtrl),
+            _input('Year of Passing *', degreeYearCtrl),
+            _input('Percentage / CGPA *', degreePercentCtrl),
+            const SizedBox(height: 15),
+            CheckboxListTile(
+              value: show12thDetails,
+              title: const Text("Add 12th Details"),
+              onChanged: (v) {
+                setState(() {
+                  show12thDetails = v!;
+                });
+              },
+            ),
+            if (show12thDetails) ...[
+              _input('12th School Name', school12Ctrl),
+              _input('12th Board', board12Ctrl),
+              _input('12th Year', year12Ctrl),
+              Row(
+  children: [
+    Expanded(
+      child: _input(
+        '12th Mark (Out of 600)',
+        mark12Ctrl,
+        onChanged: (val) {
           setState(() {
-            degree = v;
-            preferredCourse = null;
+            percent12 =
+                (double.tryParse(val) ?? 0) / 600 * 100;
           });
         },
       ),
-
-    // COURSE
-    if (program != null && degree != null)
-      _dropdown(
-        label: 'Preferred Course *',
-        value: preferredCourse,
-        items: courseMap[program]![degree]!,
-        onChanged: (v) => setState(() => preferredCourse = v),
+    ),
+    const SizedBox(width: 10),
+    Expanded(
+      child: Text(
+        percent12 > 0
+            ? '${percent12.toStringAsFixed(2)} %'
+            : 'Percentage',
+        style: const TextStyle(fontWeight: FontWeight.bold),
       ),
-  ],
-),
-const SizedBox(height: 12),
-            _section(
-  title: 'Personal Information',
-  subtitle: 'Provide applicant personal details',
-  children: [
-    _input('Name of the Applicant *', fullNameCtrl),
-
-    _input('Date of Birth *', dobCtrl, hint: 'dd-mm-yyyy'),
-
-    _dropdown(
-      label: 'Gender *',
-      value: gender,
-      items: const ['Male', 'Female', 'Other'],
-      onChanged: (v) => setState(() => gender = v),
     ),
-
-    _dropdown(
-      label: 'Blood Group *',
-      value: bloodGroupCtrl.text.isEmpty ? null : bloodGroupCtrl.text,
-      items: const ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'],
-      onChanged: (v) => bloodGroupCtrl.text = v ?? '',
-    ),
-
-    _input(
-      'Aadhaar Number *',
-      aadhaarCtrl,
-      hint: '12 digit Aadhaar number',
-    ),
-
-    _input('Email Address *', emailCtrl),
-    _input('Phone Number *', phoneCtrl),
   ],
 ),
-const SizedBox(height: 12),
-_section(
-  title: 'Parents / Guardian Information',
-  subtitle: 'Provide parent or guardian contact details',
+
+            ],
+            const SizedBox(height: 10),
+            _input('10th School Name *', school10Ctrl),
+            _input('10th Board *', board10Ctrl),
+            _input('10th Year of Passing *', year10Ctrl),
+            Row(
   children: [
-    _input('Father Name *', fatherNameCtrl),
-    _input('Father Mobile Number *', fatherMobileCtrl),
-
-    _input('Mother Name *', motherNameCtrl),
-    _input('Mother Mobile Number *', motherMobileCtrl),
-
-    _input('Guardian Name (if applicable)', guardianNameCtrl),
-    _input('Guardian Mobile Number', guardianMobileCtrl),
-  ],
-),
-const SizedBox(height: 12),
-_section(
-  title: 'Address Information',
-  subtitle: 'Permanent residential address',
-  children: [
-    _input('Door No *', doorNoCtrl),
-    _input('Street / Road *', streetCtrl),
-    _input('Village / Town *', villageCtrl),
-    _input('Post *', postCtrl),
-    _input('City *', cityCtrl),
-    _input('Taluk *', talukCtrl),
-    _input('District *', districtCtrl),
-    _input('State *', stateCtrl),
-    _input('Pincode *', pincodeCtrl),
+    Expanded(
+      child: _input(
+        '10th Mark (Out of 500) *',
+        mark10Ctrl,
+        onChanged: (val) {
+          setState(() {
+            percent10 =
+                (double.tryParse(val) ?? 0) / 500 * 100;
+          });
+        },
+      ),
+    ),
+    const SizedBox(width: 10),
+    Expanded(
+      child: Text(
+        percent10 > 0
+            ? '${percent10.toStringAsFixed(2)} %'
+            : 'Percentage',
+        style: const TextStyle(fontWeight: FontWeight.bold),
+      ),
+    ),
   ],
 ),
 
-            const SizedBox(height: 16),
-
-            _section(
-              title: 'Academic Information',
-              subtitle: 'Provide your academic background',
-              children: [
-    
-
-                _dropdown(
-                  label: 'Previous Education *',
-                  value: education,
-                  items: const ['12th', 'Diploma'],
-                  onChanged: (v) => setState(() => education = v),
-                ),
-               _input('Board / University *', boardCtrl),
-               _input('Year of Passing *', yearCtrl),
-               _input('Percentage / CGPA *', percentageCtrl),
-
-              ],
+          ],
+        ],
+      ),
+      const SizedBox(height: 16),
+      _section(
+        title: 'Community & Certificate Details',
+        subtitle: 'Scholarship and government certificate information',
+        children: [
+          _input('EMIS ID *', emisIdCtrl),
+          _input('Religion *', religionCtrl),
+          _input('Caste *', casteCtrl),
+          _input('Community *', communityCtrl),
+          _input('Community Certificate Number *', communityCertNoCtrl),
+          _input(
+            'Annual Income (₹) *',
+            annualIncomeCtrl,
+            hint: 'Numbers only',
+          ),
+          _input('Income Certificate Number *', incomeCertNoCtrl),
+          _yesNoRadio(
+            label: 'First Graduate *',
+            value: isFirstGraduate,
+            onChanged: (v) => setState(() => isFirstGraduate = v),
+          ),
+          if (isFirstGraduate)
+            _input(
+              'First Graduate Certificate Number *',
+              firstGraduateCertNoCtrl,
             ),
-            const SizedBox(height: 16),
-_section(
-  title: 'Community & Certificate Details',
-  subtitle: 'Scholarship and government certificate information',
-  children: [
-    _input('EMIS ID *', emisIdCtrl),
-    _input('Religion *', religionCtrl),
-    _input('Caste *', casteCtrl),
-    _input('Community *', communityCtrl),
-
-    _input('Community Certificate Number *', communityCertNoCtrl),
-
-    
-    _input(
-      'Annual Income (₹) *',
-      annualIncomeCtrl,
-      hint: 'Numbers only',
-    ),
-
-    _input('Income Certificate Number *', incomeCertNoCtrl),
-    
-_yesNoRadio(
-  label: 'First Graduate *',
-  value: isFirstGraduate,
-  onChanged: (v) => setState(() => isFirstGraduate = v),
-),
-
-
-if (isFirstGraduate)
-  _input(
-    'First Graduate Certificate Number *',
-    firstGraduateCertNoCtrl,
+          _yesNoRadio(
+            label: 'Nativity Certificate *',
+            value: hasNativityCert,
+            onChanged: (v) => setState(() => hasNativityCert = v),
+          ),
+          if (hasNativityCert)
+            _input(
+              'Nativity Certificate Number *',
+              nativityCertNoCtrl,
+            ),
+        ],
+      ),
+      const SizedBox(height: 1),
+    ],
   ),
-
-_yesNoRadio(
-  label: 'Nativity Certificate *',
-  value: hasNativityCert,
-  onChanged: (v) => setState(() => hasNativityCert = v),
 ),
+Step(
+  title: const Text('Document Upload'),
+  isActive: currentStep >= 3,
+  content: Column(
+    children: [
+      _section(
+        title: 'Document Upload',
+        subtitle: 'Upload required documents (PDF format, max 20kb each)',
+        children: [
 
+  const _FilePicker(label: 'Passport Size Photo *'),
 
-if (hasNativityCert)
-  _input(
-    'Nativity Certificate Number *',
-    nativityCertNoCtrl,
-  ),
-  ],
-),
+  const _FilePicker(label: '10th Mark Sheet *'),
 
-            const SizedBox(height: 16),
+  // Show 12th only when needed
+  if (education == '12th' || show12thDetails)
+    const _FilePicker(label: '12th Mark Sheet *'),
 
-            _section(
-              title: 'Document Upload',
-              subtitle: 'Upload required documents (PDF format, max 2MB each)',
-              
-              children: [
-  _filePicker(
-    label: 'Community Certificate (PDF ≤ 20KB)',
-    onSelected: (file) => communityCertFile = file,
-  ),
+  // Show diploma/degree marksheet only if NOT 12th
+  if (education != null && education != '12th')
+    _FilePicker(label: '$education Marksheet *'),
+
+  const _FilePicker(label: 'Transfer Certificate *'),
+
+  const _FilePicker(label: 'Community Certificate *'),
 
   if (isFirstGraduate)
-    _filePicker(
-      label: 'First Graduate Certificate (PDF ≤ 20KB)',
-      onSelected: (file) => firstGraduateCertFile = file,
-    ),
+    const _FilePicker(label: 'First Graduate Certificate *'),
 
-  _filePicker(
-    label: 'Income Certificate (PDF ≤ 20KB)',
-    onSelected: (file) => incomeCertFile = file,
-  ),
+  const _FilePicker(label: 'Income Certificate *'),
 
   if (hasNativityCert)
-    _filePicker(
-      label: 'Nativity Certificate (PDF ≤ 20KB)',
-      onSelected: (file) => nativityCertFile = file,
-    ),
-
-  _FilePicker(label: 'Passport Size Photo *'),
-  _FilePicker(label: '10th Mark Sheet *'),
-  _FilePicker(label: '12th Mark Sheet *'),
-  _FilePicker(label: 'Transfer Certificate'),
+    const _FilePicker(label: 'Nativity Certificate *'),
 ],
 
-            ),
-
-            const SizedBox(height: 22),
-
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-  onPressed: _submitApplication,
-  style: ElevatedButton.styleFrom(
-    backgroundColor: const Color(0xFF2563EB),
-    padding: const EdgeInsets.symmetric(vertical: 14),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(10),
-    ),
+      ),
+      const SizedBox(height: 1),
+    ],
   ),
-  child: Text(
-    'Submit Application',
-    style: GoogleFonts.inter(
-      fontWeight: FontWeight.w700,
-      color: Colors.white,
+),
+Step(
+  title: const Text('Preview'),
+  isActive: currentStep >= 4,
+  content: SingleChildScrollView(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+
+        _previewSection("Program Details", [
+          _previewItem("Program", program),
+          _previewItem("Degree", degree),
+          _previewItem("Course", preferredCourse),
+        ]),
+
+        _previewSection("Personal Information", [
+          _previewItem("Full Name", fullNameCtrl.text),
+          _previewItem("DOB", dobCtrl.text),
+          _previewItem("Gender", gender),
+          _previewItem("Blood Group", bloodGroupCtrl.text),
+          _previewItem("Aadhaar", aadhaarCtrl.text),
+          _previewItem("Email", emailCtrl.text),
+          _previewItem("Phone", phoneCtrl.text),
+        ]),
+
+        _previewSection("Parents Information", [
+          _previewItem("Father Name", fatherNameCtrl.text),
+          _previewItem("Father Mobile", fatherMobileCtrl.text),
+          _previewItem("Mother Name", motherNameCtrl.text),
+          _previewItem("Mother Mobile", motherMobileCtrl.text),
+          _previewItem("Guardian Name", guardianNameCtrl.text),
+          _previewItem("Guardian Mobile", guardianMobileCtrl.text),
+        ]),
+
+        _previewSection("Address Details", [
+          _previewItem("Door No", doorNoCtrl.text),
+          _previewItem("Street", streetCtrl.text),
+          _previewItem("Village", villageCtrl.text),
+          _previewItem("Post", postCtrl.text),
+          _previewItem("City", cityCtrl.text),
+          _previewItem("Taluk", talukCtrl.text),
+          _previewItem("District", districtCtrl.text),
+          _previewItem("State", stateCtrl.text),
+          _previewItem("Pincode", pincodeCtrl.text),
+        ]),
+
+        _previewSection("Academic Details", [
+          _previewItem("Education", education),
+          _previewItem("10th School", school10Ctrl.text),
+          _previewItem("10th Mark", mark10Ctrl.text),
+          _previewItem("12th School", school12Ctrl.text),
+          _previewItem("12th Mark", mark12Ctrl.text),
+          _previewItem("College", collegeCtrl.text),
+          _previewItem("University", universityCtrl.text),
+          _previewItem("Degree %", degreePercentCtrl.text),
+        ]),
+
+        _previewSection("Community Details", [
+          _previewItem("Religion", religionCtrl.text),
+          _previewItem("Caste", casteCtrl.text),
+          _previewItem("Community", communityCtrl.text),
+          _previewItem("Annual Income", annualIncomeCtrl.text),
+          _previewItem("First Graduate", isFirstGraduate ? "Yes" : "No"),
+          _previewItem("Nativity", hasNativityCert ? "Yes" : "No"),
+        ]),
+
+        const SizedBox(height: 25),
+
+  SizedBox(
+  width: double.infinity,
+  child: ElevatedButton(
+    onPressed: _submitApplication,
+    style: ElevatedButton.styleFrom(
+      backgroundColor: const Color(0xFF2563EB),
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+    ),
+    child: Text(
+      'Submit Application',
+      style: GoogleFonts.inter(
+        fontWeight: FontWeight.w700,
+        color: Colors.white,
+      ),
     ),
   ),
 ),
 
-            ),
+        const SizedBox(height: 15),
+      ],
+    ),
+  ),
+),
 
-            const SizedBox(height: 12),
-
-            Text(
-              'By submitting this application, you agree to our\nterms and conditions.',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(fontSize: 11, color: Colors.grey[600]),
-            ),
-          ],
-        ),
-      ),
+  ],),
     );
   }
+  Widget _previewSection(String title, List<Widget> children) {
+  return Container(
+    margin: const EdgeInsets.only(bottom: 18),
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(14),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.05),
+          blurRadius: 8,
+          offset: const Offset(0, 4),
+        ),
+      ],
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 12),
+        ...children,
+      ],
+    ),
+  );
+}
+
+Widget _previewItem(String label, String? value) {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 8),
+    child: Row(
+      children: [
+        Expanded(
+          flex: 4,
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+              color: Colors.grey,
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 6,
+          child: Text(
+            (value == null || value.isEmpty) ? "-" : value,
+            style: const TextStyle(
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 
   Future<bool> _isEmailAlreadyUsed(String email) async {
   final result = await FirebaseFirestore.instance
@@ -490,10 +869,23 @@ if (!RegExp(r'^\d+$').hasMatch(annualIncomeCtrl.text)) {
 
 
       'course': course,
-      'education': education,
-      'board': boardCtrl.text.trim(),
-      'passingYear': yearCtrl.text.trim(),
-      'percentage': percentageCtrl.text.trim(),
+      'previousEducation': education,
+
+'12thSchool': school12Ctrl.text.trim(),
+'12thBoard': board12Ctrl.text.trim(),
+'12thYear': year12Ctrl.text.trim(),
+'12thMark': mark12Ctrl.text.trim(),
+
+'10thSchool': school10Ctrl.text.trim(),
+'10thBoard': board10Ctrl.text.trim(),
+'10thYear': year10Ctrl.text.trim(),
+'10thMark': mark10Ctrl.text.trim(),
+
+'collegeName': collegeCtrl.text.trim(),
+'university': universityCtrl.text.trim(),
+'degreeYear': degreeYearCtrl.text.trim(),
+'degreePercentage': degreePercentCtrl.text.trim(),
+
 
       'status': 'pending',
       'createdAt': FieldValue.serverTimestamp(),
@@ -582,12 +974,12 @@ final Map<String, Map<String, List<String>>> courseMap = {
       ),
     );
   }
-
 Widget _input(
   String label,
   TextEditingController controller, {
   String? hint,
   int maxLines = 1,
+  Function(String)? onChanged,
 }) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -597,8 +989,9 @@ Widget _input(
               fontSize: 12, fontWeight: FontWeight.w600)),
       const SizedBox(height: 6),
       TextField(
-        controller: controller, // ✅ FIX
+        controller: controller,
         maxLines: maxLines,
+        onChanged: onChanged,
         decoration: InputDecoration(
           hintText: hint,
           filled: true,
@@ -612,6 +1005,7 @@ Widget _input(
     ],
   );
 }
+
 
 Widget _yesNoRadio({
   required String label,
@@ -746,68 +1140,100 @@ class _FilePicker extends StatefulWidget {
 class _FilePickerState extends State<_FilePicker> {
   String fileName = 'No file chosen';
 
-  Future<void> _pickFile() async {
-    final result = await FilePicker.pickFiles(
-  type: FileType.custom,
-  allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
-  withData: true,
-);
+ Future<void> _pickFile() async {
+  final result = await FilePicker.pickFiles(
+    type: FileType.custom,
+    allowedExtensions: ['pdf'], // PDF ONLY
+    withData: true,
+  );
 
+  if (result == null || result.files.isEmpty) return;
 
-    if (result != null && result.files.isNotEmpty) {
-      setState(() {
-        fileName = result.files.first.name;
-      });
-    }
+  final file = result.files.first;
+
+  // Check file extension
+  if (file.extension?.toLowerCase() != 'pdf') {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Only PDF files are allowed')),
+    );
+    return;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          widget.label,
-          style: GoogleFonts.inter(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-          ),
+  // Check file size (20KB = 20480 bytes)
+  if (file.size > 20480) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('File must be 20KB or less')),
+    );
+    return;
+  }
+
+  setState(() {
+    fileName = file.name;
+  });
+}
+
+
+ @override
+Widget build(BuildContext context) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        widget.label,
+        style: GoogleFonts.inter(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: Colors.black, // BLACK TEXT
         ),
-        const SizedBox(height: 6),
-        InkWell(
-          onTap: _pickFile,
-          borderRadius: BorderRadius.circular(10),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(10),
+      ),
+      const SizedBox(height: 6),
+      InkWell(
+        onTap: _pickFile,
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+          decoration: BoxDecoration(
+            color: Colors.white, // WHITE BACKGROUND
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: Colors.black, // BLACK BORDER
+              width: 1,
             ),
-            child: Row(
-              children: [
-                const Icon(Icons.upload_file, color: Colors.grey),
-                const SizedBox(width: 8),
-                Text(
-                  'Choose file',
-                  style: GoogleFonts.inter(fontSize: 13),
+          ),
+          child: Row(
+            children: [
+              const Icon(
+                Icons.upload_file,
+                color: Colors.black, // BLACK ICON
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                'Choose PDF',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w500,
                 ),
-                const Spacer(),
-                Expanded(
-                  child: Text(
-                    fileName,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.right,
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      color: Colors.grey[700],
-                    ),
+              ),
+              const Spacer(),
+              Expanded(
+                child: Text(
+                  fileName,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.right,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.black, // BLACK FILE NAME
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
-      ],
-    );
-  }
+      ),
+      const SizedBox(height: 10),
+    ],
+  );
+}
+
 }
