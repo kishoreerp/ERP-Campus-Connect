@@ -7,16 +7,71 @@ import 'staff_notifications_screen.dart';
 import 'staff_announcement_screen.dart';
 import 'staff_timetable_screen.dart';
 import 'staff_request_leave_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'staff_approval_screen.dart';
 
 
 
 
-class StaffHomeScreen extends StatelessWidget {
+class StaffHomeScreen extends StatefulWidget {
   final String username;
-  const StaffHomeScreen({super.key, required this.username});
+
+  const StaffHomeScreen({
+    super.key,
+    required this.username,
+  });
+
+  @override
+  State<StaffHomeScreen> createState() => _StaffHomeScreenState();
+}
+class _StaffHomeScreenState extends State<StaffHomeScreen> {
+
+  bool isClassIncharge = false;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkUserRole();
+  }
+
+  Future<void> _checkUserRole() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      if (doc.exists) {
+        final role = doc['role'];
+        final designation = doc['designation'];
+
+        if (role == 'Staff' &&
+            designation.toString().toLowerCase() == 'class incharge') {
+          isClassIncharge = true;
+        }
+      }
+    }
+
+    setState(() {
+      isLoading = false;
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+  return const Scaffold(
+    body: Center(child: CircularProgressIndicator()),
+  );
+}
+
     return Scaffold(
       backgroundColor: Colors.grey[50],
       body: SafeArea(
@@ -75,7 +130,7 @@ class StaffHomeScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Welcome, ${username.isNotEmpty ? username : 'John Smith'}!',
+                    'Welcome, ${widget.username.isNotEmpty ? widget.username : 'John Smith'}!',
                     style: GoogleFonts.inter(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
@@ -129,13 +184,21 @@ class StaffHomeScreen extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: _quickAction(
-              context,
-              Icons.notifications_outlined,
-              'Notifications',
-              const StaffNotificationsScreen(), // or null
-            ),
-          ),
+  child: isClassIncharge
+      ? _quickAction(
+          context,
+          Icons.approval_outlined,
+          'Approval',
+          const StaffApprovalScreen(),    
+        )
+      : _quickAction(
+          context,
+          Icons.notifications_outlined,
+          'Notifications',
+          const StaffNotificationsScreen(),
+        ),
+),
+
         ],
       ),
 
@@ -171,6 +234,24 @@ class StaffHomeScreen extends StatelessWidget {
           ),
         ],
       ),
+      if (isClassIncharge) ...[
+  const SizedBox(height: 12),
+  Row(
+    children: [
+      Expanded(
+        child: _quickAction(
+          context,
+          Icons.notifications_outlined,
+          'Notifications',
+          const StaffNotificationsScreen(),
+        ),
+      ),
+      const Spacer(),
+      const Spacer(),
+    ],
+  ),
+],
+
     ],
   );
 }
