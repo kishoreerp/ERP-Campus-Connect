@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+
 import 'management_home_screen.dart';
 import 'management_staff_screen.dart';
 import 'management_student_screen.dart';
@@ -10,6 +11,7 @@ class ManagementPortalScreen extends StatefulWidget {
   final String username;
   const ManagementPortalScreen({super.key, required this.username});
 
+
   @override
   State<ManagementPortalScreen> createState() =>
       _ManagementPortalScreenState();
@@ -18,23 +20,27 @@ class ManagementPortalScreen extends StatefulWidget {
 class _ManagementPortalScreenState extends State<ManagementPortalScreen> {
   int _selectedIndex = 0;
 
+
   late final List<Widget> _pages;
+
 
   @override
   void initState() {
     super.initState();
-    _pages = const [
-      ManagementHomeScreen(),
-      ManagementStaffScreen(),
-      ManagementStudentScreen(),
-      ManagementProfileScreen(),
+    _pages = [
+      ManagementHomeScreen(username: widget.username),
+      const ManagementStaffScreen(),
+      const ManagementStudentScreen(),
+      const ManagementProfileScreen(),
     ];
   }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+
 
       // ✅ COMMON HEADER (SAME AS STAFF / HOD / EXAM / ADMISSION)
       appBar: AppBar(
@@ -68,7 +74,9 @@ class _ManagementPortalScreenState extends State<ManagementPortalScreen> {
         ),
       ),
 
+
       body: SafeArea(child: _pages[_selectedIndex]),
+
 
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,

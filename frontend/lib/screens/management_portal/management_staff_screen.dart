@@ -3,8 +3,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'department_staff_list_screen.dart';
 
 
+
+
 class ManagementStaffScreen extends StatelessWidget {
   const ManagementStaffScreen({super.key});
+
 
   @override
   Widget build(BuildContext context) {
@@ -17,33 +20,12 @@ class ManagementStaffScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
 
-              // ================= HEADER =================
-              Row(
-                children: [
-                  const CircleAvatar(
-                    backgroundColor: Colors.blue,
-                    child: Text("SLEC",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold)),
-                  ),
-                  const SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Admin Panel",
-                          style: GoogleFonts.inter(
-                              fontWeight: FontWeight.w600)),
-                      Text("Management Admin",
-                          style: GoogleFonts.inter(
-                              fontSize: 12,
-                              color: Colors.grey)),
-                    ],
-                  ),
-                ],
-              ),
+
+           
+
 
               const SizedBox(height: 20),
+
 
               // ================= TITLE =================
               Row(
@@ -53,32 +35,11 @@ class ManagementStaffScreen extends StatelessWidget {
                       style: GoogleFonts.inter(
                           fontSize: 20,
                           fontWeight: FontWeight.bold)),
-                  badge("Management Admin"),
+                 
                 ],
               ),
+                  const SizedBox(height: 18),
 
-              const SizedBox(height: 14),
-
-              // ================= VIEW MODE =================
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: Colors.orange.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.info_outline,
-                        color: Colors.orange),
-                    const SizedBox(width: 8),
-                    Text("View-Only Mode - Management Admin",
-                        style: GoogleFonts.inter(
-                            color: Colors.orange.shade800)),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 18),
 
               // ================= STATS =================
               Row(
@@ -89,14 +50,18 @@ class ManagementStaffScreen extends StatelessWidget {
                 ],
               ),
 
+
               const SizedBox(height: 24),
+
 
               // ================= TEACHING =================
               Text("TEACHING STAFF BY DEPT",
                   style: GoogleFonts.inter(
                       fontWeight: FontWeight.w700)),
 
+
               const SizedBox(height: 12),
+
 
               deptTile(context,
                   title: "Computer Science",
@@ -104,11 +69,13 @@ class ManagementStaffScreen extends StatelessWidget {
                   count: "28 Faculty",
                   staffList: cseStaff),
 
+
               deptTile(context,
                   title: "Electronics & Communication",
                   hod: "HOD: Dr. Priya Sharma",
                   count: "24 Faculty",
                   staffList: eceStaff),
+
 
               deptTile(context,
                   title: "Mechanical Engineering",
@@ -116,11 +83,13 @@ class ManagementStaffScreen extends StatelessWidget {
                   count: "22 Faculty",
                   staffList: mechStaff),
 
+
               deptTile(context,
                   title: "Information Technology",
                   hod: "HOD: Dr. Anita Desai",
                   count: "18 Faculty",
                   staffList: itStaff),
+
 
               deptTile(context,
                   title: "Cyber Security",
@@ -128,11 +97,13 @@ class ManagementStaffScreen extends StatelessWidget {
                   count: "16 Faculty",
                   staffList: cyberStaff),
 
+
               deptTile(context,
                   title: "Artificial Intelligence & Data Science",
                   hod: "HOD: Dr. Karthik Iyer",
                   count: "14 Faculty",
                   staffList: aiStaff),
+
 
               deptTile(context,
                   title: "MBA",
@@ -140,13 +111,17 @@ class ManagementStaffScreen extends StatelessWidget {
                   count: "12 Faculty",
                   staffList: mbaStaff),
 
+
               const SizedBox(height: 24),
+
 
               // ================= NON TEACHING =================
                Text("NON-TEACHING STAFF",
                   style: GoogleFonts.inter(fontWeight: FontWeight.w700)),
 
+
               const SizedBox(height: 12),
+
 
               deptTile(context,
                   title: "Administrative Staff",
@@ -154,17 +129,20 @@ class ManagementStaffScreen extends StatelessWidget {
                   count: "3 Staff",
                   staffList: adminStaff),
 
+
               deptTile(context,
                   title: "Lab Technicians",
                   hod: "",
                   count: "3 Staff",
                   staffList: labStaff),
 
+
               deptTile(context,
                   title: "Library Staff",
                   hod: "",
                   count: "2 Staff",
                   staffList: libraryStaff),
+
 
               deptTile(context,
                   title: "Maintenance Staff",
@@ -178,6 +156,7 @@ class ManagementStaffScreen extends StatelessWidget {
     );
   }
 }
+
 
 Widget deptTile(
   BuildContext context, {
@@ -237,9 +216,12 @@ Widget deptTile(
 }
 
 
+
+
 //////////////////////////////////////////////////////////
 // SMALL WIDGETS
 //////////////////////////////////////////////////////////
+
 
 Widget badge(String text) {
   return Container(
@@ -252,6 +234,7 @@ Widget badge(String text) {
     child: Text(text, style: GoogleFonts.inter(fontSize: 12)),
   );
 }
+
 
 Widget statCard(String value, String label) {
   return Expanded(
@@ -277,6 +260,7 @@ Widget statCard(String value, String label) {
     ),
   );
 }
+
 
 //////////////////////////////////////////////////////////
 // DEPARTMENT TILE
@@ -311,6 +295,7 @@ Widget dept(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
 
+
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -331,6 +316,7 @@ Widget dept(
             ],
           ),
 
+
           Container(
             padding:
                 const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -341,6 +327,7 @@ Widget dept(
             child: Text(count),
           )
 
+
         ],
       ),
     ),
@@ -348,9 +335,12 @@ Widget dept(
 }
 
 
+
+
 //////////////////////////////////////////////////////////
 // NON-TEACHING TILE
 //////////////////////////////////////////////////////////
+
 
 Widget nonTeachingTile(String title, String count) {
   return Container(
@@ -380,9 +370,11 @@ Widget nonTeachingTile(String title, String count) {
   );
 }
 
+
 //////////////////////////////////////////////////////////
 // STAFF DATA
 //////////////////////////////////////////////////////////
+
 
 final cseStaff = [
   {"name":"Dr. Rajesh Kumar","role":"Professor & HOD","email":"rajesh@slec.edu.in","phone":"+91 98765 11111","present":true},
@@ -391,11 +383,13 @@ final cseStaff = [
   {"name":"Dr. Suresh Patel","role":"Associate Professor","email":"suresh@slec.edu.in","phone":"+91 98765 11114","present":false},
 ];
 
+
 final eceStaff = [
   {"name":"Dr. Priya Sharma","role":"Professor & HOD","email":"priya@slec.edu.in","phone":"+91 98765 22221","present":true},
   {"name":"Prof. Ramesh Iyer","role":"Associate Professor","email":"ramesh@slec.edu.in","phone":"+91 98765 22222","present":true},
   {"name":"Dr. Anjali Menon","role":"Assistant Professor","email":"anjali@slec.edu.in","phone":"+91 98765 22223","present":true},
 ];
+
 
 final mechStaff = [
   {"name":"Dr. Vijay Patel","role":"Professor & HOD","email":"vijay@slec.edu.in","phone":"+91 98765 33331","present":true},
@@ -403,11 +397,13 @@ final mechStaff = [
   {"name":"Dr. Lakshmi Rao","role":"Assistant Professor","email":"lakshmi@slec.edu.in","phone":"+91 98765 33333","present":true},
 ];
 
+
 final itStaff = [
   {"name":"Dr. Anita Desai","role":"Professor & HOD","email":"anita@slec.edu.in","phone":"+91 98765 44441","present":true},
   {"name":"Prof. Mohan Kumar","role":"Associate Professor","email":"mohan@slec.edu.in","phone":"+91 98765 44442","present":true},
   {"name":"Dr. Pooja Verma","role":"Assistant Professor","email":"pooja@slec.edu.in","phone":"+91 98765 44443","present":true},
 ];
+
 
 final cyberStaff = [
   {"name":"Dr. Suresh Reddy","role":"Professor & HOD","email":"suresh@slec.edu.in","phone":"+91 98765 55551","present":true},
@@ -415,11 +411,13 @@ final cyberStaff = [
   {"name":"Dr. Vikram Gupta","role":"Assistant Professor","email":"vikram@slec.edu.in","phone":"+91 98765 55553","present":true},
 ];
 
+
 final aiStaff = [
   {"name":"Dr. Karthik Iyer","role":"Professor & HOD","email":"karthik@slec.edu.in","phone":"+91 98765 66661","present":true},
   {"name":"Prof. Rekha Nair","role":"Associate Professor","email":"rekha@slec.edu.in","phone":"+91 98765 66662","present":true},
   {"name":"Dr. Arjun Bhat","role":"Assistant Professor","email":"arjun@slec.edu.in","phone":"+91 98765 66663","present":true},
 ];
+
 
 final mbaStaff = [
   {"name":"Dr. Meera Singh","role":"Professor & HOD","email":"meera@slec.edu.in","phone":"+91 98765 77771","present":true},
@@ -427,7 +425,9 @@ final mbaStaff = [
   {"name":"Dr. Divya Kapoor","role":"Assistant Professor","email":"divya@slec.edu.in","phone":"+91 98765 77773","present":false},
 ];
 
+
 // NON TEACHING
+
 
 final adminStaff = [
   {"name":"Ramesh Kumar","role":"Senior Administrator","email":"ramesh@slec.edu.in","phone":"+91 98765 88881","present":true},
@@ -435,18 +435,22 @@ final adminStaff = [
   {"name":"Prakash Singh","role":"Accounts Officer","email":"prakash@slec.edu.in","phone":"+91 98765 88883","present":false},
 ];
 
+
 final labStaff = [
   {"name":"Vijay Kumar","role":"Senior Lab Technician","email":"vijay@slec.edu.in","phone":"+91 98765 99991","present":true},
   {"name":"Anand Reddy","role":"Lab Technician","email":"anand@slec.edu.in","phone":"+91 98765 99992","present":true},
   {"name":"Lakshmi Devi","role":"Lab Technician","email":"lakshmi@slec.edu.in","phone":"+91 98765 99993","present":true},
 ];
 
+
 final libraryStaff = [
   {"name":"Geetha Menon","role":"Chief Librarian","email":"geetha@slec.edu.in","phone":"+91 98765 00001","present":true},
   {"name":"Suresh Babu","role":"Assistant Librarian","email":"suresh@slec.edu.in","phone":"+91 98765 00002","present":true},
 ];
 
+
 final maintenanceStaff = [
   {"name":"Nagaraj Gowda","role":"Maintenance Supervisor","email":"nagaraj@slec.edu.in","phone":"+91 98765 00011","present":true},
   {"name":"Kumar Swamy","role":"Electrician","email":"kumar@slec.edu.in","phone":"+91 98765 00012","present":false},
 ];
+

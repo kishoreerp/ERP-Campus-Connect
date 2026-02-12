@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:myapp/screens/hod_portal/leave_dialogs.dart';
 import 'staff_notes_screen.dart';
 
 import 'staff_events_screen.dart';
 import 'staff_notifications_screen.dart';
 import 'staff_announcement_screen.dart';
 import 'staff_timetable_screen.dart';
-import 'staff_request_leave_screen.dart';
+import 'staff_leave_dialog.dart'hide showLeaveRequestDialog;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'staff_approval_screen.dart';
+
 
 
 
@@ -38,6 +39,70 @@ class _StaffHomeScreenState extends State<StaffHomeScreen> {
     _checkUserRole();
   }
 
+  void _showApprovalPopup() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+
+                Text(
+                  "Approvals",
+                  style: GoogleFonts.inter(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+
+                const SizedBox(height: 6),
+
+                Text(
+                  "Choose approval type to view",
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    color: Colors.grey,
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                _approvalOptionTile(
+                  icon: Icons.pending_actions_outlined,
+                  title: "Pending Approval",
+                  subtitle: "Review pending requests",
+                  onTap: () {
+                    Navigator.pop(context);
+                    // TODO: Navigate to pending list screen
+                  },
+                ),
+
+                const SizedBox(height: 14),
+
+                _approvalOptionTile(
+                  icon: Icons.verified_outlined,
+                  title: "Approved",
+                  subtitle: "View approved requests",
+                  onTap: () {
+                    Navigator.pop(context);
+                    // TODO: Navigate to approved list screen
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> _checkUserRole() async {
     final user = FirebaseAuth.instance.currentUser;
 
@@ -61,6 +126,61 @@ class _StaffHomeScreenState extends State<StaffHomeScreen> {
     setState(() {
       isLoading = false;
     });
+  }
+
+  Widget _approvalOptionTile({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: Colors.black),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right, color: Colors.grey),
+          ],
+        ),
+      ),
+    );
   }
 
 
@@ -186,11 +306,14 @@ class _StaffHomeScreenState extends State<StaffHomeScreen> {
           Expanded(
   child: isClassIncharge
       ? _quickAction(
-          context,
-          Icons.approval_outlined,
-          'Approval',
-          const StaffApprovalScreen(),    
-        )
+  context,
+  Icons.approval_outlined,
+  'Approval',
+  null,
+  customOnTap: () {
+    _showApprovalPopup();
+  },
+)
       : _quickAction(
           context,
           Icons.notifications_outlined,
@@ -229,7 +352,10 @@ class _StaffHomeScreenState extends State<StaffHomeScreen> {
               context,
               Icons.exit_to_app_outlined,
               'Request Leave',
-              StaffRequestLeaveScreen(), // or null
+              null,
+              customOnTap: () {
+                showLeaveManagementDialog(context);
+              },
             ),
           ),
         ],
@@ -256,17 +382,19 @@ class _StaffHomeScreenState extends State<StaffHomeScreen> {
   );
 }
 
-
-  Widget _quickAction(
+Widget _quickAction(
   BuildContext context,
   IconData icon,
   String title,
-  Widget? screen,
-) {
+  Widget? screen, {
+  VoidCallback? customOnTap,
+}) {
   return InkWell(
     borderRadius: BorderRadius.circular(12),
     onTap: () {
-      if (screen != null) {
+      if (customOnTap != null) {
+        customOnTap();
+      } else if (screen != null) {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => screen),
@@ -299,6 +427,7 @@ class _StaffHomeScreenState extends State<StaffHomeScreen> {
     ),
   );
 }
+
 
 
   // ---------------- SCHEDULE ----------------

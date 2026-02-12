@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+
 //////////////////////////////////////////////////////////
 // MANAGEMENT STUDENT SCREEN
 //////////////////////////////////////////////////////////
 
+
 class ManagementStudentScreen extends StatelessWidget {
   const ManagementStudentScreen({super.key});
+
 
   @override
   Widget build(BuildContext context) {
@@ -19,29 +22,10 @@ class ManagementStudentScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
 
-              // ================= HEADER =================
-              Row(
-                children: [
-                  const CircleAvatar(
-                    backgroundColor: Colors.blue,
-                    child: Text("SLEC",
-                        style: TextStyle(color: Colors.white, fontSize: 12)),
-                  ),
-                  const SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Admin Panel",
-                          style: GoogleFonts.inter(
-                              fontWeight: FontWeight.bold)),
-                      Text("Management Admin",
-                          style: GoogleFonts.inter(fontSize: 12)),
-                    ],
-                  ),
-                ],
-              ),
 
-              const SizedBox(height: 20),
+             
+              const SizedBox(height: 10),
+
 
               // ================= TITLE =================
               Row(
@@ -50,45 +34,17 @@ class ManagementStudentScreen extends StatelessWidget {
                       style: GoogleFonts.inter(
                           fontSize: 20,
                           fontWeight: FontWeight.bold)),
-                  const Spacer(),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Text("Management Admin"),
-                  )
+         
+               
                 ],
               ),
 
-              const SizedBox(height: 12),
 
-              // ================= VIEW MODE =================
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: Colors.orange[50],
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.shield_outlined,
-                        color: Colors.orange),
-                 Expanded(
-  child: Text(
-    "Very very long department name",
-    overflow: TextOverflow.ellipsis,
-  ),
-),
-Icon(Icons.arrow_forward_ios),
+           
 
-                  ],
-                ),
-              ),
 
               const SizedBox(height: 16),
+
 
               // ================= SEARCH =================
               Row(
@@ -120,7 +76,9 @@ Icon(Icons.arrow_forward_ios),
                 ],
               ),
 
+
               const SizedBox(height: 18),
+
 
               // ================= YEAR COUNTS =================
               GridView.count(
@@ -139,14 +97,18 @@ Icon(Icons.arrow_forward_ios),
                 ],
               ),
 
+
               const SizedBox(height: 20),
+
 
               // ================= DEPARTMENTS =================
               Text("Department-wise Students",
                   style: GoogleFonts.inter(
                       fontWeight: FontWeight.bold)),
 
+
               const SizedBox(height: 12),
+
 
               deptRow(context, "Computer Science"),
               deptRow(context, "Information Technology"),
@@ -160,6 +122,7 @@ Icon(Icons.arrow_forward_ios),
       ),
     );
   }
+
 
   // ================= DEPARTMENT TILE =================
   Widget deptRow(BuildContext context, String title) {
@@ -200,17 +163,21 @@ Icon(Icons.arrow_forward_ios),
   }
 }
 
+
 //////////////////////////////////////////////////////////
 // YEAR CARD WIDGET
 //////////////////////////////////////////////////////////
+
 
 class YearStatCard extends StatelessWidget {
   final String value;
   final String label;
   final Color color;
 
+
   const YearStatCard(this.value, this.label, this.color,
       {super.key});
+
 
   @override
   Widget build(BuildContext context) {
@@ -237,17 +204,21 @@ class YearStatCard extends StatelessWidget {
   }
 }
 
+
 //////////////////////////////////////////////////////////
 // YEAR SELECTION SCREEN
 //////////////////////////////////////////////////////////
 
+
 class DepartmentYearsView extends StatelessWidget {
   final String departmentName;
+
 
   DepartmentYearsView({
     super.key,
     required this.departmentName,
   });
+
 
   final Map<String, List<String>> yearData = {
     "Computer Science": ["95", "126", "111", "62"],
@@ -258,9 +229,11 @@ class DepartmentYearsView extends StatelessWidget {
     "MBA": ["116", "106"],
   };
 
+
   @override
   Widget build(BuildContext context) {
     final years = yearData[departmentName] ?? [];
+
 
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
@@ -271,6 +244,7 @@ class DepartmentYearsView extends StatelessWidget {
             crossAxisAlignment:
                 CrossAxisAlignment.start,
             children: [
+
 
               Row(
                 children: [
@@ -297,7 +271,9 @@ class DepartmentYearsView extends StatelessWidget {
                 ],
               ),
 
+
               const SizedBox(height: 20),
+
 
               if (years.length > 0)
                 yearTile(context,"1st Year",
@@ -317,6 +293,7 @@ class DepartmentYearsView extends StatelessWidget {
       ),
     );
   }
+
 
  Widget yearTile(BuildContext context, String title, String count) {
   return InkWell(
@@ -365,14 +342,17 @@ class DepartmentYearsView extends StatelessWidget {
   );
 }
 
+
 }
 //////////////////////////////////////////////////////////
 // STUDENT LIST SCREEN
 //////////////////////////////////////////////////////////
 
+
 class StudentListScreen extends StatelessWidget {
   final String departmentName;
   final String yearName;
+
 
   StudentListScreen({
     super.key,
@@ -380,8 +360,10 @@ class StudentListScreen extends StatelessWidget {
     required this.yearName,
   });
 
+
   // Demo Students
   final List<Map<String, String>> students = [
+
 
     {"name": "Rajesh Kumar", "reg": "CSE01001"},
     {"name": "Priya Sharma", "reg": "CSE01002"},
@@ -390,6 +372,7 @@ class StudentListScreen extends StatelessWidget {
     {"name": "Vikram Singh", "reg": "CSE01005"},
     {"name": "Divya Nair", "reg": "CSE01006"},
   ];
+
 
   @override
   Widget build(BuildContext context) {
@@ -401,6 +384,7 @@ class StudentListScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+
 
               // ---------- HEADER ----------
               Row(
@@ -424,20 +408,13 @@ class StudentListScreen extends StatelessWidget {
                               color: Colors.grey)),
                     ],
                   ),
-                  const Spacer(),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Text("Management Admin"),
-                  )
+                 
                 ],
               ),
 
+
               const SizedBox(height: 16),
+
 
               // ---------- VIEW MODE ----------
               Container(
@@ -458,7 +435,9 @@ class StudentListScreen extends StatelessWidget {
                 ),
               ),
 
+
               const SizedBox(height: 16),
+
 
               // ---------- SEARCH ----------
               TextField(
@@ -473,7 +452,9 @@ class StudentListScreen extends StatelessWidget {
                 ),
               ),
 
+
               const SizedBox(height: 16),
+
 
               // ---------- STUDENT LIST ----------
               Expanded(
@@ -488,6 +469,7 @@ class StudentListScreen extends StatelessWidget {
   yearName,
 );
 
+
                   },
                 ),
               ),
@@ -497,6 +479,7 @@ class StudentListScreen extends StatelessWidget {
       ),
     );
   }
+
 
   // ---------- STUDENT TILE ----------
 Widget studentTile(
@@ -553,16 +536,19 @@ Widget studentTile(
   );
 }
 
+
 }
 //////////////////////////////////////////////////////////
 // STUDENT PROFILE SCREEN
 //////////////////////////////////////////////////////////
+
 
 class StudentProfileScreen extends StatelessWidget {
   final String name;
   final String regNo;
   final String department;
   final String year;
+
 
   const StudentProfileScreen({
     super.key,
@@ -572,10 +558,12 @@ class StudentProfileScreen extends StatelessWidget {
     required this.year,
   });
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade100,
+
 
       body: SafeArea(
         child: SingleChildScrollView(
@@ -583,6 +571,7 @@ class StudentProfileScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+
 
               // ================= HEADER =================
               Row(
@@ -599,19 +588,13 @@ class StudentProfileScreen extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Text("Management Admin"),
-                  )
+                 
                 ],
               ),
 
+
               const SizedBox(height: 12),
+
 
               // ================= VIEW MODE =================
               Container(
@@ -629,7 +612,9 @@ class StudentProfileScreen extends StatelessWidget {
                 ),
               ),
 
+
               const SizedBox(height: 20),
+
 
               // ================= PROFILE CARD =================
               Container(
@@ -660,7 +645,9 @@ class StudentProfileScreen extends StatelessWidget {
                 ),
               ),
 
+
               const SizedBox(height: 20),
+
 
               // ================= PERSONAL INFO =================
        whiteSection(
@@ -690,7 +677,10 @@ class StudentProfileScreen extends StatelessWidget {
 ),
 
 
+
+
               const SizedBox(height: 16),
+
 
               // ================= ACADEMIC INFO =================
              whiteSection(
@@ -729,7 +719,9 @@ class StudentProfileScreen extends StatelessWidget {
   ],
 ),
 
+
               const SizedBox(height: 16),
+
 
               // ================= PARENT INFO =================
             whiteSection(
@@ -753,6 +745,7 @@ class StudentProfileScreen extends StatelessWidget {
   ],
 ),
 
+
             ],
           ),
         ),
@@ -760,7 +753,9 @@ class StudentProfileScreen extends StatelessWidget {
     );
   }
 
+
   // ---------- Small Widgets ----------
+
 
   Widget sectionTitle(String text) {
     return Padding(
@@ -772,6 +767,7 @@ class StudentProfileScreen extends StatelessWidget {
       ),
     );
   }
+
 
   Widget simpleinfoTile({
   required IconData icon,
@@ -830,6 +826,7 @@ Widget whiteSection({
   );
 }
 
+
 // ================= INFO ROW TILE =================
 Widget infoTile({
   required IconData icon,
@@ -870,4 +867,10 @@ Widget infoTile({
     ),
   );
 }
+
+
+
+
+
+
 

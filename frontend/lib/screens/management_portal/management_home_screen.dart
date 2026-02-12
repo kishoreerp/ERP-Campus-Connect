@@ -6,13 +6,22 @@ import 'management_approve_requests_screen.dart';
 import 'manage_users_screen.dart';
 
 
+
+
 class ManagementHomeScreen extends StatelessWidget {
-  const ManagementHomeScreen({super.key});
+ final String username;
+
+
+  const ManagementHomeScreen({super.key, required this.username});
+
+
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffF5F6FA),
+
 
       body: SafeArea(
         child: SingleChildScrollView(
@@ -20,121 +29,80 @@ class ManagementHomeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
+ 
 // ================= HEADER  =================
-Row(
+Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
   children: [
-    Container(
-      height: 34,
-      width: 34,
-      decoration: BoxDecoration(
-        color: Colors.teal,
-        borderRadius: BorderRadius.circular(6),
-      ),
-      alignment: Alignment.center,
-      child: Text(
-        'SLEC',
-        style: GoogleFonts.inter(
-          color: Colors.white,
-          fontWeight: FontWeight.w700,
-          fontSize: 12,
-        ),
-      ),
-    ),
-    const SizedBox(width: 10),
 
-    Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Management Portal',
-          style: GoogleFonts.inter(
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
+
+   
+
+
+    const SizedBox(height: 16),
+
+
+    // Your remaining content
+Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF6A11CB), Color(0xFF2575FC)],
+            ),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 6,
+                offset: const Offset(0, 3),
+              )
+            ],
           ),
-        ),
-        Text(
-          'St. Lourdes Engineering College',
-          style: GoogleFonts.inter(
-            color: Colors.grey[600],
-            fontSize: 13,
-          ),
-        ),
-      ],
-    ),
-
-    const Spacer(),
-
-    IconButton(
-      icon: const Icon(Icons.notifications_outlined),
-      onPressed: () {},
-    ),
-  ],
-),
-
-
-              // ================= TITLE =================
-              Row(
+          child: Row(
+            children: [
+              const CircleAvatar(
+                radius: 26,
+                backgroundColor: Colors.white,
+                child: Icon(Icons.person_outline,
+                    color: Colors.blueAccent, size: 34),
+              ),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Management",
-                          style: GoogleFonts.inter(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold)),
-                      Text("Dashboard",
-                          style: GoogleFonts.inter(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 4),
-                      Text("ST. Lourdes Engineering College",
-                          style: GoogleFonts.inter(
-                              fontSize: 12,
-                              color: Colors.grey)),
-                    ],
-                  ),
-
-                  const Spacer(),
-
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.grey),
+                  Text(
+                    'Welcome, "sandhiya"',
+                    style: GoogleFonts.inter(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
                     ),
-                    child: Text("Management Admin",
-                        style: GoogleFonts.inter(fontSize: 12)),
-                  )
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'EMP12345 • st.Lourdes engineering',
+                    style:
+                        GoogleFonts.inter(color: Colors.white70, fontSize: 13),
+                  ),
                 ],
               ),
+            ],
+          ),
+        ),
 
-              const SizedBox(height: 16),
 
-              // ================= WARNING =================
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: Colors.orange.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.orange),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.warning_amber, color: Colors.orange),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        "View-Only Mode: You can monitor all activities but cannot make changes",
-                        style: GoogleFonts.inter(fontSize: 12),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+   ],
 
-              const SizedBox(height: 22),
+
+      ),      const SizedBox(height: 22),
+
+
+             
+
+
+           
+
 
               // ================= OVERVIEW =================
               Row(
@@ -145,26 +113,24 @@ Row(
                   const Spacer(),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.blue,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text("LIVE DATA",
-                        style: GoogleFonts.inter(
-                            color: Colors.white, fontSize: 10)),
+                        horizontal: 5, vertical: 2),
+                 
+
+
                   ),
                 ],
               ),
 
-              const SizedBox(height: 12),
+
+              const SizedBox(height: 10),
+
 
               GridView.count(
                 crossAxisCount: 2,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
+                 crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
                 childAspectRatio: 1.9,
                 children: const [
                   _StatCard("3247", "TOTAL STUDENTS", Icons.school),
@@ -174,7 +140,9 @@ Row(
                 ],
               ),
 
-              const SizedBox(height: 24),
+
+              const SizedBox(height: 10),
+
 
               // ================= QUICK ACTIONS =================
               Container(
@@ -187,6 +155,7 @@ Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
 
+
                     Row(
                       children: [
                         const Icon(Icons.flash_on, size: 18),
@@ -197,16 +166,19 @@ Row(
                       ],
                     ),
 
-                    const SizedBox(height: 14),
+
+                    const SizedBox(height: 10),
+
 
                   GridView.count(
   crossAxisCount: 2,
   shrinkWrap: true,
   physics: const NeverScrollableScrollPhysics(),
-  crossAxisSpacing: 12,
-  mainAxisSpacing: 12,
-  childAspectRatio: 1.9,
+  crossAxisSpacing: 10,
+  mainAxisSpacing: 10,
+  childAspectRatio: 2.6,
   children: [
+
 
     _ActionCard(
       "ATTENDANCE",
@@ -221,6 +193,7 @@ Row(
       },
     ),
 
+
    _ActionCard(
   "ANNOUNCE",
   Icons.campaign,
@@ -233,6 +206,8 @@ Row(
     );
   },
 ),
+
+
 
 
   _ActionCard(
@@ -249,6 +224,8 @@ Row(
 ),
 
 
+
+
     _ActionCard(
       "USERS",
       Icons.people,
@@ -262,14 +239,18 @@ Row(
       },
     ),
 
+
   ],
 ),
+
 
                   ],
                 ),
               ),
 
-              const SizedBox(height: 20),
+
+              const SizedBox(height: 10),
+
 
               // ================= NOTIFICATIONS =================
               Container(
@@ -281,6 +262,7 @@ Row(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+
 
                     Row(
                       children: [
@@ -302,7 +284,9 @@ Row(
                       ],
                     ),
 
+
                     const SizedBox(height: 14),
+
 
                     const _NotificationCard(
                       title: "23 pending approval requests",
@@ -312,6 +296,7 @@ Row(
                       dotColor: Colors.orange,
                     ),
 
+
                     const _NotificationCard(
                       title: "HOD Meeting at 3:00 PM today",
                       subtitle:
@@ -319,6 +304,7 @@ Row(
                       time: "30 mins ago",
                       dotColor: Colors.black,
                     ),
+
 
                     const _NotificationCard(
                       title: "System maintenance scheduled tomorrow",
@@ -335,6 +321,7 @@ Row(
   dotColor: Colors.black,
 ),
 
+
 _NotificationCard(
   title: "Feedback responses pending review",
   subtitle:
@@ -342,6 +329,7 @@ _NotificationCard(
   time: "5 hours ago",
   dotColor: Colors.orange,
 ),
+
 
 const SizedBox(height: 10),
                   ],
@@ -355,6 +343,7 @@ const SizedBox(height: 10),
   }
 }
 
+
 // =================================================
 // STAT CARD
 // =================================================
@@ -363,7 +352,9 @@ class _StatCard extends StatelessWidget {
   final String title;
   final IconData icon;
 
+
   const _StatCard(this.value, this.title, this.icon);
+
 
   @override
   Widget build(BuildContext context) {
@@ -391,6 +382,7 @@ class _StatCard extends StatelessWidget {
   }
 }
 
+
 // =================================================
 // ACTION CARD
 // =================================================
@@ -399,11 +391,13 @@ class _ActionCard extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
 
+
   const _ActionCard(
     this.title,
     this.icon, {
     required this.onTap,
   });
+
 
   @override
   Widget build(BuildContext context) {
@@ -430,6 +424,8 @@ class _ActionCard extends StatelessWidget {
 }
 
 
+
+
 // =================================================
 // NOTIFICATION CARD
 // =================================================
@@ -439,12 +435,14 @@ class _NotificationCard extends StatelessWidget {
   final String time;
   final Color dotColor;
 
+
   const _NotificationCard({
     required this.title,
     required this.subtitle,
     required this.time,
     required this.dotColor,
   });
+
 
   @override
   Widget build(BuildContext context) {
@@ -460,22 +458,28 @@ class _NotificationCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
 
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
 
+
                 Text(title,
                     style: GoogleFonts.inter(
                         fontWeight: FontWeight.w600)),
 
+
                 const SizedBox(height: 4),
+
 
                 Text(subtitle,
                     style: GoogleFonts.inter(
                         fontSize: 12, color: Colors.grey)),
 
+
                 const SizedBox(height: 6),
+
 
                 Row(
                   children: [
@@ -491,7 +495,9 @@ class _NotificationCard extends StatelessWidget {
             ),
           ),
 
+
           const SizedBox(width: 8),
+
 
           CircleAvatar(radius: 4, backgroundColor: dotColor),
         ],
@@ -499,3 +505,4 @@ class _NotificationCard extends StatelessWidget {
     );
   }
 }
+
