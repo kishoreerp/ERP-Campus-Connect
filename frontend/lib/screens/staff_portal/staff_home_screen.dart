@@ -11,9 +11,9 @@ import 'staff_leave_dialog.dart'hide showLeaveRequestDialog;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-
+  import 'package:cloud_firestore/cloud_firestore.dart';
+  import 'staff_approved_screen.dart';
+  import 'staff_pending_approval_screen.dart';
 
 
 
@@ -79,8 +79,11 @@ class _StaffHomeScreenState extends State<StaffHomeScreen> {
                   title: "Pending Approval",
                   subtitle: "Review pending requests",
                   onTap: () {
-                    Navigator.pop(context);
-                    // TODO: Navigate to pending list screen
+                     Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const StaffPendingApprovalScreen()),
+                    );
                   },
                 ),
 
@@ -91,8 +94,12 @@ class _StaffHomeScreenState extends State<StaffHomeScreen> {
                   title: "Approved",
                   subtitle: "View approved requests",
                   onTap: () {
-                    Navigator.pop(context);
-                    // TODO: Navigate to approved list screen
+                   Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => const StaffApprovedScreen()),
+                    );
+                   
                   },
                 ),
               ],
