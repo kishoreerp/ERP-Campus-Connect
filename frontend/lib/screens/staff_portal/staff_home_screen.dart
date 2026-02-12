@@ -369,21 +369,15 @@ class _StaffHomeScreenState extends State<StaffHomeScreen> {
       ),
       if (isClassIncharge) ...[
   const SizedBox(height: 12),
-  Row(
-    children: [
-      Expanded(
-        child: _quickAction(
-          context,
-          Icons.notifications_outlined,
-          'Notifications',
-          const StaffNotificationsScreen(),
-        ),
-      ),
-      const Spacer(),
-      const Spacer(),
-    ],
+  _quickAction(
+    context,
+    Icons.notifications_outlined,
+    'Notifications',
+    const StaffNotificationsScreen(),
+    isFullWidth: true,
   ),
 ],
+
 
     ],
   );
@@ -395,8 +389,9 @@ Widget _quickAction(
   String title,
   Widget? screen, {
   VoidCallback? customOnTap,
+  bool isFullWidth = false,
 }) {
-  return InkWell(
+  Widget tile = InkWell(
     borderRadius: BorderRadius.circular(12),
     onTap: () {
       if (customOnTap != null) {
@@ -409,6 +404,7 @@ Widget _quickAction(
       }
     },
     child: Container(
+      width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -433,38 +429,42 @@ Widget _quickAction(
       ),
     ),
   );
-}
 
-
-
-  // ---------------- SCHEDULE ----------------
-  Widget _buildSchedule() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text("Today's Schedule",
-            style:
-                GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 16)),
-        const SizedBox(height: 12),
-        const _ScheduleTile(
-            title: 'Data Structures',
-            subtitle: '09:00 - 10:00 • Lab 301',
-            tag: '2nd Year'),
-        const _ScheduleTile(
-            title: 'Algorithms',
-            subtitle: '10:00 - 11:00 • Room 205',
-            tag: '3rd Year'),
-        const _ScheduleTile(
-            title: 'Database Systems',
-            subtitle: '11:00 - 12:00 • Lab 302',
-            tag: 'Final Year'),
-        const _ScheduleTile(
-            title: 'Web Development',
-            subtitle: '14:00 - 15:00 • Lab 303',
-            tag: '1st Year'),
-      ],
-    );
+  if (isFullWidth) {
+    return tile; // no Row, full width
   }
+
+  return Expanded(child: tile);
+}
+Widget _buildSchedule() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        "Today's Schedule",
+        style: GoogleFonts.inter(
+            fontWeight: FontWeight.w600, fontSize: 16),
+      ),
+      const SizedBox(height: 12),
+      const _ScheduleTile(
+          title: 'Data Structures',
+          subtitle: '09:00 - 10:00 • Lab 301',
+          tag: '2nd Year'),
+      const _ScheduleTile(
+          title: 'Algorithms',
+          subtitle: '10:00 - 11:00 • Room 205',
+          tag: '3rd Year'),
+      const _ScheduleTile(
+          title: 'Database Systems',
+          subtitle: '11:00 - 12:00 • Lab 302',
+          tag: 'Final Year'),
+      const _ScheduleTile(
+          title: 'Web Development',
+          subtitle: '14:00 - 15:00 • Lab 303',
+          tag: '1st Year'),
+    ],
+  );
+}
 
   // ---------------- RECENT UPDATES ----------------
   Widget _buildRecentUpdates() {

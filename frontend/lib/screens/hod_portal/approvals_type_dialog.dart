@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'staff_pending_screen.dart';
 import 'staff_approved_screen.dart';
+import 'student_approved_screen.dart';
+import 'student_pending_screen.dart';
 
 Future<void> showApprovalsTypeDialog(BuildContext context,
     {required bool isStaff}) {

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'approvals_type_dialog.dart';
+import 'approvals_type_dialog.dart' as type_dialog;
+import 'approvals_dialogs.dart' as dialogs;
+
 
 Future<void> showApprovalsEntryDialog(BuildContext context) {
   return showDialog(
@@ -29,7 +31,7 @@ Future<void> showApprovalsEntryDialog(BuildContext context) {
               subtitle: "View staff pending approvals",
               onTap: () {
                 Navigator.pop(context);
-                showApprovalsTypeDialog(context, isStaff: true);
+                type_dialog.showApprovalsTypeDialog(context, isStaff: true);
               },
             ),
 
@@ -41,6 +43,8 @@ Future<void> showApprovalsEntryDialog(BuildContext context) {
               subtitle: "View student pending approvals",
               onTap: () {
                 Navigator.pop(context);
+                type_dialog.showApprovalsTypeDialog(context, isStaff: false);
+
               },
             ),
           ],
