@@ -79,87 +79,20 @@ class HODHomeScreen extends StatelessWidget {
               const SizedBox(height: 18),
 
               // Quick Actions title
-              Text(
-                'Quick Actions',
-                style: GoogleFonts.inter(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 12),
+Text(
+  'Quick Actions',
+  style: GoogleFonts.inter(
+    fontSize: 16,
+    fontWeight: FontWeight.w600,
+    color: Colors.black87,
+  ),
+),
+const SizedBox(height: 12),
 
-              // 2x3 grid where each tile has icon centered above the label.
-              // Icon and label remain black (as in your screenshot).
-              GridView.count(
-                crossAxisCount: 3,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                childAspectRatio: 1.15,
-                children: [
-                  _quickTileCentered(
-                    context,
-                    icon: Icons.campaign_outlined,
-                    label: 'Announcements',
-                    onTap: () => showAnnouncementManagementDialog(context),
-                  ),
-                  _quickTileCentered(
-                    context,
-                    icon: Icons.event_note,
-                    label: 'Events',
-                    onTap: () {
-                       Navigator.push(
-                                   context,
-                             MaterialPageRoute(
-                             builder: (_) => HODEventsScreen(),
-                            ),
-                                 );
-                    },
-                  ),
-                  _quickTileCentered(
-                    context,
-                    icon: Icons.notifications_outlined,
-                    label: 'Notifications',
-                    onTap: () {
-                       showNotificationsDialog(context);
-                    },
-                  ),
-                  _quickTileCentered(
-                    context,
-                    icon: Icons.note_alt_outlined,
-                    label: 'Notes',
-                    onTap: () {
-                     Navigator.push(
-                      context,
-                        MaterialPageRoute(
-                       builder: (_) => const HODNotesScreen(),
-                      ),
-                       );
-                    },
-                  ),
-                  _quickTileCentered(
-                    context,
-                    icon: Icons.approval,
-                    label: 'Approvals',
-                    onTap: () {
-                     showApprovalsEntryDialog(context);
-                    },
-                  ),
-                  _quickTileCentered(
-                    context,
-                    icon: Icons.calendar_month,
-                    label: 'Request Leave',
-                    onTap: () {  
-                       showLeaveManagementDialog(context);
-                     
-                    },
-                  ),
-                ],
-              ),
+_buildQuickActions(context),   // 👈 ADD THIS LINE
 
-              const SizedBox(height: 18),
+const SizedBox(height: 18),
+
 
               // Recent Announcements header
               Text(
@@ -199,6 +132,128 @@ class HODHomeScreen extends StatelessWidget {
               const SizedBox(height: 28),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuickActions(BuildContext context) {
+  return Column(
+    children: [
+
+      // First Row
+      Row(
+        children: [
+          Expanded(
+            child: _quickAction(
+              context,
+              Icons.campaign_outlined,
+              'Announcement',
+              customOnTap: () => showAnnouncementManagementDialog(context),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: _quickAction(
+              context,
+              Icons.event_note,
+              'Events',
+              screen: HODEventsScreen(),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: _quickAction(
+              context,
+              Icons.notifications_outlined,
+              'Notifications',
+              customOnTap: () => showNotificationsDialog(context),
+            ),
+          ),
+        ],
+      ),
+
+      const SizedBox(height: 12),
+
+      // Second Row
+      Row(
+        children: [
+          Expanded(
+            child: _quickAction(
+              context,
+              Icons.note_alt_outlined,
+              'Notes',
+              screen: const HODNotesScreen(),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: _quickAction(
+              context,
+              Icons.approval,
+              'Approvals',
+              customOnTap: () => showApprovalsEntryDialog(context),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: _quickAction(
+              context,
+              Icons.calendar_month,
+              'Request Leave',
+              customOnTap: () => showLeaveManagementDialog(context),
+            ),
+          ),
+        ],
+      ),
+    ],
+  );
+}
+ Widget _quickAction(
+    BuildContext context,
+    IconData icon,
+    String title, {
+    Widget? screen,
+    VoidCallback? customOnTap,
+  }) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: () {
+        if (customOnTap != null) {
+          customOnTap();
+        } else if (screen != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => screen),
+          );
+        }
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 6,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: Colors.black87, size: 26),
+            const SizedBox(height: 6),
+            Text(
+              title,
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                color: Colors.black87,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -554,6 +609,56 @@ class _ManageAnnouncementsDialog extends StatelessWidget {
       ),
     );
   }
+
+Widget _quickAction(
+  BuildContext context,
+  IconData icon,
+  String title, {
+  Widget? screen,
+  VoidCallback? customOnTap,
+}) {
+  return InkWell(
+    borderRadius: BorderRadius.circular(12),
+    onTap: () {
+      if (customOnTap != null) {
+        customOnTap();
+      } else if (screen != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => screen),
+        );
+      }
+    },
+    child: Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Icon(icon, color: Colors.black87, size: 26),
+          const SizedBox(height: 6),
+          Text(
+            title,
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              color: Colors.black87,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
 
   Widget _announcementCard(
     BuildContext context, {

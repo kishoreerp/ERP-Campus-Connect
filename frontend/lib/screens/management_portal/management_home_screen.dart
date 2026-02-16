@@ -14,9 +14,6 @@ class ManagementHomeScreen extends StatelessWidget {
 
   const ManagementHomeScreen({super.key, required this.username});
 
-
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,11 +32,7 @@ Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: [
 
-
-   
-
-
-    const SizedBox(height: 16),
+    const SizedBox(height:6),
 
 
     // Your remaining content
@@ -89,21 +82,8 @@ Container(
               ),
             ],
           ),
-        ),
-
-
-   ],
-
-
+        ),],
       ),      const SizedBox(height: 22),
-
-
-             
-
-
-           
-
-
               // ================= OVERVIEW =================
               Row(
                 children: [
@@ -114,9 +94,6 @@ Container(
                   Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 5, vertical: 2),
-                 
-
-
                   ),
                 ],
               ),
@@ -129,9 +106,9 @@ Container(
                 crossAxisCount: 2,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                 crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-                childAspectRatio: 1.9,
+                 crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 2.4,
                 children: const [
                   _StatCard("3247", "TOTAL STUDENTS", Icons.school),
                   _StatCard("156", "TEACHING STAFF", Icons.person),
@@ -145,111 +122,24 @@ Container(
 
 
               // ================= QUICK ACTIONS =================
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+            
 
-
-                    Row(
-                      children: [
-                        const Icon(Icons.flash_on, size: 18),
-                        const SizedBox(width: 6),
-                        Text("QUICK ACTIONS",
-                            style: GoogleFonts.inter(
-                                fontWeight: FontWeight.w600)),
-                      ],
-                    ),
-
-
-                    const SizedBox(height: 10),
-
-
-                  GridView.count(
-  crossAxisCount: 2,
-  shrinkWrap: true,
-  physics: const NeverScrollableScrollPhysics(),
-  crossAxisSpacing: 10,
-  mainAxisSpacing: 10,
-  childAspectRatio: 2.6,
-  children: [
-
-
-    _ActionCard(
-      "ATTENDANCE",
-      Icons.check_circle,
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const ManagementAttendanceScreen(),
-          ),
-        );
-      },
-    ),
-
-
-   _ActionCard(
-  "ANNOUNCE",
-  Icons.campaign,
-  onTap: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const ManagementAnnouncementScreen(),
-      ),
-    );
-  },
-),
-
-
-
-
-  _ActionCard(
-  "REQUESTS",
-  Icons.description,
-  onTap: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const ManagementApproveRequestsScreen(),
-      ),
-    );
-  },
-),
-
-
-
-
-    _ActionCard(
-      "USERS",
-      Icons.people,
-      onTap: () {
-        Navigator.push(
-  context,
-  MaterialPageRoute(
-    builder: (_) => const ManageUsersScreen(),
+Text(
+  "Quick Actions",
+  style: GoogleFonts.inter(
+    fontWeight: FontWeight.w600,
+    fontSize: 16,
   ),
-        );
-      },
-    ),
-
-
-  ],
 ),
 
+const SizedBox(height: 12),
 
-                  ],
-                ),
-              ),
+_buildQuickActions(context),
+
+const SizedBox(height: 20),
 
 
-              const SizedBox(height: 10),
+             
 
 
               // ================= NOTIFICATIONS =================
@@ -341,6 +231,135 @@ const SizedBox(height: 10),
       ),
     );
   }
+  Widget _buildQuickActions(BuildContext context) {
+  return Column(
+    children: [
+
+      // First Row
+      Row(
+        children: [
+          Expanded(
+            child: _quickAction(
+              context,
+              Icons.check_circle,
+              "Attendance",
+              () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ManagementAttendanceScreen(),
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: _quickAction(
+              context,
+              Icons.campaign,
+              "Announce",
+              () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        const ManagementAnnouncementScreen(),
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: _quickAction(
+              context,
+              Icons.description,
+              "Requests",
+              () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        const ManagementApproveRequestsScreen(),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+
+      const SizedBox(height: 12),
+
+      // Second Row
+      Row(
+        children: [
+          Expanded(
+            child: _quickAction(
+              context,
+              Icons.people,
+              "Users",
+              () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ManageUsersScreen(),
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(width: 10),
+          const Expanded(child: SizedBox()), // empty space
+          const SizedBox(width: 10),
+          const Expanded(child: SizedBox()), // empty space
+        ],
+      ),
+    ],
+  );
+}
+Widget _quickAction(
+  BuildContext context,
+  IconData icon,
+  String title,
+  VoidCallback onTap,
+) {
+  return InkWell(
+    borderRadius: BorderRadius.circular(12),
+    onTap: onTap,
+    child: Container(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: const Color.fromARGB(255, 23, 23, 23).withOpacity(0.05),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: Colors.black87, size: 26),
+          const SizedBox(height: 6),
+          Text(
+            title,
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              color: Colors.black87,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
 }
 
 
@@ -352,14 +371,12 @@ class _StatCard extends StatelessWidget {
   final String title;
   final IconData icon;
 
-
   const _StatCard(this.value, this.title, this.icon);
-
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
@@ -367,15 +384,23 @@ class _StatCard extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon),
-          const SizedBox(height: 10),
-          Text(value,
-              style: GoogleFonts.inter(
-                  fontSize: 20, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 4),
-          Text(title,
-              style: GoogleFonts.inter(
-                  fontSize: 11, color: Colors.grey)),
+          Icon(icon, size: 20),
+          const SizedBox(height: 6),
+          Text(
+            value,
+            style: GoogleFonts.inter(
+              fontSize: 17,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            title,
+            style: GoogleFonts.inter(
+              fontSize: 10,
+              color: Colors.grey,
+            ),
+          ),
         ],
       ),
     );
@@ -504,5 +529,6 @@ class _NotificationCard extends StatelessWidget {
       ),
     );
   }
+  
 }
 
