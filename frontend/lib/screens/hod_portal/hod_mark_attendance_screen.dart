@@ -4,99 +4,132 @@ import 'package:google_fonts/google_fonts.dart';
 class HODMarkAttendanceScreen extends StatelessWidget {
   const HODMarkAttendanceScreen({super.key});
   
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              
-              const SizedBox(height: 2),
-              Text("Hourly Attendance",
-                  style: GoogleFonts.inter(
-                      fontSize: 17, fontWeight: FontWeight.w700)),
-              Text("Mark attendance for each class hour",
-                  style: GoogleFonts.inter(color: Colors.grey[700])),
-              const SizedBox(height: 16),
-              _infoBox(),
-              const SizedBox(height: 20),
 
-              // Hourly Cards (keeps your design)
-              _hourCardMarked(
-                context,
-                hour: "1st Hour",
-                time: "09:00 - 10:00",
-                subject: "Data Structures",
-                code: "CS501",
-                year: "2nd Year",
-                total: "45",
-                cse: "30",
-                it: "15",
-                present: "42",
-                absent: "3",
-                percent: "93%",
-              ),
-              _hourCardMarked(
-                context,
-                hour: "2nd Hour",
-                time: "10:00 - 11:00",
-                subject: "Algorithms",
-                code: "CS502",
-                year: "3rd Year",
-                total: "38",
-                present: "36",
-                absent: "2",
-                percent: "95%",
-              ),
-              _breakCard("Interval", "11:00 - 11:15", "Break"),
-              _hourCardPending(
-                context,
-                hour: "3rd Hour",
-                time: "11:15 - 12:15",
-                subject: "Database Systems",
-                code: "CS503",
-                year: "Final Year",
-                total: "42",
-              ),
-              _hourCardPending(
-                context,
-                hour: "4th Hour",
-                time: "12:15 - 13:15",
-                subject: "Operating Systems",
-                code: "CS505",
-                year: "3rd Year",
-                total: "35",
-              ),
-              _breakCard("Lunch Break", "13:15 - 14:15", "Lunch"),
-              _hourCardPending(
-                context,
-                hour: "5th Hour",
-                time: "14:15 - 15:15",
-                subject: "Web Development",
-                code: "CS504",
-                year: "1st Year",
-                total: "50",
-                cse: "30",
-                it: "20",
-              ),
-              _hourCardUpcoming(
-                hour: "6th Hour",
-                time: "15:15 - 16:15",
-                subject: "Computer Networks",
-                code: "CS506",
-                year: "2nd Year",
-                total: "40",
-              ),
-              const SizedBox(height: 40),
-            ],
-          ),
-        ),
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: Colors.grey[50],
+
+    // ================= APP BAR =================
+    appBar: AppBar(
+      backgroundColor: Colors.white,
+      elevation: 0,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back, color: Colors.black),
+        onPressed: () => Navigator.pop(context),
       ),
-    );
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Hourly Attendance",
+            style: GoogleFonts.inter(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.black,
+            ),
+          ),
+          Text(
+            "Mark attendance for each class hour",
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              color: Colors.grey,
+            ),
+          ),
+        ],
+      ),
+    ),
+
+    // ================= BODY =================
+    body: SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+
+          _infoBox(),
+          const SizedBox(height: 20),
+
+          _hourCardMarked(
+            context,
+            hour: "1st Hour",
+            time: "09:00 - 10:00",
+            subject: "Data Structures",
+            code: "CS501",
+            year: "2nd Year",
+            total: "45",
+            cse: "30",
+            it: "15",
+            present: "42",
+            absent: "3",
+            percent: "93%",
+          ),
+
+          _hourCardMarked(
+            context,
+            hour: "2nd Hour",
+            time: "10:00 - 11:00",
+            subject: "Algorithms",
+            code: "CS502",
+            year: "3rd Year",
+            total: "38",
+            present: "36",
+            absent: "2",
+            percent: "95%",
+          ),
+
+          _breakCard("Interval", "11:00 - 11:15", "Break"),
+
+          _hourCardPending(
+            context,
+            hour: "3rd Hour",
+            time: "11:15 - 12:15",
+            subject: "Database Systems",
+            code: "CS503",
+            year: "Final Year",
+            total: "42",
+          ),
+
+          _hourCardPending(
+            context,
+            hour: "4th Hour",
+            time: "12:15 - 13:15",
+            subject: "Operating Systems",
+            code: "CS505",
+            year: "3rd Year",
+            total: "35",
+          ),
+
+          _breakCard("Lunch Break", "13:15 - 14:15", "Lunch"),
+
+          _hourCardPending(
+            context,
+            hour: "5th Hour",
+            time: "14:15 - 15:15",
+            subject: "Web Development",
+            code: "CS504",
+            year: "1st Year",
+            total: "50",
+            cse: "30",
+            it: "20",
+          ),
+
+          _hourCardUpcoming(
+            hour: "6th Hour",
+            time: "15:15 - 16:15",
+            subject: "Computer Networks",
+            code: "CS506",
+            year: "2nd Year",
+            total: "40",
+          ),
+
+          const SizedBox(height: 40),
+        ],
+      ),
+    ),
+  );
+}
+
   }
 
   
@@ -115,7 +148,7 @@ class HODMarkAttendanceScreen extends StatelessWidget {
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                'Staff Hourly Attendance\nMark attendance per hour. Once marked, you can only view it.',
+                'Hod Hourly Attendance\nMark attendance per hour.Once marked,you can only view it.',
                 style:
                     GoogleFonts.inter(color: Colors.blue.shade800, fontSize: 13.5),
               ),
@@ -480,6 +513,7 @@ class HODMarkAttendanceScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
 
+
               // Summary card
               Container(
                 padding: const EdgeInsets.all(12),
@@ -496,8 +530,10 @@ class HODMarkAttendanceScreen extends StatelessWidget {
               ),
               const SizedBox(height: 14),
 
+
               Text("Student List", style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 15)),
               const SizedBox(height: 10),
+
 
               // Student list scroll area
               Expanded(
@@ -539,6 +575,7 @@ class HODMarkAttendanceScreen extends StatelessWidget {
       ),
     );
   }
+
 
   // Mark Attendance dialog (interactive, toggles present/absent)
   void _showMarkAttendanceDialog(BuildContext context,
@@ -602,6 +639,7 @@ class HODMarkAttendanceScreen extends StatelessWidget {
               'Dipti V'
             ][index % 30]; // fallback
 
+
       return {
         'name': name,
         'roll': isIT ? 'IT${(index - 29).toString().padLeft(3, '0')}' : 'CSE${(index + 1).toString().padLeft(3, '0')}',
@@ -610,6 +648,7 @@ class HODMarkAttendanceScreen extends StatelessWidget {
       };
     });
 
+
     showDialog(
       context: context,
       builder: (context) {
@@ -617,11 +656,13 @@ class HODMarkAttendanceScreen extends StatelessWidget {
           int presentCount = students.where((s) => s['present']).length;
           int absentCount = students.length - presentCount;
 
+
           void markAll(bool val) {
             setState(() {
               for (var s in students) s['present'] = val;
             });
           }
+
 
           return Dialog(
             insetPadding: const EdgeInsets.all(16),
@@ -644,6 +685,7 @@ class HODMarkAttendanceScreen extends StatelessWidget {
                   ]),
                   const SizedBox(height: 12),
 
+
                   // summary
                   Container(
                     padding: const EdgeInsets.all(12),
@@ -663,6 +705,7 @@ class HODMarkAttendanceScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
 
+
                   // mark all buttons
                   Row(children: [
                     Expanded(
@@ -681,8 +724,10 @@ class HODMarkAttendanceScreen extends StatelessWidget {
                   ]),
                   const SizedBox(height: 12),
 
+
                   Text("Student List", style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 15)),
                   const SizedBox(height: 8),
+
 
                   // list
                   Expanded(
@@ -704,28 +749,41 @@ class HODMarkAttendanceScreen extends StatelessWidget {
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                                 title: Text("${index + 1}. ${s['name']}", style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 14)),
                                 subtitle: Text("${s['roll']} • ${s['dept']}", style: GoogleFonts.inter(color: Colors.grey[700], fontSize: 13)),
-                                trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                                  Text(isPresent ? "Present" : "Absent",
-                                      style: GoogleFonts.inter(color: isPresent ? Colors.green : Colors.red, fontWeight: FontWeight.w600)),
-                                  const SizedBox(width: 8),
-                                  Switch(
-                                    value: isPresent,
-                                    activeColor: Colors.green,
-                                    onChanged: (val) {
-                                      setState(() {
-                                        s['present'] = val;
-                                      });
-                                    },
-                                  )
-                                ]),
+                                trailing: FittedBox(
+                               fit: BoxFit.scaleDown,
+                                child: Row(
+                               mainAxisSize: MainAxisSize.min,
+                                children: [
+                                 Text(isPresent ? "Present" : "Absent",
+                                style: GoogleFonts.inter(
+                                     color: isPresent ? Colors.green : Colors.red,
+                                   fontWeight: FontWeight.w600,
+                                    ),),
+                                  const SizedBox(width: 6),
+                                  Transform.scale(scale: 0.8,
+                               child: Switch(
+                               value: isPresent,
+                                   activeColor: Colors.white,
+                                 activeTrackColor: Colors.green,
+                                 inactiveThumbColor: Colors.white,
+                                 inactiveTrackColor: const Color.fromARGB(255, 184, 182, 182),
+                                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  onChanged: (val) {
+                                  setState(() {
+                                 s['present'] = val;
+                                });
+                              },),
+                                  ),
+                              ],),),
                               ),
                             );
-                          },
+                          },                      
                         ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 12),
+
 
                   // submit
                   SizedBox(
@@ -748,6 +806,3 @@ class HODMarkAttendanceScreen extends StatelessWidget {
       },
     );
   }
-}
-
-

@@ -1,10 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'event_dialogs.dart';
 
 
-class HODEventsScreen extends StatelessWidget {
+class HODEventsScreen extends StatefulWidget {
   const HODEventsScreen({super.key});
+
+
+  @override
+  State<HODEventsScreen> createState() =>
+      _HODEventsScreenState();
+}
+
+
+class _HODEventsScreenState extends State<HODEventsScreen> {
+
+
+  List<Map<String, String>> events = [
+    {
+      "title": "Department Review Meeting",
+      "date": "2024-01-22 • 10:00 AM",
+      "tag": "event"
+    },
+    {
+      "title": "Mid-term Exam Starts",
+      "date": "2024-01-25 • Full Day",
+      "tag": "exam"
+    },
+    {
+      "title": "Republic Day Holiday",
+      "date": "2024-01-26 • Closed",
+      "tag": "holiday"
+    },
+  ];
 
 
   @override
@@ -15,24 +42,36 @@ class HODEventsScreen extends StatelessWidget {
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment:
+                CrossAxisAlignment.start,
             children: [
+
+
               /// HEADER
               Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () => Navigator.pop(context),
+                    icon:
+                        const Icon(Icons.arrow_back),
+                    onPressed: () =>
+                        Navigator.pop(context),
                   ),
                   Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment:
+                        CrossAxisAlignment.start,
                     children: [
                       Text("Events",
-                          style: GoogleFonts.inter(
-                              fontSize: 18, fontWeight: FontWeight.w700)),
-                      Text("View calendar and manage events",
-                          style: GoogleFonts.inter(
-                              fontSize: 13, color: Colors.grey)),
+                          style:
+                              GoogleFonts.inter(
+                                  fontSize: 18,
+                                  fontWeight:
+                                      FontWeight.w700)),
+                      Text(
+                          "View calendar and manage events",
+                          style:
+                              GoogleFonts.inter(
+                                  fontSize: 13,
+                                  color: Colors.grey)),
                     ],
                   )
                 ],
@@ -42,58 +81,28 @@ class HODEventsScreen extends StatelessWidget {
               const SizedBox(height: 16),
 
 
-              /// ACTION BUTTONS
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () => showMakeEventDialog(context),
-                      icon: const Icon(Icons.add, size: 18),
-                      label: const Text("Make Event"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8)),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => showManageEventsDialog(context),
-                      icon: const Icon(Icons.edit_outlined),
-                      label: const Text("Edit Events"),
-                    ),
-                  ),
-                ],
-              ),
-
-
-              const SizedBox(height: 20),
-
-
-              /// CALENDAR (STATIC – MATCHES UI)
+              /// CALENDAR
               Container(
-                padding: const EdgeInsets.all(14),
+                padding:
+                    const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade200),
-                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                      color:
+                          Colors.grey.shade200),
+                  borderRadius:
+                      BorderRadius.circular(
+                          12),
                 ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: const [
-                        Icon(Icons.chevron_left),
-                        Text("January 2026",
-                            style: TextStyle(fontWeight: FontWeight.w600)),
-                        Icon(Icons.chevron_right),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    _CalendarGrid(),
-                  ],
+                child:
+                    CalendarDatePicker(
+                  initialDate:
+                      DateTime.now(),
+                  firstDate:
+                      DateTime(2020),
+                  lastDate:
+                      DateTime(2030),
+                  onDateChanged:
+                      (selectedDate) {},
                 ),
               ),
 
@@ -101,22 +110,62 @@ class HODEventsScreen extends StatelessWidget {
               const SizedBox(height: 24),
 
 
-              Text("Upcoming Events",
-                  style: GoogleFonts.inter(
-                      fontSize: 15, fontWeight: FontWeight.w700)),
+              /// UPCOMING HEADER
+              Row(
+                mainAxisAlignment:
+                    MainAxisAlignment
+                        .spaceBetween,
+                children: [
+                  Text("Upcoming Events",
+                      style:
+                          GoogleFonts.inter(
+                              fontSize: 15,
+                              fontWeight:
+                                  FontWeight.w700)),
+                  ElevatedButton.icon(
+  onPressed: () => _showMakeEventDialog(context),
+  icon: const Icon(
+    Icons.add,
+    size: 16,
+    color: Colors.white, // ✅ icon white
+  ),
+  label: const Text(
+    "Make Event",
+    style: TextStyle(
+      color: Colors.white, // ✅ text white
+      fontWeight: FontWeight.w500,
+    ),
+  ),
+  style: ElevatedButton.styleFrom(
+    backgroundColor: Colors.black,
+  ),
+),
+
+
+                ],
+              ),
 
 
               const SizedBox(height: 12),
 
 
-              _eventTile("Department Review Meeting",
-                  "2024-01-22 • 10:00 AM", "event"),
-              _eventTile(
-                  "Mid-term Exam Starts", "2024-01-25 • Full Day", "exam"),
-              _eventTile(
-                  "Republic Day Holiday", "2024-01-26 • Closed", "holiday"),
-              _eventTile(
-                  "Faculty Evaluation", "2024-02-01 • 2:00 PM", "event"),
+              /// EVENTS LIST
+              ListView.builder(
+                shrinkWrap: true,
+                physics:
+                    const NeverScrollableScrollPhysics(),
+                itemCount: events.length,
+                itemBuilder:
+                    (context, index) {
+                  final event =
+                      events[index];
+                  return _eventTile(
+                      event["title"]!,
+                      event["date"]!,
+                      event["tag"]!,
+                      index);
+                },
+              ),
             ],
           ),
         ),
@@ -125,97 +174,469 @@ class HODEventsScreen extends StatelessWidget {
   }
 
 
-  Widget _eventTile(String title, String date, String tag) {
+  /// EVENT TILE WITH DELETE
+  Widget _eventTile(
+      String title,
+      String date,
+      String tag,
+      int index) {
     return Container(
-      margin: const EdgeInsets.only(top: 12),
-      padding: const EdgeInsets.all(14),
+      margin:
+          const EdgeInsets.only(top: 12),
+      padding:
+          const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade200),
+        borderRadius:
+            BorderRadius.circular(12),
+        border: Border.all(
+            color:
+                Colors.grey.shade200),
       ),
       child: Row(
         children: [
+
+
           Container(
-            padding: const EdgeInsets.all(10),
+            padding:
+                const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.purple.shade50,
-              borderRadius: BorderRadius.circular(10),
+              color: Colors
+                  .purple.shade50,
+              borderRadius:
+                  BorderRadius.circular(
+                      10),
             ),
-            child: Icon(Icons.calendar_today_outlined,
-                color: Colors.purple.shade400),
+            child: Icon(
+                Icons
+                    .calendar_today_outlined,
+                color: const Color.fromARGB(255, 195, 116, 211)),
           ),
+
+
           const SizedBox(width: 12),
+
+
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  CrossAxisAlignment
+                      .start,
               children: [
                 Text(title,
-                    style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-                const SizedBox(height: 4),
+                    style: GoogleFonts
+                        .inter(
+                            fontWeight:
+                                FontWeight
+                                    .w600)),
+                const SizedBox(
+                    height: 4),
                 Text(date,
-                    style:
-                        GoogleFonts.inter(fontSize: 12, color: Colors.grey)),
-                const SizedBox(height: 6),
+                    style: GoogleFonts
+                        .inter(
+                            fontSize: 12,
+                            color: Colors
+                                .grey)),
+                const SizedBox(
+                    height: 6),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(6),
+                      const EdgeInsets
+                          .symmetric(
+                              horizontal:
+                                  8,
+                              vertical:
+                                  4),
+                  decoration:
+                      BoxDecoration(
+                    color: Colors
+                        .grey.shade100,
+                    borderRadius:
+                        BorderRadius
+                            .circular(
+                                6),
                   ),
                   child: Text(tag,
-                      style: GoogleFonts.inter(fontSize: 11)),
+                      style: GoogleFonts
+                          .inter(
+                              fontSize:
+                                  11)),
                 )
               ],
             ),
-          )
+          ),
+
+
+          IconButton(
+            icon: const Icon(
+                Icons.delete_outline,
+                color: Colors.red),
+            onPressed: () {
+              setState(() {
+                events.removeAt(
+                    index);
+              });
+            },
+          ),
         ],
       ),
     );
   }
-}
 
 
-/// CALENDAR GRID
-class _CalendarGrid extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final days = [
-      "Su","Mo","Tu","We","Th","Fr","Sa",
-      "28","29","30","31","1","2","3",
-      "4","5","6","7","8","9","10",
-      "11","12","13","14","15","16","17",
-      "18","19","20","21","22","23","24",
-      "25","26","27","28","29","30","31",
-    ];
+  /// MAKE EVENT POPUP
+  void _showMakeEventDialog(
+      BuildContext context) {
 
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: days.length,
-      gridDelegate:
-          const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 7),
-      itemBuilder: (_, i) {
-        final selected = days[i] == "10";
-        return Center(
-          child: selected
-              ? Container(
-                  width: 32,
-                  height: 32,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(8)),
-                  child:
-                      Text(days[i], style: const TextStyle(color: Colors.white)),
-                )
-              : Text(days[i]),
+    TextEditingController
+        reasonController =
+        TextEditingController();
+    TextEditingController
+        locationController =
+        TextEditingController();
+    TextEditingController
+        descriptionController =
+        TextEditingController();
+
+
+    DateTime? selectedDate;
+    TimeOfDay? selectedTime;
+
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder:
+              (context, setStateDialog) {
+            return Dialog(
+              shape:
+                  RoundedRectangleBorder(
+                borderRadius:
+                    BorderRadius.circular(
+                        20),
+              ),
+              child: Container(
+                padding:
+                    const EdgeInsets
+                        .all(20),
+                child:
+                    SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment:
+                        CrossAxisAlignment
+                            .start,
+                    children: [
+
+
+                      const Text(
+                          "Make Event",
+                          style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.black,
+                              fontWeight:
+                                  FontWeight
+                                      .w600)),
+
+
+                      const SizedBox(
+                          height: 10),
+
+
+                      /// REASON (TOP)
+                     /// TITLE
+/// TITLE
+const Text(
+  "Title",
+  style: TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+  ),
+),
+const SizedBox(height: 6),
+
+
+Container(
+  width: double.infinity,
+  padding: const EdgeInsets.symmetric(
+    horizontal: 14,
+    vertical: 4,
+  ),
+  decoration: BoxDecoration(
+    color: Colors.grey.shade200, // ✅ same as date/time
+    borderRadius: BorderRadius.circular(12),
+  ),
+  child: TextField(
+    controller: reasonController,
+    decoration: const InputDecoration(
+      hintText: "Enter event title",
+      border: InputBorder.none,
+    ),
+  ),
+),
+const SizedBox(height: 16),
+
+
+
+
+
+
+                      /// DATE
+                      const Text("Date"),
+                      const SizedBox(height: 6),
+                      GestureDetector(
+                        onTap: () async {
+                          DateTime? picked =
+                              await showDatePicker(
+                            context:
+                                context,
+                            initialDate:
+                                selectedDate ??
+                                    DateTime
+                                        .now(),
+                            firstDate:
+                                DateTime(
+                                    2024),
+                            lastDate:
+                                DateTime(
+                                    2050),
+                          );
+
+
+                          if (picked !=
+                              null) {
+                            setStateDialog(
+                                () {
+                              selectedDate =
+                                  picked;
+                            });
+                          }
+                        },
+                        child: Container(
+                          width: double
+                              .infinity,
+                          padding:
+                              const EdgeInsets
+                                  .symmetric(
+                                      horizontal:
+                                          14,
+                                      vertical:
+                                          16),
+                          decoration:
+                              BoxDecoration(
+                            color: Colors
+                                .grey
+                                .shade200,
+                            borderRadius:
+                                BorderRadius
+                                    .circular(
+                                        12),
+                          ),
+                          child: Text(
+                            selectedDate ==
+                                    null
+                                ? "dd-mm-yyyy"
+                                : "${selectedDate!.day}-${selectedDate!.month}-${selectedDate!.year}",
+                          ),
+                        ),
+                      ),
+
+
+                      const SizedBox(height: 16),
+
+
+                      /// TIME
+                      const Text("Time"),
+                      const SizedBox(height: 6),
+                      GestureDetector(
+                        onTap: () async {
+                          TimeOfDay? picked =
+                              await showTimePicker(
+                            context:
+                                context,
+                            initialTime:
+                                selectedTime ??
+                                    TimeOfDay
+                                        .now(),
+                          );
+
+
+                          if (picked !=
+                              null) {
+                            setStateDialog(
+                                () {
+                              selectedTime =
+                                  picked;
+                            });
+                          }
+                        },
+                        child: Container(
+                          width: double
+                              .infinity,
+                          padding:
+                              const EdgeInsets
+                                  .symmetric(
+                                      horizontal:
+                                          14,
+                                      vertical:
+                                          16),
+                          decoration:
+                              BoxDecoration(
+                            color: Colors
+                                .grey
+                                .shade200,
+                            borderRadius:
+                                BorderRadius
+                                    .circular(
+                                        12),
+                          ),
+                          child: Text(
+                            selectedTime ==
+                                    null
+                                ? "--:-- --"
+                                : selectedTime!
+                                    .format(
+                                        context),
+                          ),
+                        ),
+                      ),
+
+
+                      const SizedBox(height: 16),
+
+
+                      /// LOCATION (OUTER BORDER)
+                     /// LOCATION
+/// LOCATION
+const Text(
+  "Location",
+  style: TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+  ),
+),
+const SizedBox(height: 6),
+
+
+Container(
+  width: double.infinity,
+  padding: const EdgeInsets.symmetric(
+    horizontal: 14,
+    vertical: 4,
+  ),
+  decoration: BoxDecoration(
+    color: Colors.grey.shade200, // ✅ same style
+    borderRadius: BorderRadius.circular(12),
+  ),
+  child: TextField(
+    controller: locationController,
+    decoration: const InputDecoration(
+      hintText: "Enter location",
+      border: InputBorder.none,
+    ),
+  ),
+),
+const SizedBox(height: 16),
+
+
+
+
+                   /// DESCRIPTION
+/// DESCRIPTION
+const Text(
+  "Description",
+  style: TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+  ),
+),
+const SizedBox(height: 6),
+
+
+Container(
+  width: double.infinity,
+  padding: const EdgeInsets.symmetric(
+    horizontal: 14,
+    vertical: 8,
+  ),
+  decoration: BoxDecoration(
+    color: Colors.grey.shade200, // ✅ same style
+    borderRadius: BorderRadius.circular(12),
+  ),
+  child: TextField(
+    controller: descriptionController,
+    maxLines: 3,
+    decoration: const InputDecoration(
+      hintText: "Enter description",
+      border: InputBorder.none,
+    ),
+  ),
+),
+const SizedBox(height: 20),
+
+
+
+
+
+
+                      Row(
+  children: [
+
+
+    /// CANCEL BUTTON
+    Expanded(
+      child: OutlinedButton(
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: Colors.black),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: const Text(
+          "Cancel",
+          style: TextStyle(color: Colors.black),
+        ),
+      ),
+    ),
+
+
+    const SizedBox(width: 12),
+
+
+    /// CREATE EVENT BUTTON
+    Expanded(
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.black,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: const Text(
+          "Create Event",
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+    ),
+  ],
+),
+
+
+                     
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
         );
       },
     );
   }
 }
-
-
-
