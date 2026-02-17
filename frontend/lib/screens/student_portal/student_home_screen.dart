@@ -4,8 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../services/current_user_service.dart';
 
-
-
 import 'student_notes_screen.dart';
 import 'student_events_screen.dart';
 import 'student_notifications_screen.dart';
@@ -13,20 +11,15 @@ import 'student_class_timetable_screen.dart';
 import 'student_exam_timetable_screen.dart';
 import 'student_marks_screen.dart';
 
-
-
-
-
-
-
-
 class StudentHomeScreen extends StatefulWidget {
   const StudentHomeScreen({super.key});
 
 
   @override
 State<StudentHomeScreen> createState() => _StudentHomeScreenState();
+
 }
+
 
 Map<String, dynamic>? studentData;
 
@@ -52,18 +45,24 @@ void initState() {
 
 
 
-Future<void> loadLeaveRequests() async {
+Future<void> loadLeaveRequests(VoidCallback refresh) async {
+  leaveLoading = true;
+  refresh();
+
   final uid = FirebaseAuth.instance.currentUser!.uid;
 
   final snapshot = await FirebaseFirestore.instance
       .collection('leave_requests')
       .where('studentId', isEqualTo: uid)
+      .orderBy('date', descending: true)
       .get();
 
   leaveRequests = snapshot.docs.map((d) => d.data()).toList();
+
   leaveLoading = false;
-  setState(() {});
+  refresh();
 }
+
 
 Future<void> loadRecentUpdates() async {
   final snapshot = await FirebaseFirestore.instance
@@ -408,8 +407,12 @@ Text(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           insetPadding: const EdgeInsets.all(20),
           child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
+  padding: const EdgeInsets.all(20),
+  child: SizedBox(
+    height: MediaQuery.of(context).size.height * 0.65,
+    child: SingleChildScrollView(
+      child: Column(
+
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -449,13 +452,12 @@ Text(
               ],
             ),
           ),
+        ),
+          ),
         );
       },
     );
-  }
-
-
-
+ }
 
   Widget _timetableOption(
     BuildContext context, {
@@ -504,7 +506,7 @@ Text(
   }
   // ---------------- LEAVE MANAGEMENT POPUP ----------------
 void _showLeaveManagementDialog(BuildContext context) {
-  loadLeaveRequests();
+
   final TextEditingController reasonController = TextEditingController();
   String? selectedLeaveType;
   final leaveTypes = ["Medical(Long Leave)","On Duty (OD)", "Personal","Permission"];
@@ -548,9 +550,6 @@ void _showLeaveManagementDialog(BuildContext context) {
                           color: Colors.grey[600], fontSize: 13)),
                   const SizedBox(height: 16),
 
-
-
-
                   // Tabs
                   Container(
                     decoration: BoxDecoration(
@@ -562,10 +561,12 @@ void _showLeaveManagementDialog(BuildContext context) {
                         Expanded(
                           child: GestureDetector(
                             onTap: () {
-                              setState(() {
-                               selectedTab = 0;
-                               });
-                              },
+  if (selectedTab == 0) return;
+
+  seState(() {
+    selectedTab = 0;
+  });
+},
 
 
 
@@ -600,15 +601,22 @@ void _showLeaveManagementDialog(BuildContext context) {
                         ),
                         Expanded(
                           child: GestureDetector(
-                            onTap: () {
-                             setState(() {
-                              selectedTab = 1;
-                              });
-                              },
+  onTap: () async {
+  if (selectedTab == 1) return;
 
+  seState(() {
+    selectedTab = 1;
+    leaveLoading = true;
+  });
 
-
-
+  try {
+    await loadLeaveRequests(() => seState(() {}));
+  } catch (e) {
+    seState(() {
+      leaveLoading = false;
+    });
+  }
+},
                             child: Container(
                               padding: const EdgeInsets.symmetric(vertical: 10),
                               decoration: BoxDecoration(
@@ -645,7 +653,8 @@ void _showLeaveManagementDialog(BuildContext context) {
                                       color: Colors.deepPurple,
                                       borderRadius: BorderRadius.circular(6),
                                     ),
-                                    child: Text("2",
+                                    child: Text(
+                                        leaveRequests.length.toString(),
                                         style: GoogleFonts.inter(
                                             color: Colors.white, fontSize: 11)),
                                   ),
@@ -700,7 +709,8 @@ void _showLeaveManagementDialog(BuildContext context) {
                                 ))
                             .toList(),
                         onChanged: (value) =>
-                            setState(() => selectedLeaveType = value),
+                        seState(() => selectedLeaveType = value),
+
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -755,23 +765,45 @@ void _showLeaveManagementDialog(BuildContext context) {
                         Expanded(
                           child: ElevatedButton.icon(
   onPressed: () async {
-await FirebaseFirestore.instance.collection('leave_requests').add({
-    'studentId': FirebaseAuth.instance.currentUser!.uid,
-    'type': selectedLeaveType,
-    'reason': reasonController.text,
-    'date': Timestamp.now(),
-    'approvers': ['Class Incharge Staff', 'HOD'],
-    'status': ['pending', 'pending'],
-  });
+  if (selectedLeaveType == null || reasonController.text.trim().isEmpty) {
+  showTopPopup(
+  message: "Please select leave type and enter reason",
+  backgroundColor: Colors.red.shade700,
+  icon: Icons.warning_amber_rounded,
+);
+
+  return;
+}
+
+
+  try {
+    await FirebaseFirestore.instance.collection('leave_requests').add({
+      'studentId': FirebaseAuth.instance.currentUser!.uid,
+      'type': selectedLeaveType,
+      'reason': reasonController.text.trim(),
+      'date': Timestamp.now(),
+      'approvers': ['Class Incharge Staff', 'HOD'],
+      'status': ['pending', 'pending'],
+    });
+
+    if (!mounted) return;
+
     Navigator.pop(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text("Leave request submitted successfully!"),
-        backgroundColor: Colors.deepPurple,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  },
+
+    showTopPopup(
+  message: "Leave request submitted successfully!",
+  backgroundColor: Colors.green,
+  icon: Icons.check_circle,
+);
+  } catch (e) {
+    showTopPopup(
+  message: "Error: $e",
+  backgroundColor: Colors.red.shade700,
+  icon: Icons.error,
+);
+  }
+},
+
   icon: const Icon(Icons.send_outlined, size: 18, color: Colors.white),
   label: Text(
     "Submit Request",
@@ -781,7 +813,8 @@ await FirebaseFirestore.instance.collection('leave_requests').add({
     ),
   ),
   style: ElevatedButton.styleFrom(
-    backgroundColor: Colors.deepPurple,
+    backgroundColor: Colors.black,
+  foregroundColor: Colors.white, // ensures icon + text are white
     padding: const EdgeInsets.symmetric(vertical: 12),
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(10),
@@ -831,9 +864,6 @@ await FirebaseFirestore.instance.collection('leave_requests').add({
   );
 }
 
-
-
-
 // helper for student info rows
 Widget _infoRow(String label, String value) {
   return Padding(
@@ -856,9 +886,6 @@ Widget _infoRow(String label, String value) {
     ),
   );
 }
-
-
-
 
 // helper for leave cards
 Widget _leaveCard(String type, String reason, String date,
@@ -992,6 +1019,60 @@ Widget _buildRecentUpdates() {
   );
 }
 
+void showTopPopup({
+  required String message,
+  Color backgroundColor = Colors.black,
+  IconData icon = Icons.info_outline,
+}) {
+  final overlay = Overlay.of(context);
+  late OverlayEntry overlayEntry;
+
+  overlayEntry = OverlayEntry(
+    builder: (context) => Positioned(
+      top: MediaQuery.of(context).padding.top + 20,
+      left: 16,
+      right: 16,
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.25),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: Colors.white),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  message,
+                  style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+
+  overlay.insert(overlayEntry);
+
+  Future.delayed(const Duration(seconds: 3), () {
+    overlayEntry.remove();
+  });
+}
 
 
   }
@@ -1033,20 +1114,3 @@ Widget _buildRecentUpdates() {
     );
   }
  
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

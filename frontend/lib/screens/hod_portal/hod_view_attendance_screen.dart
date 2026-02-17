@@ -15,8 +15,7 @@ class HODViewAttendanceScreen extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
+          onPressed: () => Navigator.pop(context),),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -248,54 +247,224 @@ class _AttendanceDetailsDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Sample Data
+    final students = [
+      {"roll": "SLEC2025001", "name": "Aarav Sharma", "status": "Present"},
+      {"roll": "SLEC2025002", "name": "Priya Patel", "status": "Present"},
+      {"roll": "SLEC2025003", "name": "Rohan Kumar", "status": "Absent"},
+      {"roll": "SLEC2025004", "name": "Ananya Singh", "status": "Present"},
+      {"roll": "SLEC2024001", "name": "Vikram Reddy", "status": "Absent"},
+    ];
+
+    final total = students.length;
+    final present =
+        students.where((s) => s["status"] == "Present").length;
+    final absent = total - present;
+
     return Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 60),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 60),
+      backgroundColor: const Color(0xFFF4F6F9),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
+            // ================= HEADER =================
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(subject,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        subject,
                         style: GoogleFonts.inter(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600)),
-                    Text("$code - Attendance Details",
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      Text(
+                        "$code • Attendance Details",
                         style: GoogleFonts.inter(
-                            fontSize: 12, color: Colors.grey)),
-                  ],
+                          fontSize: 13,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => Navigator.pop(context),
+                )
+              ],
+            ),
+
+            const SizedBox(height: 20),
+
+            // ================= SUMMARY CARDS =================
+            Row(
+              children: [
+                Expanded(
+                  child: _SummaryCard(
+                    title: "Total",
+                    count: total.toString(),
+                    color: Colors.blue,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _SummaryCard(
+                    title: "Present",
+                    count: present.toString(),
+                    color: const Color(0xFF2E7D32),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _SummaryCard(
+                    title: "Absent",
+                    count: absent.toString(),
+                    color: Colors.red,
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
 
-            _row("Roll No", "Name", "Status", header: true),
-            const Divider(),
+            const SizedBox(height: 20),
 
-            _row("SLEC2025001", "Aarav Sharma", "Present"),
-            _row("SLEC2025002", "Priya Patel", "Present"),
-            _row("SLEC2025003", "Rohan Kumar", "Present"),
-            _row("SLEC2025004", "Ananya Singh", "Present"),
-            _row("SLEC2024001", "Vikram Reddy", "Present"),
+            // ================= TABLE =================
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    )
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    _tableHeader(),
+                    Divider(color: Colors.grey.shade200, height: 1),
+                    Expanded(
+                      child: ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: students.length,
+                        itemBuilder: (_, index) {
+                          final s = students[index];
+                          return _StudentRow(
+                            s["roll"]!,
+                            s["name"]!,
+                            s["status"]!,
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _row(String roll, String name, String status,
-      {bool header = false}) {
+  Widget _tableHeader() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          Expanded(flex: 3, child: _headerText("Roll No")),
+          Expanded(flex: 4, child: _headerText("Name")),
+          Expanded(flex: 3, child: _headerText("Status")),
+        ],
+      ),
+    );
+  }
+
+  Widget _headerText(String text) {
+    return Text(
+      text,
+      style: GoogleFonts.inter(
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+        color: Colors.grey.shade700,
+      ),
+    );
+  }
+}
+
+
+class _SummaryCard extends StatelessWidget {
+  final String title;
+  final String count;
+  final Color color;
+
+  const _SummaryCard({
+    required this.title,
+    required this.count,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Text(
+            count,
+            style: GoogleFonts.inter(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            title,
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              color: Colors.grey.shade600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StudentRow extends StatelessWidget {
+  final String roll;
+  final String name;
+  final String status;
+
+  const _StudentRow(this.roll, this.name, this.status);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
       child: Row(
         children: [
           Expanded(
@@ -303,8 +472,9 @@ class _AttendanceDetailsDialog extends StatelessWidget {
             child: Text(
               roll,
               style: GoogleFonts.inter(
-                  fontWeight:
-                      header ? FontWeight.w600 : FontWeight.w400),
+                fontSize: 13,
+                color: Colors.grey.shade800,
+              ),
             ),
           ),
           Expanded(
@@ -312,32 +482,38 @@ class _AttendanceDetailsDialog extends StatelessWidget {
             child: Text(
               name,
               style: GoogleFonts.inter(
-                  fontWeight:
-                      header ? FontWeight.w600 : FontWeight.w400),
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF1A1D1F),
+              ),
             ),
           ),
           Expanded(
             flex: 3,
-            child: header
-                ? Text(status,
-                    style: GoogleFonts.inter(
-                        fontWeight: FontWeight.w600))
-                : Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      status,
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.inter(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.green),
-                    ),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE6F4EA),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: const Color(0xFF34A853).withOpacity(0.4),
                   ),
+                ),
+                child: Text(
+                  status,
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF2E7D32),
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
       ),

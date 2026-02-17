@@ -14,6 +14,27 @@ class HODEventsScreen extends StatefulWidget {
 
 class _HODEventsScreenState extends State<HODEventsScreen> {
 
+List<String> selectedDepartments = [];
+List<String> selectedTargets = [];
+
+
+final List<String> departments = [
+  "All Departments",
+  "Computer Science and Engineering",
+  "Cybersecurity",
+  "Artificial Intelligence and Data Science",
+  "Information Technology",
+  "Electronics and Communication Engineering",
+];
+
+final List<String> targets = [
+  "Staff",
+  "All Years",
+  "1st Year",
+  "2nd Year",
+  "3rd Year",
+  "4th Year",
+];
 
   List<Map<String, String>> events = [
     {
@@ -32,6 +53,62 @@ class _HODEventsScreenState extends State<HODEventsScreen> {
       "tag": "holiday"
     },
   ];
+
+Future<List<String>?> _showMultiSelectDialog(
+  BuildContext context, {
+  required String title,
+  required List<String> items,
+  required List<String> selectedItems,
+}) {
+  List<String> tempSelected = List.from(selectedItems);
+
+  return showDialog<List<String>>(
+    context: context,
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (context, setStateDialog) {
+          return AlertDialog(
+            title: Text(title),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: ListView(
+                shrinkWrap: true,
+                children: items.map((item) {
+                  final isSelected = tempSelected.contains(item);
+
+                  return CheckboxListTile(
+                    value: isSelected,
+                    title: Text(item),
+                    controlAffinity: ListTileControlAffinity.leading,
+                    onChanged: (bool? value) {
+                      setStateDialog(() {
+                        if (value == true) {
+                          tempSelected.add(item);
+                        } else {
+                          tempSelected.remove(item);
+                        }
+                      });
+                    },
+                  );
+                }).toList(),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Cancel"),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, tempSelected),
+                child: const Text("Done"),
+              ),
+            ],
+          );
+        },
+      );
+    },
+  );
+}
 
 
   @override
@@ -342,9 +419,120 @@ class _HODEventsScreenState extends State<HODEventsScreen> {
                       const SizedBox(
                           height: 10),
 
+/// DEPARTMENT MULTI SELECT
+const Text(
+  "Department",
+  style: TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+  ),
+),
+const SizedBox(height: 6),
 
-                      /// REASON (TOP)
-                     /// TITLE
+SizedBox(
+  width: double.infinity,
+  child: GestureDetector(
+    onTap: () async {
+      final result = await _showMultiSelectDialog(
+        context,
+        title: "Select Departments",
+        items: departments,
+        selectedItems: selectedDepartments,
+      );
+
+      if (result != null) {
+        setStateDialog(() {
+          selectedDepartments = result;
+        });
+      }
+    },
+    child: Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 14,
+        vertical: 16,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Text(
+              selectedDepartments.isEmpty
+                  ? "Select Departments"
+                  : selectedDepartments.join(", "),
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 14),
+            ),
+          ),
+          const Icon(Icons.keyboard_arrow_down),
+        ],
+      ),
+    ),
+  ),
+),
+
+const SizedBox(height: 16),
+
+/// TARGET MULTI SELECT
+const Text(
+  "Target",
+  style: TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+  ),
+),
+const SizedBox(height: 6),
+
+SizedBox(
+  width: double.infinity,
+  child: GestureDetector(
+    onTap: () async {
+      final result = await _showMultiSelectDialog(
+        context,
+        title: "Select Targets",
+        items: targets,
+        selectedItems: selectedTargets,
+      );
+
+      if (result != null) {
+        setStateDialog(() {
+          selectedTargets = result;
+        });
+      }
+    },
+    child: Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 14,
+        vertical: 16,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Text(
+              selectedTargets.isEmpty
+                  ? "Select Targets"
+                  : selectedTargets.join(", "),
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 14),
+            ),
+          ),
+          const Icon(Icons.keyboard_arrow_down),
+        ],
+      ),
+    ),
+  ),
+),
+
+const SizedBox(height: 16),
+                  
 /// TITLE
 const Text(
   "Title",
