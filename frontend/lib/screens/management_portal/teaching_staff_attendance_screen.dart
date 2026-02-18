@@ -11,8 +11,7 @@ class TeachingStaffAttendanceScreen extends StatefulWidget {
 
 class _TeachingStaffAttendanceScreenState
     extends State<TeachingStaffAttendanceScreen> {
-
-  bool showPresent = true; // toggle
+    bool showPresent = true; // toggle
 
   // ---------------- PRESENT STAFF ----------------
   final List<Map<String, String>> presentStaff = [

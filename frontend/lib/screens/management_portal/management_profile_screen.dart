@@ -31,7 +31,7 @@ class _ManagementProfileScreenState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: const Color.fromARGB(255, 248, 248, 250),
 
       body: SafeArea(
         child: SingleChildScrollView(

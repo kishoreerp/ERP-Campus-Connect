@@ -17,7 +17,7 @@ class ManagementHomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffF5F6FA),
+      backgroundColor: const Color.fromARGB(255, 248, 248, 250),
 
 
       body: SafeArea(
@@ -32,7 +32,7 @@ Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: [
 
-    const SizedBox(height:6),
+    const SizedBox(height:2),
 
 
     // Your remaining content
@@ -60,7 +60,7 @@ Container(
                 child: Icon(Icons.person_outline,
                     color: Colors.blueAccent, size: 34),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 4),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

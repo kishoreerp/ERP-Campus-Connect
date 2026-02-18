@@ -9,31 +9,7 @@ class TTStaffScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F9FC),
-
-      /// APP BAR
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF3D5AFE),
-        elevation: 0,
-        title: Text(
-          'SLEC Timetable Admin',
-          style: GoogleFonts.inter(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: Center(
-              child: Text(
-                '1/9/2026',
-                style: TextStyle(fontSize: 12),
-              ),
-            ),
-          ),
-        ],
-      ),
+      backgroundColor: Colors.white,
 
       /// BODY
       body: Padding(

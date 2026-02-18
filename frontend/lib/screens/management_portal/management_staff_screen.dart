@@ -12,7 +12,7 @@ class ManagementStaffScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xffF5F6FA),
+      backgroundColor:Color.fromARGB(255, 249, 250, 250),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -24,7 +24,7 @@ class ManagementStaffScreen extends StatelessWidget {
            
 
 
-              const SizedBox(height: 20),
+              
 
 
               // ================= TITLE =================
@@ -38,7 +38,7 @@ class ManagementStaffScreen extends StatelessWidget {
                  
                 ],
               ),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 8),
 
 
               // ================= STATS =================
@@ -51,7 +51,7 @@ class ManagementStaffScreen extends StatelessWidget {
               ),
 
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 12),
 
 
               // ================= TEACHING =================
@@ -60,7 +60,7 @@ class ManagementStaffScreen extends StatelessWidget {
                       fontWeight: FontWeight.w700)),
 
 
-              const SizedBox(height: 12),
+              const SizedBox(height: 5),
 
 
               deptTile(context,

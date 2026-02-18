@@ -415,8 +415,7 @@ class _StepTile extends StatelessWidget {
 // ---------------- CTA gradient box ----------------
 class _CtaBox extends StatelessWidget {
   final VoidCallback onApplyTap;
-
-  const _CtaBox({required this.onApplyTap});
+   const _CtaBox({required this.onApplyTap});
 
   @override
   Widget build(BuildContext context) {

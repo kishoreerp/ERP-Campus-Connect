@@ -14,7 +14,7 @@ class ManagementStudentScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: const Color.fromARGB(255, 248, 248, 250),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(14),
@@ -22,31 +22,18 @@ class ManagementStudentScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
 
-
-             
-              const SizedBox(height: 10),
-
-
               // ================= TITLE =================
               Row(
                 children: [
                   Text("Student Management",
                       style: GoogleFonts.inter(
                           fontSize: 20,
-                          fontWeight: FontWeight.bold)),
-         
-               
+                          fontWeight: FontWeight.bold)),  
                 ],
               ),
 
-
-           
-
-
               const SizedBox(height: 16),
-
-
-              // ================= SEARCH =================
+ // ================= SEARCH =================
               Row(
                 children: [
                   Expanded(
@@ -75,10 +62,7 @@ class ManagementStudentScreen extends StatelessWidget {
                   )
                 ],
               ),
-
-
               const SizedBox(height: 18),
-
 
               // ================= YEAR COUNTS =================
               GridView.count(
@@ -96,20 +80,14 @@ class ManagementStudentScreen extends StatelessWidget {
                   YearStatCard("779", "Final Year", Colors.orange),
                 ],
               ),
-
-
-              const SizedBox(height: 20),
-
+  
+                const SizedBox(height: 20),
 
               // ================= DEPARTMENTS =================
               Text("Department-wise Students",
                   style: GoogleFonts.inter(
                       fontWeight: FontWeight.bold)),
-
-
-              const SizedBox(height: 12),
-
-
+                const SizedBox(height: 12),
               deptRow(context, "Computer Science"),
               deptRow(context, "Information Technology"),
               deptRow(context, "Cyber Security"),

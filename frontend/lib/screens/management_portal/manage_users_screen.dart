@@ -78,7 +78,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 decoration: BoxDecoration(
-                  color: Colors.black,
+                  color: const Color.fromARGB(255, 19, 19, 19),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -308,9 +308,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                         color: Colors.white, fontSize: 11)),
               ),
 
-              const SizedBox(width: 8),
-
-              const Icon(Icons.delete, color: Colors.red),
+              const SizedBox(width: 3),              
             ],
           ),
 

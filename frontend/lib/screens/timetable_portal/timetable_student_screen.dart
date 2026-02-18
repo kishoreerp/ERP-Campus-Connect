@@ -30,32 +30,10 @@ class TTStudentScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-
+    
       /// APP BAR
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF3D5AFE),
-        elevation: 0,
-        title: Text(
-          'SLEC Timetable Admin',
-          style: GoogleFonts.inter(
-            fontWeight: FontWeight.w600,
-            fontSize: 16,
-          ),
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: Center(
-              child: Text(
-                '12/16/2025',
-                style: GoogleFonts.inter(fontSize: 12),
-              ),
-            ),
-          ),
-        ],
-      ),
+      return Scaffold(
+  backgroundColor: Colors.white,
 
       /// BODY
       body: SingleChildScrollView(
@@ -67,11 +45,11 @@ class TTStudentScreen extends StatelessWidget {
             Text(
               'Student Timetable',
               style: GoogleFonts.inter(
-                fontSize: 18,
+                fontSize: 20,
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 3),
             Text(
               'View and manage student schedules',
               style: GoogleFonts.inter(
@@ -80,7 +58,7 @@ class TTStudentScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 15),
 
             /// =====================
             /// UNDERGRADUATE
@@ -88,11 +66,11 @@ class TTStudentScreen extends StatelessWidget {
             Text(
               'Undergraduate',
               style: GoogleFonts.inter(
-                fontSize: 14,
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 6),
 
             GridView.count(
               crossAxisCount: 2,
@@ -114,8 +92,8 @@ class TTStudentScreen extends StatelessWidget {
                   onTap: () => _openYear(context, '3rd Year', ugDepartments),
                 ),
                 _YearCard(
-                  title: 'Final Year',
-                  onTap: () => _openYear(context, 'Final Year', ugDepartments),
+                  title: '4th Year',
+                  onTap: () => _openYear(context, '4th Year', ugDepartments),
                 ),
               ],
             ),
