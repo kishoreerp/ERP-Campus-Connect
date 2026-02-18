@@ -400,64 +400,89 @@ Text(
 
   // ---------------- TIMETABLE POPUP ----------------
   void _showTimetableDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          insetPadding: const EdgeInsets.all(20),
-          child: Padding(
-  padding: const EdgeInsets.all(20),
-  child: SizedBox(
-    height: MediaQuery.of(context).size.height * 0.65,
-    child: SingleChildScrollView(
-      child: Column(
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        insetPadding: const EdgeInsets.all(20),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min, // ✅ IMPORTANT
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Select Timetable Type",
+                    style: GoogleFonts.inter(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: const Icon(Icons.close, color: Colors.black54),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Text(
+                "Choose the timetable you want to view",
+                style: GoogleFonts.inter(
+                  color: Colors.grey[600],
+                  fontSize: 13,
+                ),
+              ),
+              const SizedBox(height: 20),
 
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Select Timetable Type", style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w700)),
-                    GestureDetector(onTap: () => Navigator.pop(context), child: const Icon(Icons.close, color: Colors.black54)),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                Text("Choose the timetable you want to view", style: GoogleFonts.inter(color: Colors.grey[600], fontSize: 13)),
-                const SizedBox(height: 20),
-                _timetableOption(
-                  context,
-                  icon: Icons.calendar_today_outlined,
-                  title: "Class Timetable",
-                  subtitle: "View your regular class schedule",
-                  color: Colors.blueAccent,
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => const StudentClassTimetableScreen()));
-                  },
-                ),
-                const SizedBox(height: 12),
-                _timetableOption(
-                  context,
-                  icon: Icons.assignment_outlined,
-                  title: "Exam Timetable",
-                  subtitle: "View examination schedule",
-                  color: Colors.purpleAccent,
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(context, MaterialPageRoute(builder: (_) => const StudentExamTimetableScreen()));
-                  },
-                ),
-              ],
-            ),
+              _timetableOption(
+                context,
+                icon: Icons.calendar_today_outlined,
+                title: "Class Timetable",
+                subtitle: "View your regular class schedule",
+                color: Colors.blueAccent,
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const StudentClassTimetableScreen(),
+                    ),
+                  );
+                },
+              ),
+
+              const SizedBox(height: 12),
+
+              _timetableOption(
+                context,
+                icon: Icons.assignment_outlined,
+                title: "Exam Timetable",
+                subtitle: "View examination schedule",
+                color: Colors.purpleAccent,
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const StudentExamTimetableScreen(),
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
         ),
-          ),
-        );
-      },
-    );
- }
+      );
+    },
+  );
+}
+
 
   Widget _timetableOption(
     BuildContext context, {
@@ -509,12 +534,10 @@ void _showLeaveManagementDialog(BuildContext context) {
 
   final TextEditingController reasonController = TextEditingController();
   String? selectedLeaveType;
-  final leaveTypes = ["Medical(Long Leave)","On Duty (OD)", "Personal","Permission"];
+  final leaveTypes = ["Medical","On Duty (OD)", "Emergency","others"];
   int selectedTab = 0;
 
-
-
-
+  
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -728,7 +751,7 @@ void _showLeaveManagementDialog(BuildContext context) {
                       maxLines: 3,
                       decoration: InputDecoration(
                         hintText:
-                            "Please provide the reason for your leave request...",
+                            "Please provide the reason for your leave request...& from date to date leave required",
                         hintStyle:
                             GoogleFonts.inter(color: Colors.grey[600]),
                         filled: true,

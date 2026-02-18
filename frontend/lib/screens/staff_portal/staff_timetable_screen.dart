@@ -141,8 +141,6 @@ Widget _toggleItem(String title, bool value) {
 
   // ---------------- WEEK TIMETABLE ----------------
  Widget _buildWeekTimetable() {
-  final ScrollController _scrollController = ScrollController();
-
   final days = [
     'Monday',
     'Tuesday',
@@ -163,13 +161,13 @@ Widget _toggleItem(String title, bool value) {
 
   return Padding(
     padding: const EdgeInsets.all(16),
-    child: Scrollbar(
-      controller: _scrollController,
-      thumbVisibility: true,
-      child: SingleChildScrollView(
-        controller: _scrollController,
-        scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
+    child: ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: InteractiveViewer(
+        constrained: false,
+        boundaryMargin: const EdgeInsets.all(20),
+        minScale: 1,
+        maxScale: 1, // 👈 disables zoom (only horizontal move)
         child: DataTable(
           columnSpacing: 30,
           headingRowColor:
@@ -200,7 +198,6 @@ Widget _toggleItem(String title, bool value) {
     ),
   );
 }
-
 
 
   // ---------------- EXAM TIMETABLE ----------------

@@ -44,30 +44,41 @@ class _StaffNotesSubjectScreenState
 
 
   /// FILE PICKER (OLD SAFE API)
-  Future<void> _pickFile() async {
-    final result = await FilePicker.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf', 'doc', 'docx', 'ppt', 'pptx'],
-    );
+Future<void> _pickFile() async {
+  const int maxFileSize = 20 * 1024; // ✅ 20 KB limit
 
+  final result = await FilePicker.pickFiles(
+    type: FileType.custom,
+    allowedExtensions: ['pdf', 'doc', 'docx', 'ppt', 'pptx'],
+  );
 
-    if (result != null) {
-      final fileName = result.files.single.name;
+  if (result != null) {
+    final file = result.files.single;
 
-
-      setState(() {
-        notes.add({
-          'title': fileName,
-          'info': 'New file • Today',
-        });
-      });
-
-
+    if (file.size > maxFileSize) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Uploaded: $fileName')),
+        const SnackBar(
+          content: Text('File size must be less than 20 KB'),
+          backgroundColor: Colors.red,
+        ),
       );
+      return; // ❌ Stop upload
     }
+
+    final fileName = file.name;
+
+    setState(() {
+      notes.add({
+        'title': fileName,
+        'info': '${(file.size / 1024).toStringAsFixed(1)} KB • Today',
+      });
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Uploaded: $fileName')),
+    );
   }
+}
 
 
   /// DOWNLOAD (DUMMY)
@@ -163,7 +174,7 @@ class _StaffNotesSubjectScreenState
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'PDF, DOC, PPT (Max 2MB)',
+                      'PDF, DOC, PPT (Max 20KB)',
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         color: Colors.grey,

@@ -14,7 +14,6 @@ class _ManagementProfileScreenState
     extends State<ManagementProfileScreen> {
 
   // ================= STATE =================
-  String selectedStatus = "Present";
   String phoneNumber = "+91 9876543210";
 
   bool notificationsEnabled = true;
@@ -44,36 +43,22 @@ class _ManagementProfileScreenState
               //---------------- HEADER ----------------
               Row(
                 children: [
-                  const CircleAvatar(
-                    backgroundColor: Colors.blue,
-                    child: Text("SLEC",
-                        style: TextStyle(color: Colors.white)),
-                  ),
-                  const SizedBox(width: 10),
+                const Spacer(),
+  IconButton(
+      icon: const Icon(Icons.settings_outlined, color: Colors.grey),
+      onPressed: () {
+        showDialog(
+          context: context,
+          barrierColor: Colors.black.withOpacity(0.45),
+          builder: (_) => const _SettingsDialog(),
+        );
+      },
+    ),
 
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Admin Panel",
-                          style: GoogleFonts.inter(
-                              fontWeight: FontWeight.w600)),
-                      Text("Management Admin",
-                          style: GoogleFonts.inter(
-                              fontSize: 12,
-                              color: Colors.grey)),
-                    ],
-                  ),
-
-                  const Spacer(),
-
-                  IconButton(
-                    icon: const Icon(Icons.settings),
-                    onPressed: showSettingsPopup,
-                  )
                 ],
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 6),
 
               //---------------- PROFILE CARD ----------------
               Container(
@@ -102,39 +87,8 @@ class _ManagementProfileScreenState
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 15),
 
-              //---------------- STATUS TILE ----------------
-              InkWell(
-                onTap: showStatusDialog,
-                child: card(
-                  Row(
-                    children: [
-                      Icon(
-                        getStatusIcon(selectedStatus),
-                        color: getStatusColor(selectedStatus),
-                      ),
-                      const SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment.start,
-                        children: [
-                          Text("Status",
-                              style: GoogleFonts.inter(
-                                  fontWeight: FontWeight.w600)),
-                          Text(selectedStatus,
-                              style: GoogleFonts.inter(
-                                  color: Colors.grey)),
-                        ],
-                      ),
-                      const Spacer(),
-                      const Icon(Icons.arrow_drop_down),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
 
               //---------------- PERSONAL INFO ----------------
               card(
@@ -164,10 +118,6 @@ class _ManagementProfileScreenState
                             ],
                           ),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.edit),
-                          onPressed: editPhoneDialog,
-                        )
                       ],
                     ),
 
@@ -182,347 +132,53 @@ class _ManagementProfileScreenState
                 ),
               ),
 
-              const SizedBox(height: 30),
+              const SizedBox(height: 10),
 
               //---------------- LOGOUT ----------------
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.logout),
-                  label: const Text("Logout"),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(14)),
-                  ),
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            const SlecHomeScreen(),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ================= STATUS POPUP =================
-
-  void showStatusDialog() {
-    showDialog(
-      context: context,
-      builder: (_) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16)),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text("Update Status",
-                    style: GoogleFonts.inter(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold)),
-                const SizedBox(height: 12),
-
-                statusOption("Present"),
-                statusOption("Absent"),
-                statusOption("Permission"),
-                statusOption("OD"),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget statusOption(String value) {
-    bool selected = selectedStatus == value;
-
-    return InkWell(
-      onTap: () {
-        setState(() => selectedStatus = value);
-        Navigator.pop(context);
-      },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: selected ? Colors.black : Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade300),
-        ),
-        child: Row(
-          children: [
-            Icon(getStatusIcon(value),
-                color: getStatusColor(value)),
-            const SizedBox(width: 12),
-            Text(
-              value == "OD" ? "OD (On Duty)" : value,
-              style: GoogleFonts.inter(
-                fontWeight: FontWeight.w600,
-                color:
-                    selected ? Colors.white : Colors.black,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ================= SETTINGS POPUP =================
-
-  void showSettingsPopup() {
-    showDialog(
-      context: context,
-      builder: (_) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18)),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
-              children: [
-
-                Row(
-                  children: [
-                    Text("Settings",
-                        style: GoogleFonts.inter(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold)),
-                    const Spacer(),
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () =>
-                          Navigator.pop(context),
-                    )
-                  ],
-                ),
-
-                Text(
-                  "Manage your account settings and preferences",
-                  style: GoogleFonts.inter(
-                      fontSize: 12,
-                      color: Colors.grey),
-                ),
-
-                const SizedBox(height: 20),
-
-                settingsSwitchTile(),
-                changePasswordTile(),
-              settingsItemTile(
-  Icons.description,
-  "Terms and Conditions",
-  onTap: () {
-    showDialog(
-      context: context,
-      builder: (_) => const TermsConditionsDialog(),
-    );
-  },
-),
-
-settingsItemTile(
-  Icons.privacy_tip,
-  "Privacy Policy",
-  onTap: () {
-    showDialog(
-      context: context,
-      builder: (_) => const PrivacyPolicyDialog(),
-    );
-  },
-),
-
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget settingsSwitchTile() {
-    return card(
-      Row(
-        children: [
-          Icon(
-            notificationsEnabled
-                ? Icons.notifications_active
-                : Icons.notifications_off,
-            color: notificationsEnabled
-                ? Colors.blue
-                : Colors.grey,
-          ),
-          const SizedBox(width: 12),
-          const Text("Push Notifications"),
-          const Spacer(),
-          Switch(
-            value: notificationsEnabled,
-            onChanged: (v) {
-              setState(() {
-                notificationsEnabled = v;
-              });
-            },
-          )
-        ],
-      ),
-    );
-  }
-
-Widget changePasswordTile() {
-  return Container(
-    margin: const EdgeInsets.only(bottom: 10),
-    padding: const EdgeInsets.all(14),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(14),
+             SizedBox(
+  width: double.infinity,
+  child: OutlinedButton.icon(
+    icon: const Icon(
+      Icons.logout_outlined,
+      color: Color.fromARGB(255, 47, 44, 52),
+      size: 20,
     ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-
-        // HEADER ROW
-        InkWell(
-          onTap: () {
-            setState(() {
-              showChangePassword = !showChangePassword;
-            });
-          },
-          child: Row(
-            children: [
-              const Icon(Icons.lock, color: Colors.green),
-              const SizedBox(width: 12),
-              const Text(
-                "Change Password",
-                style: TextStyle(fontWeight: FontWeight.w600),
-              ),
-              const Spacer(),
-              Text(
-                showChangePassword ? "Cancel" : "Change",
-                style: const TextStyle(
-                  color: Colors.blue,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        if (showChangePassword) ...[
-          const SizedBox(height: 14),
-
-          const Text("Current Password"),
-          const SizedBox(height: 6),
-          TextField(
-            controller: currentPasswordController,
-            obscureText: true,
-            decoration: InputDecoration(
-              hintText: "Enter current password",
-              filled: true,
-              fillColor: Colors.grey.shade100,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          const Text("New Password"),
-          const SizedBox(height: 6),
-          TextField(
-            controller: newPasswordController,
-            obscureText: true,
-            decoration: InputDecoration(
-              hintText: "Enter new password",
-              filled: true,
-              fillColor: Colors.grey.shade100,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          const Text("Confirm Password"),
-          const SizedBox(height: 6),
-          TextField(
-            controller: confirmPasswordController,
-            obscureText: true,
-            decoration: InputDecoration(
-              hintText: "Confirm new password",
-              filled: true,
-              fillColor: Colors.grey.shade100,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 18),
-
-          SizedBox(
-            width: double.infinity,
-            height: 46,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              onPressed: updatePassword,
-              child: const Text("Update Password"),
-            ),
-          ),
-        ],
-      ],
+    label: Text(
+      "Logout",
+      style: GoogleFonts.inter(
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        color: const Color.fromARGB(255, 47, 44, 52),
+      ),
     ),
-  );
-}
-
-  void updatePassword() {
-    if (newPasswordController.text !=
-        confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content:
-                Text("Passwords do not match")),
+    style: OutlinedButton.styleFrom(
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      side: BorderSide(color: const Color.fromARGB(255, 83, 83, 83)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      backgroundColor: const Color.fromARGB(255, 83, 83, 83).withOpacity(0.04),
+    ),
+    onPressed: () {
+      showDialog(
+        context: context,
+        barrierDismissible: true,
+        barrierColor: Colors.black.withOpacity(0.45),
+        builder: (_) => const LogoutConfirmDialog(),
       );
-      return;
-    }
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-          content:
-              Text("Password Updated Successfully")),
+    },
+  ),
+),
+            ],
+          ),
+        ),
+      ),
     );
-
-    setState(() {
-     bool showChangePassword = false;
-      currentPasswordController.clear();
-      newPasswordController.clear();
-      confirmPasswordController.clear();
-    });
   }
+
+
+
+ 
 
  Widget settingsItemTile(
   IconData icon,
@@ -545,73 +201,11 @@ Widget changePasswordTile() {
   );
 }
 
-  // ================= PHONE EDIT =================
 
-  void editPhoneDialog() {
-    TextEditingController controller =
-        TextEditingController(text: phoneNumber);
 
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Edit Phone"),
-        content: TextField(
-          controller: controller,
-          keyboardType: TextInputType.phone,
-          decoration:
-              const InputDecoration(border: OutlineInputBorder()),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () =>
-                Navigator.pop(context),
-            child: const Text("Cancel"),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                phoneNumber = controller.text;
-              });
-              Navigator.pop(context);
-            },
-            child: const Text("Save"),
-          ),
-        ],
-      ),
-    );
-  }
 
-  // ================= HELPERS =================
 
-  IconData getStatusIcon(String status) {
-    switch (status) {
-      case "Present":
-        return Icons.check_circle;
-      case "Absent":
-        return Icons.cancel;
-      case "Permission":
-        return Icons.schedule;
-      case "OD":
-        return Icons.assignment;
-      default:
-        return Icons.help;
-    }
-  }
 
-  Color getStatusColor(String status) {
-    switch (status) {
-      case "Present":
-        return Colors.green;
-      case "Absent":
-        return Colors.red;
-      case "Permission":
-        return Colors.orange;
-      case "OD":
-        return Colors.blue;
-      default:
-        return Colors.grey;
-    }
-  }
 
   Widget card(Widget child) {
     return Container(
@@ -652,9 +246,10 @@ Widget changePasswordTile() {
   }
 }
 
-////////////////////////////////////////////////////////////
-/// PRIVACY POLICY DIALOG
-////////////////////////////////////////////////////////////
+// ===================================================================
+// ================= SETTINGS DIALOG =================================
+// ===================================================================
+
 class _SettingsDialog extends StatefulWidget {
   const _SettingsDialog();
 
@@ -718,11 +313,20 @@ class _SettingsDialogState extends State<_SettingsDialog> {
                       ),
                     ),
                     Switch(
-                      value: notifications,
-                      activeColor: Colors.black,
-                      onChanged: (v) =>
-                          setState(() => notifications = v),
-                    ),
+  value: notifications,
+  activeColor: Colors.black,
+  activeTrackColor: Colors.black.withOpacity(0.35),
+
+  inactiveThumbColor: Colors.grey.shade600,
+  inactiveTrackColor: Colors.grey.shade300,
+
+  onChanged: (v) {
+    setState(() {
+      notifications = v;
+    });
+  },
+),
+
                   ],
                 ),
               ),
@@ -1007,3 +611,30 @@ class _PolicyItem extends StatelessWidget {
   }
 }
 
+class LogoutConfirmDialog extends StatelessWidget {
+  const LogoutConfirmDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text("Logout"),
+      content: const Text("Are you sure you want to logout?"),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Cancel"),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.pop(context); // close dialog
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              '/',
+              (route) => false,
+            );
+          },
+          child: const Text("Logout"),
+        ),
+      ],
+    );
+  }
+}

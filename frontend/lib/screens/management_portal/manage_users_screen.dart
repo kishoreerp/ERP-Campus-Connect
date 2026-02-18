@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'add_new_staff_screen.dart';
+import 'add_new_admin_screen.dart';
 
 
 class ManageUsersScreen extends StatefulWidget {
@@ -70,7 +70,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => const AddNewStaffScreen(),
+        builder: (_) => const AddNewAdminScreen(),
       ),
     );
   },
