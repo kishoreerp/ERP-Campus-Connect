@@ -7,6 +7,8 @@ import 'notification_dialog.dart';
 import 'hod_notes_screen.dart';
 import 'approvals_entry_dialog.dart';
 import 'leave_dialogs.dart';
+import 'hod_timetable_screen.dart';
+
 class HODHomeScreen extends StatelessWidget {
   final String username;
   const HODHomeScreen({super.key, required this.username});
@@ -87,49 +89,16 @@ Text(
     color: Colors.black87,
   ),
 ),
-const SizedBox(height: 12),
+const SizedBox(height: 10),
 
-_buildQuickActions(context),   // 👈 ADD THIS LINE
+_buildQuickActions(context), 
+const SizedBox(height: 10),
+_buildSchedule(),
+const SizedBox(height: 10),
+_buildRecentUpdates(),
 
-const SizedBox(height: 18),
+const SizedBox(height: 10),
 
-
-              // Recent Announcements header
-              Text(
-                'Recent Announcements',
-                style: GoogleFonts.inter(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // Announcement cards (sample)
-              _announcementCard(
-                title: 'Department Meeting',
-                subtitle: 'HOD meeting with all faculty on Friday at 3 PM',
-                date: '2024-01-14',
-                onTap: () {
-                  // TODO: open announcement detail
-                },
-              ),
-              const SizedBox(height: 12),
-              _announcementCard(
-                title: 'Exam Schedule',
-                subtitle: 'Mid-term exam schedule has been published',
-                date: '2024-01-13',
-                onTap: () {},
-              ),
-              const SizedBox(height: 12),
-              _announcementCard(
-                title: 'Faculty Workshop',
-                subtitle: 'Faculty development workshop next week',
-                date: '2024-01-12',
-                onTap: () {},
-              ),
-
-              const SizedBox(height: 28),
             ],
           ),
         ),
@@ -137,11 +106,11 @@ const SizedBox(height: 18),
     );
   }
 
-  Widget _buildQuickActions(BuildContext context) {
+ Widget _buildQuickActions(BuildContext context) {
   return Column(
     children: [
 
-      // First Row
+      // ---------- FIRST ROW ----------
       Row(
         children: [
           Expanded(
@@ -175,7 +144,7 @@ const SizedBox(height: 18),
 
       const SizedBox(height: 12),
 
-      // Second Row
+      // ---------- SECOND ROW ----------
       Row(
         children: [
           Expanded(
@@ -199,16 +168,31 @@ const SizedBox(height: 18),
           Expanded(
             child: _quickAction(
               context,
-              Icons.calendar_month,
+              Icons.flight_takeoff,
+
               'Request Leave',
               customOnTap: () => showLeaveManagementDialog(context),
             ),
           ),
         ],
       ),
+
+      const SizedBox(height: 12),
+
+      // ---------- THIRD ROW (NEW) ----------
+      
+
+_quickAction(
+  context,
+  Icons.calendar_month_outlined,
+  'Time Table',
+  screen: const HodTimetableScreen(),
+),
+
     ],
   );
 }
+
  Widget _quickAction(
     BuildContext context,
     IconData icon,
@@ -258,6 +242,70 @@ const SizedBox(height: 18),
       ),
     );
   }
+
+Widget _buildSchedule() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        "Today's Schedule",
+        style: GoogleFonts.inter(
+          fontWeight: FontWeight.w600,
+          fontSize: 16,
+          color: Colors.black87,
+        ),
+      ),
+      const SizedBox(height: 12),
+
+      const _HODScheduleTile(
+        title: 'Faculty Review Meeting',
+        subtitle: '09:00 - 10:00 • Conference Hall',
+        tag: 'Internal',
+      ),
+      const _HODScheduleTile(
+        title: 'Student Grievance Meeting',
+        subtitle: '11:00 - 12:00 • Cabin',
+        tag: 'Students',
+      ),
+      const _HODScheduleTile(
+        title: 'Department Planning',
+        subtitle: '14:00 - 15:00 • Meeting Room',
+        tag: 'Admin',
+      ),
+    ],
+  );
+}
+Widget _buildRecentUpdates() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        "Recent Updates",
+        style: GoogleFonts.inter(
+          fontWeight: FontWeight.w600,
+          fontSize: 16,
+          color: Colors.black87,
+        ),
+      ),
+      const SizedBox(height: 12),
+
+      const _HODUpdateTile(
+        icon: Icons.error_outline,
+        color: Colors.redAccent,
+        title: 'Staff Leave Request',
+        subtitle: '3 new leave requests pending approval',
+      ),
+      const SizedBox(height: 8),
+
+      const _HODUpdateTile(
+        icon: Icons.schedule_outlined,
+        color: Colors.orangeAccent,
+        title: 'Exam Duty Assigned',
+        subtitle: 'Exam invigilation schedule published',
+      ),
+    ],
+  );
+}
 
   // centered small tile (icon above label)
   Widget _quickTileCentered(BuildContext context,
@@ -731,6 +779,131 @@ Widget _quickAction(
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+class _HODScheduleTile extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final String tag;
+
+  const _HODScheduleTile({
+    required this.title,
+    required this.subtitle,
+    required this.tag,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: Colors.blue.shade50,
+          child: const Icon(Icons.access_time, color: Colors.blue),
+        ),
+        title: Text(
+          title,
+          style: GoogleFonts.inter(
+            fontSize: 14.5,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: GoogleFonts.inter(
+            fontSize: 13,
+            color: Colors.grey[700],
+          ),
+        ),
+        trailing: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.blue.shade50,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            tag,
+            style: GoogleFonts.inter(
+              color: Colors.blueAccent,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+class _HODUpdateTile extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String subtitle;
+
+  const _HODUpdateTile({
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: color),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    color: Colors.grey[700],
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

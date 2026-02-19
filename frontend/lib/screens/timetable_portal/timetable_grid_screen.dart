@@ -44,7 +44,10 @@ class TimetableGridScreen extends StatelessWidget {
           preferredSize: const Size.fromHeight(24),
           child: Padding(
             padding: const EdgeInsets.only(bottom: 8),
-            child: Text(subtitle, style: const TextStyle(fontSize: 12)),
+            child: Text(
+              subtitle,
+              style: const TextStyle(fontSize: 12),
+            ),
           ),
         ),
       ),
@@ -58,62 +61,84 @@ class TimetableGridScreen extends StatelessWidget {
     );
   }
 
-  /// ACTION BUTTONS (Make / Edit / Upload)
+  /// ACTION BUTTONS
   Widget _actionBar(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: [
-          /// ✅ MAKE BUTTON (FIXED)
+          /// MAKE
           ElevatedButton.icon(
-            onPressed: () {
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(16),
-                  ),
-                ),
-                builder: (_) => const CreateTimetableEntrySheet(),
-              );
-            },
+       onPressed: () {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: const SingleChildScrollView(
+        child: CreateTimetableEntrySheet(),
+      ),
+    ),
+  );
+},
+
             icon: const Icon(Icons.add),
             label: const Text('Make'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.black,
+              side: const BorderSide(color: Colors.black),
+            ),
           ),
 
           const SizedBox(width: 12),
 
-          /// EDIT BUTTON (leave empty or add later)
+          /// EDIT
           OutlinedButton.icon(
-  onPressed: () {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      onPressed: () {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
       ),
-      builder: (_) => const EditTimetableEntrySheet(),
-    );
-  },
-  icon: const Icon(Icons.edit),
-  label: const Text('Edit'),
-),
+      child: const SingleChildScrollView(
+        child: CreateTimetableEntrySheet(),
+      ),
+    ),
+  );
+},
 
+            icon: const Icon(Icons.edit),
+            label: const Text('Edit'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.black,
+              side: const BorderSide(color: Colors.black),
+            ),
+          ),
 
           const Spacer(),
 
+          /// UPLOAD
           ElevatedButton.icon(
             onPressed: () {},
             icon: const Icon(Icons.upload),
             label: const Text('Upload to Student Portal'),
+             style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.black,
+              side: const BorderSide(color: Colors.black),
+            ),
           ),
         ],
       ),
     );
   }
 
-  /// MAIN GRID
+  /// GRID
   Widget _timetableGrid() {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -130,7 +155,6 @@ class TimetableGridScreen extends StatelessWidget {
     );
   }
 
-  /// HEADER ROW
   TableRow _headerRow() {
     return TableRow(
       children: [
@@ -140,7 +164,6 @@ class TimetableGridScreen extends StatelessWidget {
     );
   }
 
-  /// EACH TIME ROW
   TableRow _timeRow(int index) {
     return TableRow(
       children: [
@@ -151,20 +174,25 @@ class TimetableGridScreen extends StatelessWidget {
     );
   }
 
-  /// CELLS
   Widget _headerCell(String text) {
     return Container(
       height: 48,
       alignment: Alignment.center,
       color: const Color(0xFFEAF0F6),
-      child: Text(text, style: const TextStyle(fontWeight: FontWeight.w600)),
+      child: Text(
+        text,
+        style: const TextStyle(fontWeight: FontWeight.w600),
+      ),
     );
   }
 
   Widget _timeCell(String text) {
     return Container(
       padding: const EdgeInsets.all(8),
-      child: Text(text, style: const TextStyle(fontSize: 12)),
+      child: Text(
+        text,
+        style: const TextStyle(fontSize: 12),
+      ),
     );
   }
 
@@ -190,8 +218,10 @@ class TimetableGridScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(e.subject,
-                style: const TextStyle(fontWeight: FontWeight.w600)),
+            Text(
+              e.subject,
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
             const SizedBox(height: 4),
             Text(e.teacher, style: const TextStyle(fontSize: 11)),
             Text(e.room, style: const TextStyle(fontSize: 11)),

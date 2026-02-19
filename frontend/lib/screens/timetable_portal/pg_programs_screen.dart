@@ -9,36 +9,45 @@ class PgProgramsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F9FC),
-
-      /// APP BAR
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF3D5AFE),
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Postgraduate Programs',
-          style: GoogleFonts.inter(
+  backgroundColor: const Color(0xFFF6F7FB),
+  appBar: AppBar(
+    elevation: 0,
+    backgroundColor: const Color(0xFFF6F7FB),
+    leading: IconButton(
+      icon: const Icon(
+        Icons.arrow_back,
+        color: Colors.black,
+      ),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    ),
+    titleSpacing: 0,
+    title: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Computer Science',
+          style: TextStyle(
+            color: Colors.black,
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
         ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: Center(
-              child: Text(
-                '1/9/2026',
-                style: TextStyle(fontSize: 12),
-              ),
-            ),
+        const SizedBox(height: 2),
+        Text(
+          '4 Staff Members',
+          style: TextStyle(
+            color: Colors.grey.shade600,
+            fontSize: 12,
+            fontWeight: FontWeight.w400,
           ),
-        ],
-      ),
+        ),
+      ],
+    ),
+  ),
 
+     
       /// BODY
       body: Padding(
         padding: const EdgeInsets.all(16),

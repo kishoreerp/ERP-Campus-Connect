@@ -1,8 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class CreateTimetableEntrySheet extends StatelessWidget {
+class CreateTimetableEntrySheet extends StatefulWidget {
   const CreateTimetableEntrySheet({super.key});
+
+  @override
+  State<CreateTimetableEntrySheet> createState() =>
+      _CreateTimetableEntrySheetState();
+}
+
+class _CreateTimetableEntrySheetState
+    extends State<CreateTimetableEntrySheet> {
+  String? selectedDay;
+  String? selectedTime;
+  String? selectedFaculty;
+
+
+  final subjectController = TextEditingController();
+
+  final days = [
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+  ];
+
+  final times = [
+    '09:00 - 09:50',
+    '09:50 - 10:40',
+    '10:55 - 11:45',
+    '11:45 - 12:35',
+  ];
+
+  final faculties = [
+    'Dr. Rajesh Kumar',
+    'Dr. Arun Sharma',
+    'Prof. Kavitha Reddy',
+    'Dr. Suresh Patel',
+  ];
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -38,79 +77,70 @@ class CreateTimetableEntrySheet extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             'Add a new class to the timetable',
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              color: Colors.grey,
-            ),
+            style: GoogleFonts.inter(fontSize: 12, color: Colors.grey),
           ),
 
           const SizedBox(height: 16),
 
-          /// DAY
           _label('Day'),
-          _dropdown(hint: 'Monday'),
+          _dropdown(
+            value: selectedDay,
+            hint: 'Select day',
+            items: days,
+            onChanged: (v) => setState(() => selectedDay = v),
+          ),
 
           const SizedBox(height: 12),
 
-          /// TIME SLOT
           _label('Time Slot'),
-          _dropdown(hint: '09:00 - 10:00'),
+          _dropdown(
+            value: selectedTime,
+            hint: 'Select time slot',
+            items: times,
+            onChanged: (v) => setState(() => selectedTime = v),
+          ),
 
           const SizedBox(height: 12),
 
-          /// SUBJECT
           _label('Subject'),
           _textField(hint: 'Enter subject name'),
 
           const SizedBox(height: 12),
 
-          /// FACULTY
           _label('Faculty'),
-          _dropdown(hint: 'Select faculty'),
+          _dropdown(
+            value: selectedFaculty,
+            hint: 'Select faculty',
+            items: faculties,
+            onChanged: (v) => setState(() => selectedFaculty = v),
+          ),
 
           const SizedBox(height: 12),
 
-          /// ROOM
-          _label('Room'),
-          _dropdown(hint: 'Select room'),
-
           const SizedBox(height: 20),
 
-          /// CREATE BUTTON
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.black,
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
               ),
-              onPressed: () {
-                // TODO: Save timetable entry
-              },
-              child: Text(
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
                 'Create Entry',
-                style: GoogleFonts.inter(
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
+                style: TextStyle(color: Colors.white),
               ),
             ),
           ),
 
           const SizedBox(height: 8),
 
-          /// CANCEL
           SizedBox(
             width: double.infinity,
             child: OutlinedButton(
               onPressed: () => Navigator.pop(context),
-              child: Text(
-                'Cancel',
-                style: GoogleFonts.inter(fontWeight: FontWeight.w500),
-              ),
+              child: const Text('Cancel'),
             ),
           ),
         ],
@@ -118,48 +148,48 @@ class CreateTimetableEntrySheet extends StatelessWidget {
     );
   }
 
-  /// SMALL HELPERS (UI ONLY)
+  Widget _label(String text) => Text(
+        text,
+        style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w500),
+      );
 
-  Widget _label(String text) {
-    return Text(
-      text,
-      style: GoogleFonts.inter(
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-      ),
-    );
-  }
+  Widget _textField({required String hint}) => TextField(
+        controller: subjectController,
+        decoration: InputDecoration(
+          hintText: hint,
+          filled: true,
+          fillColor: Colors.grey.shade100,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide.none,
+          ),
+        ),
+      );
 
-  Widget _textField({required String hint}) {
-    return TextField(
-      decoration: InputDecoration(
-        hintText: hint,
-        filled: true,
-        fillColor: Colors.grey.shade100,
-        border: OutlineInputBorder(
+  Widget _dropdown({
+    required String? value,
+    required String hint,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+  }) =>
+      Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade100,
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
         ),
-      ),
-    );
-  }
-
-  Widget _dropdown({required String hint}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: null,
-          hint: Text(hint),
-          isExpanded: true,
-          items: const [],
-          onChanged: (value) {},
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            value: value,
+            hint: Text(hint),
+            isExpanded: true,
+            items: items
+                .map(
+                  (e) => DropdownMenuItem(value: e, child: Text(e)),
+                )
+                .toList(),
+            onChanged: onChanged,
+          ),
         ),
-      ),
-    );
-  }
+      );
 }

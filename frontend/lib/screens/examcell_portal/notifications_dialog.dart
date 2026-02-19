@@ -57,12 +57,6 @@ class NotificationsDialog extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: const [
-                  Text(
-                    'Recent Notifications',
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  SizedBox(height: 12),
-
                   _NotificationCard(
                     color: Colors.deepOrange,
                     icon: Icons.warning_amber_rounded,
@@ -104,18 +98,6 @@ class NotificationsDialog extends StatelessWidget {
           ),
 
           const Divider(height: 1),
-
-          // ---------------- FOOTER ----------------
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Close'),
-              ),
-            ),
-          ),
         ],
       ),
     );

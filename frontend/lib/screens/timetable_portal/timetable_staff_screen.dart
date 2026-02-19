@@ -9,7 +9,9 @@ class TTStaffScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF7F9FC),
+
+     
 
       /// BODY
       body: Padding(
@@ -70,7 +72,7 @@ class TTStaffScreen extends StatelessWidget {
                     },
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 14),
                 Expanded(
                   child: _categoryCard(
                     title: 'PG',

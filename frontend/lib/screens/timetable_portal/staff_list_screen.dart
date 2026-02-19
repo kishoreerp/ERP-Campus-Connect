@@ -18,33 +18,7 @@ class StaffListScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF7F9FC),
 
-      /// APP BAR
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF3D5AFE),
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          departmentName,
-          style: GoogleFonts.inter(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        actions: const [
-          Padding(
-            padding: EdgeInsets.only(right: 16),
-            child: Center(
-              child: Text(
-                '1/9/2026',
-                style: TextStyle(fontSize: 12),
-              ),
-            ),
-          ),
-        ],
-      ),
+     
 
       /// BODY
       body: Padding(

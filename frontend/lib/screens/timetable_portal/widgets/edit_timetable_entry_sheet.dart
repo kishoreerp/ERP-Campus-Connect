@@ -1,8 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class EditTimetableEntrySheet extends StatelessWidget {
+class EditTimetableEntrySheet extends StatefulWidget {
   const EditTimetableEntrySheet({super.key});
+
+  @override
+  State<EditTimetableEntrySheet> createState() =>
+      _EditTimetableEntrySheetState();
+}
+
+class _EditTimetableEntrySheetState extends State<EditTimetableEntrySheet> {
+  String? selectedDay;
+  String? selectedTime;
+  String? selectedFaculty;
+
+  final subjectController = TextEditingController();
+
+  final days = [
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+  ];
+
+  final times = [
+    '09:00 - 09:50',
+    '09:50 - 10:40',
+    '10:55 - 11:45',
+    '11:45 - 12:35',
+  ];
+
+  final faculties = [
+    'Dr. Rajesh Kumar',
+    'Dr. Arun Sharma',
+    'Prof. Kavitha Reddy',
+    'Dr. Suresh Patel',
+  ];
+
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -57,22 +94,9 @@ class EditTimetableEntrySheet extends StatelessWidget {
               color: const Color(0xFFE3F2FD),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Click on any cell in the timetable grid to edit',
-                  style: GoogleFonts.inter(fontSize: 12),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'No entry selected',
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+            child: Text(
+              'Edit the selected timetable entry',
+              style: GoogleFonts.inter(fontSize: 12),
             ),
           ),
 
@@ -80,13 +104,23 @@ class EditTimetableEntrySheet extends StatelessWidget {
 
           /// DAY
           _label('Day'),
-          _dropdown(hint: 'Monday'),
+          _dropdown(
+            value: selectedDay,
+            hint: 'Select day',
+            items: days,
+            onChanged: (v) => setState(() => selectedDay = v),
+          ),
 
           const SizedBox(height: 12),
 
           /// TIME SLOT
           _label('Time Slot'),
-          _dropdown(hint: '09:00 - 10:00'),
+          _dropdown(
+            value: selectedTime,
+            hint: 'Select time slot',
+            items: times,
+            onChanged: (v) => setState(() => selectedTime = v),
+          ),
 
           const SizedBox(height: 12),
 
@@ -98,15 +132,15 @@ class EditTimetableEntrySheet extends StatelessWidget {
 
           /// FACULTY
           _label('Faculty'),
-          _dropdown(hint: 'Select faculty'),
+          _dropdown(
+            value: selectedFaculty,
+            hint: 'Select faculty',
+            items: faculties,
+            onChanged: (v) => setState(() => selectedFaculty = v),
+          ),
 
           const SizedBox(height: 12),
 
-          /// ROOM
-          _label('Room'),
-          _dropdown(hint: 'Select room'),
-
-          const SizedBox(height: 20),
 
           /// SAVE CHANGES
           SizedBox(
@@ -119,7 +153,10 @@ class EditTimetableEntrySheet extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              onPressed: () {},
+              onPressed: () {
+                // TODO: Save updated entry
+                Navigator.pop(context);
+              },
               child: Text(
                 'Save Changes',
                 style: GoogleFonts.inter(
@@ -143,7 +180,10 @@ class EditTimetableEntrySheet extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              onPressed: () {},
+              onPressed: () {
+                // TODO: Delete entry
+                Navigator.pop(context);
+              },
               icon: const Icon(Icons.delete, color: Colors.white),
               label: Text(
                 'Delete',
@@ -178,15 +218,13 @@ class EditTimetableEntrySheet extends StatelessWidget {
   Widget _label(String text) {
     return Text(
       text,
-      style: GoogleFonts.inter(
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-      ),
+      style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w500),
     );
   }
 
   Widget _textField({required String hint}) {
     return TextField(
+      controller: subjectController,
       decoration: InputDecoration(
         hintText: hint,
         filled: true,
@@ -199,7 +237,12 @@ class EditTimetableEntrySheet extends StatelessWidget {
     );
   }
 
-  Widget _dropdown({required String hint}) {
+  Widget _dropdown({
+    required String? value,
+    required String hint,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
@@ -208,13 +251,18 @@ class EditTimetableEntrySheet extends StatelessWidget {
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
+          value: value,
           hint: Text(hint),
           isExpanded: true,
-          items: const [
-            DropdownMenuItem(value: '1', child: Text('Option 1')),
-            DropdownMenuItem(value: '2', child: Text('Option 2')),
-          ],
-          onChanged: (_) {},
+          items: items
+              .map(
+                (e) => DropdownMenuItem(
+                  value: e,
+                  child: Text(e),
+                ),
+              )
+              .toList(),
+          onChanged: onChanged,
         ),
       ),
     );
