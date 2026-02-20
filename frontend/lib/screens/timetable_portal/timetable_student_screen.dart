@@ -42,7 +42,7 @@ class TTStudentScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
   
-    const SizedBox(height: 12),
+    const SizedBox(height: 6),
             /// TITLE
             Text(
               'Student Timetable',
@@ -60,7 +60,7 @@ class TTStudentScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
 
             /// =====================
             /// UNDERGRADUATE
