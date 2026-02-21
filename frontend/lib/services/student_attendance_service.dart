@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 
 class StudentAttendanceService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -95,13 +98,7 @@ class StudentAttendanceService {
     }
 
     return total == 0 ? 0 : attended / total;
-  }
-
-  // ===========================================
-  // LOAD MONTHLY CALENDAR DATA
-  // ===========================================
-
-Future<List<Map<String, dynamic>>> loadMonthlyAttendance(
+  }Future<List<Map<String, dynamic>>> loadMonthlyAttendance(
   DateTime month,
 ) async {
   final userSnap = await _db
@@ -114,11 +111,13 @@ Future<List<Map<String, dynamic>>> loadMonthlyAttendance(
   final start = DateTime(month.year, month.month, 1);
   final end = DateTime(month.year, month.month + 1, 0);
 
+  // 🔵 Load Govt Holidays automatically
+  final govtHolidays = await fetchIndianHolidays(month.year);
+
   final snap = await _db.collection("attendance").get();
 
-  /// 👉 date -> presentCount for whole day
   final Map<DateTime, int> presentPerDay = {};
-  final Set<DateTime> holidaySet = {};
+  final Set<DateTime> holidaySet = {...govtHolidays};
 
   for (final d in snap.docs) {
     final data = d.data();
@@ -127,6 +126,7 @@ Future<List<Map<String, dynamic>>> loadMonthlyAttendance(
     if (!data.containsKey("students")) continue;
 
     DateTime docDate;
+
     try {
       docDate = DateTime.parse(data["date"]);
     } catch (_) {
@@ -147,21 +147,80 @@ Future<List<Map<String, dynamic>>> loadMonthlyAttendance(
 
     final bool present = student["present"] == true;
 
-    // 👉 accumulate per day
     presentPerDay[normalized] =
         (presentPerDay[normalized] ?? 0) + (present ? 1 : 0);
-
-    if (data["status"] == "holiday") {
-      holidaySet.add(normalized);
-    }
   }
 
-  return presentPerDay.entries.map((e) {
+  final Set<DateTime> allDays = {
+    ...presentPerDay.keys,
+    ...holidaySet,
+  };
+
+  return allDays.map((d) {
     return {
-      "date": e.key,
-      "presentCount": e.value,
-      "holiday": holidaySet.contains(e.key),
+      "date": d,
+      "presentCount": presentPerDay[d] ?? 0,
+      "holiday": holidaySet.contains(d),
     };
   }).toList();
 }
+
+Future<Set<DateTime>> fetchIndianHolidays(int year) async {
+  final url = Uri.parse(
+      "https://date.nager.at/api/v3/PublicHolidays/$year/IN");
+
+  final res = await http.get(url);
+
+  if (res.statusCode != 200) {
+    return {};
+  }
+
+  final List list = jsonDecode(res.body);
+
+  final Set<DateTime> holidays = {};
+
+  for (final e in list) {
+    final d = DateTime.parse(e["date"]);
+    holidays.add(DateTime(d.year, d.month, d.day));
+  }
+
+  return holidays;
+
+}
+// ===========================================
+// ⏱ CHECK IF CURRENT PERIOD IS EDITABLE
+// ===========================================
+
+bool canEditAttendance(String timeRange) {
+  try {
+    final parts = timeRange.split("-");
+    if (parts.length != 2) return false;
+
+    final startParts = parts[0].trim().split(":");
+    final endParts = parts[1].trim().split(":");
+
+    final now = DateTime.now();
+
+    final start = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      int.parse(startParts[0]),
+      int.parse(startParts[1]),
+    );
+
+    final end = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      int.parse(endParts[0]),
+      int.parse(endParts[1]),
+    );
+
+    return now.isAfter(start) && now.isBefore(end);
+  } catch (_) {
+    return false;
+  }
+}
+
 }

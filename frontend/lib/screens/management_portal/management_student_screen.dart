@@ -28,8 +28,8 @@ class ManagementStudentScreen extends StatelessWidget {
                   Text("Student Management",
                       style: GoogleFonts.inter(
                           fontSize: 20,
-                          fontWeight: FontWeight.bold)),  
-                ],
+                          fontWeight: FontWeight.bold)),
+                        ],
               ),
 
               const SizedBox(height: 16),

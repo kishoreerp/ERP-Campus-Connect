@@ -9,24 +9,16 @@ class ManagementStaffScreen extends StatelessWidget {
   const ManagementStaffScreen({super.key});
 
 
-  @override
+ @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:Color.fromARGB(255, 249, 250, 250),
+      backgroundColor: const Color.fromARGB(255, 248, 250, 250),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
-
-           
-
-
-              
-
-
               // ================= TITLE =================
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -39,8 +31,6 @@ class ManagementStaffScreen extends StatelessWidget {
                 ],
               ),
                   const SizedBox(height: 8),
-
-
               // ================= STATS =================
               Row(
                 children: [
@@ -49,35 +39,26 @@ class ManagementStaffScreen extends StatelessWidget {
                   statCard("42", "NON-TEACHING"),
                 ],
               ),
-
-
-              const SizedBox(height: 12),
-
-
+                const SizedBox(height: 12),
               // ================= TEACHING =================
               Text("TEACHING STAFF BY DEPT",
                   style: GoogleFonts.inter(
                       fontWeight: FontWeight.w700)),
+               const SizedBox(height: 5),
 
-
-              const SizedBox(height: 5),
-
-
-              deptTile(context,
+               deptTile(context,
                   title: "Computer Science",
                   hod: "HOD: Dr. Rajesh Kumar",
                   count: "28 Faculty",
                   staffList: cseStaff),
 
-
-              deptTile(context,
+               deptTile(context,
                   title: "Electronics & Communication",
                   hod: "HOD: Dr. Priya Sharma",
                   count: "24 Faculty",
                   staffList: eceStaff),
 
-
-              deptTile(context,
+                deptTile(context,
                   title: "Mechanical Engineering",
                   hod: "HOD: Dr. Vijay Patel",
                   count: "22 Faculty",
@@ -213,10 +194,7 @@ Widget deptTile(
       ),
     ),
   );
-}
-
-
-
+  }
 
 //////////////////////////////////////////////////////////
 // SMALL WIDGETS
@@ -234,7 +212,6 @@ Widget badge(String text) {
     child: Text(text, style: GoogleFonts.inter(fontSize: 12)),
   );
 }
-
 
 Widget statCard(String value, String label) {
   return Expanded(
@@ -260,7 +237,6 @@ Widget statCard(String value, String label) {
     ),
   );
 }
-
 
 //////////////////////////////////////////////////////////
 // DEPARTMENT TILE
@@ -340,7 +316,6 @@ Widget dept(
 //////////////////////////////////////////////////////////
 // NON-TEACHING TILE
 //////////////////////////////////////////////////////////
-
 
 Widget nonTeachingTile(String title, String count) {
   return Container(
