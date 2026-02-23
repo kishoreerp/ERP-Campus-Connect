@@ -76,16 +76,10 @@ Future<void> loadRecentUpdates() async {
   });
 }
 
-
-
-
-
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -107,9 +101,6 @@ Future<void> loadRecentUpdates() async {
       ),
     );
   }
-
-
-
 
   // ---------------- HEADER ----------------
   Widget _buildHeader(BuildContext context) {
@@ -157,11 +148,9 @@ Future<void> loadRecentUpdates() async {
   ),
 ),
 
+  const SizedBox(height: 2),
 
-const SizedBox(height: 2),
-
-
-Text(
+  Text(
   studentData?['department'] ?? '',
   style: GoogleFonts.inter(
     color: Colors.grey[600],
@@ -255,9 +244,6 @@ Text(
       ),
     );
   }
-
-
-
 
   // ---------------- QUICK ACTIONS ----------------
   Widget _buildQuickActions(BuildContext context) {
@@ -395,9 +381,6 @@ Text(
     );
   }
 
-
-
-
   // ---------------- TIMETABLE POPUP ----------------
   void _showTimetableDialog(BuildContext context) {
   showDialog(
@@ -529,7 +512,7 @@ Text(
       ),
     );
   }
-  // ---------------- LEAVE MANAGEMENT POPUP ----------------
+// ---------------- LEAVE MANAGEMENT POPUP ----------------
 void _showLeaveManagementDialog(BuildContext context) {
 
   final TextEditingController reasonController = TextEditingController();
