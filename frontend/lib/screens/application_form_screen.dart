@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 
 
 class ApplicationFormScreen extends StatefulWidget {
@@ -36,10 +40,13 @@ final TextEditingController bloodGroupCtrl = TextEditingController();
 final TextEditingController aadhaarCtrl = TextEditingController();
 final TextEditingController fatherNameCtrl = TextEditingController();
 final TextEditingController fatherMobileCtrl = TextEditingController();
+final TextEditingController fatherOccupationCtrl = TextEditingController();
 final TextEditingController motherNameCtrl = TextEditingController();
 final TextEditingController motherMobileCtrl = TextEditingController();
+final TextEditingController motherOccupationCtrl = TextEditingController();
 final TextEditingController guardianNameCtrl = TextEditingController();
 final TextEditingController guardianMobileCtrl = TextEditingController();
+final TextEditingController guardianOccupationCtrl = TextEditingController();
 
 
 // Address split controllers
@@ -87,7 +94,7 @@ final TextEditingController degreeYearCtrl = TextEditingController();
 final TextEditingController degreePercentCtrl = TextEditingController();
 
 PlatformFile? previousEducationFile;
-
+PlatformFile? passportPhotoFile;
 bool isFirstGraduate = false;
 bool hasNativityCert = false;
 bool show12thDetails = false;
@@ -106,7 +113,7 @@ PlatformFile? nativityCertFile;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+       backgroundColor: const Color.fromARGB(255, 250, 250, 250),
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
@@ -130,12 +137,14 @@ PlatformFile? nativityCertFile;
   type: StepperType.vertical,
   currentStep: currentStep,
   onStepContinue: () {
-    if (currentStep < 4) {
-      setState(() => currentStep++);
-    } else {
-      _submitApplication();
-    }
-  },
+  if (!_validateCurrentStep()) return;
+
+  if (currentStep < 4) {
+    setState(() => currentStep++);
+  } else {
+    _submitApplication();
+  }
+},
   onStepCancel: () {
     if (currentStep > 0) {
       setState(() => currentStep--);
@@ -244,7 +253,7 @@ Step(
         subtitle: 'Provide applicant personal details',
         children: [
           _input('Name of the Applicant *', fullNameCtrl),
-          _input('Date of Birth *', dobCtrl, hint: 'dd-mm-yyyy'),
+          _dobField(),
           _dropdown(
             label: 'Gender *',
             value: gender,
@@ -257,13 +266,18 @@ Step(
             items: const ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'],
             onChanged: (v) => bloodGroupCtrl.text = v ?? '',
           ),
-          _input(
-            'Aadhaar Number *',
-            aadhaarCtrl,
-            hint: '12 digit Aadhaar number',
-          ),
-          _input('Email Address *', emailCtrl),
-          _input('Phone Number *', phoneCtrl),
+          _numberInput(
+  'Aadhaar Number *',
+  aadhaarCtrl,
+  maxLength: 12,
+  hint: '12 digit Aadhaar number',
+),
+          _emailInput(),
+         _numberInput(
+  'Phone Number *',
+  phoneCtrl,
+  maxLength: 10,
+),
         ],
       ),
       const SizedBox(height: 1),
@@ -280,11 +294,16 @@ Step(
         subtitle: 'Provide parent or guardian contact details',
         children: [
           _input('Father Name *', fatherNameCtrl),
-          _input('Father Mobile Number *', fatherMobileCtrl),
-          _input('Mother Name *', motherNameCtrl),
-          _input('Mother Mobile Number *', motherMobileCtrl),
-          _input('Guardian Name (if applicable)', guardianNameCtrl),
-          _input('Guardian Mobile Number', guardianMobileCtrl),
+_numberInput('Father Mobile Number (Required if provided)', fatherMobileCtrl,maxLength: 10,),
+_input('Father Occupation (Required if mobile provided)', fatherOccupationCtrl),
+
+_input('Mother Name *', motherNameCtrl),
+_numberInput('Mother Mobile Number (Required if provided)', motherMobileCtrl,maxLength: 10,),
+_input('Mother Occupation (Required if mobile provided)', motherOccupationCtrl),
+
+_input('Guardian Name (if applicable)', guardianNameCtrl),
+_numberInput('Guardian Mobile Number (Optional)', guardianMobileCtrl,maxLength: 10,),
+_input('Guardian Occupation (Optional)', guardianOccupationCtrl),
         ],
       ),
       const SizedBox(height: 12),
@@ -545,7 +564,15 @@ Step(
         subtitle: 'Upload required documents (PDF format, max 20kb each)',
         children: [
 
-  const _FilePicker(label: 'Passport Size Photo *'),
+  _ImagePicker(
+  label: 'Passport Size Photo *',
+  onFileSelected: (file) {
+    setState(() {
+      passportPhotoFile = file;
+    });
+  },
+),
+  
 
   const _FilePicker(label: '10th Mark Sheet *'),
 
@@ -557,17 +584,45 @@ Step(
   if (education != null && education != '12th')
     _FilePicker(label: '$education Marksheet *'),
 
-  const _FilePicker(label: 'Transfer Certificate *'),
+  _FilePicker(label: 'Transfer Certificate *'),
 
-  const _FilePicker(label: 'Community Certificate *'),
+ _FilePicker(
+  label: 'Community Certificate *',
+  onFileSelected: (file) {
+    setState(() {
+      communityCertFile = file;
+    });
+  },
+),
 
   if (isFirstGraduate)
-    const _FilePicker(label: 'First Graduate Certificate *'),
+    _FilePicker(
+      label: 'First Graduate Certificate *',
+      onFileSelected: (file) {
+        setState(() {
+          firstGraduateCertFile = file;
+        });
+      },
+    ),
 
-  const _FilePicker(label: 'Income Certificate *'),
+ _FilePicker(
+  label: 'Income Certificate *',
+  onFileSelected: (file) {
+    setState(() {
+      incomeCertFile = file;
+    });
+  },
+),
 
   if (hasNativityCert)
-    const _FilePicker(label: 'Nativity Certificate *'),
+    _FilePicker(
+      label: 'Nativity Certificate *',
+      onFileSelected: (file) {
+        setState(() {
+          nativityCertFile = file;
+        });
+      },
+    ),
 ],
 
       ),
@@ -578,95 +633,174 @@ Step(
 Step(
   title: const Text('Preview'),
   isActive: currentStep >= 4,
-  content: SingleChildScrollView(
+ content: SingleChildScrollView(
+  child: Container(
+    padding: const EdgeInsets.all(20),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      border: Border.all(color: Colors.grey.shade300),
+    ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
 
-        _previewSection("Program Details", [
-          _previewItem("Program", program),
-          _previewItem("Degree", degree),
-          _previewItem("Course", preferredCourse),
-        ]),
+        // ================= HEADER =================
+        Center(
+          child: Column(
+            children: [
+              Text(
+                "XYZ ENGINEERING COLLEGE",
+                style: GoogleFonts.inter(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                "ADMISSION APPLICATION FORM",
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const Divider(height: 30, thickness: 1),
+            ],
+          ),
+        ),
 
-        _previewSection("Personal Information", [
-          _previewItem("Full Name", fullNameCtrl.text),
-          _previewItem("DOB", dobCtrl.text),
-          _previewItem("Gender", gender),
-          _previewItem("Blood Group", bloodGroupCtrl.text),
-          _previewItem("Aadhaar", aadhaarCtrl.text),
-          _previewItem("Email", emailCtrl.text),
-          _previewItem("Phone", phoneCtrl.text),
-        ]),
+        // ================= PHOTO + BASIC INFO =================
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
 
-        _previewSection("Parents Information", [
-          _previewItem("Father Name", fatherNameCtrl.text),
-          _previewItem("Father Mobile", fatherMobileCtrl.text),
-          _previewItem("Mother Name", motherNameCtrl.text),
-          _previewItem("Mother Mobile", motherMobileCtrl.text),
-          _previewItem("Guardian Name", guardianNameCtrl.text),
-          _previewItem("Guardian Mobile", guardianMobileCtrl.text),
-        ]),
+            // LEFT SIDE DETAILS
+            Expanded(
+              child: Column(
+                children: [
+                  _docRow("Program", program),
+                  _docRow("Degree", degree),
+                  _docRow("Department", preferredCourse),
+                  _docRow("Full Name", fullNameCtrl.text),
+                  _docRow("Date of Birth", dobCtrl.text),
+                  _docRow("Gender", gender),
+                  _docRow("Blood Group", bloodGroupCtrl.text),
+                  _docRow("Aadhaar", aadhaarCtrl.text),
+                  _docRow("Email", emailCtrl.text),
+                  _docRow("Phone", phoneCtrl.text),
+                ],
+              ),
+            ),
 
-        _previewSection("Address Details", [
-          _previewItem("Door No", doorNoCtrl.text),
-          _previewItem("Street", streetCtrl.text),
-          _previewItem("Village", villageCtrl.text),
-          _previewItem("Post", postCtrl.text),
-          _previewItem("City", cityCtrl.text),
-          _previewItem("Taluk", talukCtrl.text),
-          _previewItem("District", districtCtrl.text),
-          _previewItem("State", stateCtrl.text),
-          _previewItem("Pincode", pincodeCtrl.text),
-        ]),
+            const SizedBox(width: 20),
 
-        _previewSection("Academic Details", [
-          _previewItem("Education", education),
-          _previewItem("10th School", school10Ctrl.text),
-          _previewItem("10th Mark", mark10Ctrl.text),
-          _previewItem("12th School", school12Ctrl.text),
-          _previewItem("12th Mark", mark12Ctrl.text),
-          _previewItem("College", collegeCtrl.text),
-          _previewItem("University", universityCtrl.text),
-          _previewItem("Degree %", degreePercentCtrl.text),
-        ]),
+            // RIGHT SIDE PHOTO
+            Container(
+              width: 120,
+              height: 140,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black),
+              ),
+              child: passportPhotoFile != null
+                  ? Image.memory(
+                      passportPhotoFile!.bytes!,
+                      fit: BoxFit.cover,
+                    )
+                  : const Center(
+                      child: Text("Photo"),
+                    ),
+            ),
+          ],
+        ),
 
-        _previewSection("Community Details", [
-          _previewItem("Religion", religionCtrl.text),
-          _previewItem("Caste", casteCtrl.text),
-          _previewItem("Community", communityCtrl.text),
-          _previewItem("Annual Income", annualIncomeCtrl.text),
-          _previewItem("First Graduate", isFirstGraduate ? "Yes" : "No"),
-          _previewItem("Nativity", hasNativityCert ? "Yes" : "No"),
-        ]),
+        const SizedBox(height: 30),
+        const Divider(),
 
-        const SizedBox(height: 25),
+        // ================= PARENTS =================
+        _sectionTitle("Parents / Guardian Details"),
+        _docRow("Father Name", fatherNameCtrl.text),
+        _docRow("Father Mobile", fatherMobileCtrl.text),
+        _docRow("Mother Name", motherNameCtrl.text),
+        _docRow("Mother Mobile", motherMobileCtrl.text),
+        _docRow("Guardian Name", guardianNameCtrl.text),
 
-  SizedBox(
+        const SizedBox(height: 20),
+        const Divider(),
+
+        // ================= ADDRESS =================
+        _sectionTitle("Address"),
+        _docRow(
+          "Full Address",
+          "${doorNoCtrl.text}, ${streetCtrl.text}, ${villageCtrl.text}, "
+          "${cityCtrl.text}, ${districtCtrl.text}, ${stateCtrl.text} - ${pincodeCtrl.text}",
+        ),
+
+        const SizedBox(height: 20),
+        const Divider(),
+
+        // ================= ACADEMIC =================
+        _sectionTitle("Academic Details"),
+        _docRow("Previous Education", education),
+        _docRow("10th School", school10Ctrl.text),
+        _docRow("10th Mark", mark10Ctrl.text),
+        _docRow("12th School", school12Ctrl.text),
+        _docRow("12th Mark", mark12Ctrl.text),
+        _docRow("College", collegeCtrl.text),
+        _docRow("University", universityCtrl.text),
+        _docRow("Degree %", degreePercentCtrl.text),
+
+       const SizedBox(height: 20),
+
+// SUBMIT BUTTON
+SizedBox(
   width: double.infinity,
   child: ElevatedButton(
     onPressed: _submitApplication,
     style: ElevatedButton.styleFrom(
-      backgroundColor: const Color(0xFF2563EB),
-      padding: const EdgeInsets.symmetric(vertical: 14),
+      backgroundColor: Colors.black,
+      foregroundColor: Colors.white,
+      padding: const EdgeInsets.symmetric(vertical: 16),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(8),
       ),
     ),
-    child: Text(
-      'Submit Application',
-      style: GoogleFonts.inter(
-        fontWeight: FontWeight.w700,
-        color: Colors.white,
-      ),
+    child: const Text(
+      "Submit Application",
+      style: TextStyle(fontWeight: FontWeight.w600),
     ),
   ),
 ),
 
-        const SizedBox(height: 15),
+const SizedBox(height: 12),
+
+// GO BACK BUTTON
+SizedBox(
+  width: double.infinity,
+  child: OutlinedButton(
+    onPressed: () {
+      setState(() {
+        currentStep = 3; // 👈 Go back to Document Upload step
+      });
+    },
+    style: OutlinedButton.styleFrom(
+      side: const BorderSide(color: Colors.black),
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+    ),
+    child: const Text(
+      "Go Back & Edit",
+      style: TextStyle(
+        color: Colors.black,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+  ),
+),
       ],
     ),
   ),
+),
 ),
 
   ],),
@@ -703,7 +837,189 @@ Step(
     ),
   );
 }
+Widget _emailInput() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        'Email Address *',
+        style: GoogleFonts.inter(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      const SizedBox(height: 6),
+      TextField(
+        controller: emailCtrl,
+        keyboardType: TextInputType.emailAddress,
+        onChanged: (value) {
+          final lower = value.toLowerCase();
 
+          if (value != lower) {
+            emailCtrl.value = TextEditingValue(
+              text: lower,
+              selection: TextSelection.collapsed(offset: lower.length),
+            );
+          }
+        },
+        decoration: InputDecoration(
+          hintText: 'student@gmail.com',
+          filled: true,
+          fillColor: Colors.grey[100],
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _numberInput(
+  String label,
+  TextEditingController controller, {
+  required int maxLength,
+  String? hint,
+}) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        label,
+        style: GoogleFonts.inter(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      const SizedBox(height: 6),
+      TextField(
+        controller: controller,
+        keyboardType: TextInputType.number,
+        inputFormatters: [
+          FilteringTextInputFormatter.digitsOnly, // ✅ numbers only
+          LengthLimitingTextInputFormatter(maxLength), // ✅ limit length
+        ],
+        decoration: InputDecoration(
+          hintText: hint,
+          filled: true,
+          fillColor: Colors.grey[100],
+          counterText: "", // hides counter
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+        ),
+      ),
+    ],
+  );
+}
+
+Widget _dobField() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        'Date of Birth *',
+        style: GoogleFonts.inter(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      const SizedBox(height: 6),
+      TextField(
+        controller: dobCtrl,
+        readOnly: true, // 🔒 Prevent manual typing
+        decoration: InputDecoration(
+          hintText: 'Select Date',
+          filled: true,
+          fillColor: Colors.grey[100],
+          suffixIcon: const Icon(Icons.calendar_today),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
+          ),
+        ),
+        onTap: () async {
+  FocusScope.of(context).unfocus();
+
+  await Future.delayed(const Duration(milliseconds: 150));
+
+  DateTime? pickedDate = await showDatePicker(
+    context: context,
+    initialDate: DateTime(2005),
+    firstDate: DateTime(1980),
+    lastDate: DateTime.now(),
+    builder: (context, child) {
+      return Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: const ColorScheme.light(
+            primary: Color(0xFF2563EB),
+            onPrimary: Colors.white,
+            onSurface: Colors.black,
+          ),
+          datePickerTheme: DatePickerThemeData(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+          ),
+        ),
+        child: child!,
+      );
+    },
+  );
+
+  if (pickedDate != null) {
+    setState(() {
+      dobCtrl.text =
+          "${pickedDate.day.toString().padLeft(2, '0')}-"
+          "${pickedDate.month.toString().padLeft(2, '0')}-"
+          "${pickedDate.year}";
+    });
+  }
+},
+      ),
+    ],
+  );
+}
+
+Widget _docRow(String label, String? value) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 6),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 150,
+          child: Text(
+            "$label :",
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Text(
+            (value == null || value.isEmpty) ? "-" : value,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _sectionTitle(String title) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 10),
+    child: Text(
+      title,
+      style: GoogleFonts.inter(
+        fontSize: 14,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+  );
+}
 Widget _previewItem(String label, String? value) {
   return Padding(
     padding: const EdgeInsets.only(bottom: 8),
@@ -744,8 +1060,174 @@ Widget _previewItem(String label, String? value) {
   return result.docs.isNotEmpty;
 }
 
+bool _validateCurrentStep() {
+    switch (currentStep) {
 
+      case 0:
+  if (program == null || degree == null || preferredCourse == null) {
+    _showTopPopup('Please select Program, Degree and Course');
+    return false;
+  }
 
+  if (fullNameCtrl.text.trim().isEmpty ||
+      dobCtrl.text.trim().isEmpty ||
+      gender == null ||
+      emailCtrl.text.trim().isEmpty ||
+      phoneCtrl.text.trim().isEmpty ||
+      aadhaarCtrl.text.trim().isEmpty) {
+    _showTopPopup('Please fill all personal details');
+    return false;
+  }
+
+  // ✅ Aadhaar must be exactly 12 digits
+  if (!RegExp(r'^\d{12}$').hasMatch(aadhaarCtrl.text.trim())) {
+    _showTopPopup('Aadhaar number must be exactly 12 digits');
+    return false;
+  }
+
+  // ✅ Student Mobile must be exactly 10 digits
+  if (!RegExp(r'^\d{10}$').hasMatch(phoneCtrl.text.trim())) {
+    _showTopPopup('Mobile number must be exactly 10 digits');
+    return false;
+  }
+
+  // ✅ EMAIL VALIDATION HERE
+  final email = emailCtrl.text.trim();
+  final emailRegex = RegExp(
+    r'^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$',
+  );
+
+  if (!emailRegex.hasMatch(email)) {
+    _showTopPopup('Enter valid email format (example: student@gmail.com)');
+    return false;
+  }
+
+  return true;
+
+  case 3:
+
+  if (passportPhotoFile == null) {
+    _showTopPopup('Passport photo is required');
+    return false;
+  }
+
+if (passportPhotoFile == null) {
+  _showTopPopup('Passport photo is required');
+  return false;
+}
+
+final ext = passportPhotoFile!.extension?.toLowerCase();
+if (!['png', 'jpg', 'jpeg'].contains(ext)) {
+  _showTopPopup('Passport photo must be PNG/JPG/JPEG');
+  return false;
+}
+
+if (passportPhotoFile!.size > 20 * 1024) {
+  _showTopPopup('Passport photo must be ≤ 20KB');
+  return false;
+}
+  if (communityCertFile == null) {
+    _showTopPopup('Community certificate is required');
+    return false;
+  }
+
+  if (!validatePdf(communityCertFile)) {
+    _showTopPopup('Community certificate must be PDF ≤ 20KB');
+    return false;
+  }
+
+  if (incomeCertFile == null) {
+    _showTopPopup('Income certificate is required');
+    return false;
+  }
+
+  if (!validatePdf(incomeCertFile)) {
+    _showTopPopup('Income certificate must be PDF ≤ 20KB');
+    return false;
+  }
+
+  if (isFirstGraduate) {
+    if (firstGraduateCertFile == null) {
+      _showTopPopup('First Graduate certificate is required');
+      return false;
+    }
+
+    if (!validatePdf(firstGraduateCertFile)) {
+      _showTopPopup('First Graduate certificate must be PDF ≤ 20KB');
+      return false;
+    }
+  }
+
+  if (hasNativityCert) {
+    if (nativityCertFile == null) {
+      _showTopPopup('Nativity certificate is required');
+      return false;
+    }
+
+    if (!validatePdf(nativityCertFile)) {
+      _showTopPopup('Nativity certificate must be PDF ≤ 20KB');
+      return false;
+    }
+  }
+
+  return true;
+
+      case 1:
+  final fatherMobile = fatherMobileCtrl.text.trim();
+  final motherMobile = motherMobileCtrl.text.trim();
+  final guardianMobile = guardianMobileCtrl.text.trim();
+
+  // 🔴 At least one parent name required
+  if (fatherNameCtrl.text.trim().isEmpty &&
+      motherNameCtrl.text.trim().isEmpty &&
+      guardianNameCtrl.text.trim().isEmpty) {
+    _showTopPopup('Enter at least one Parent/Guardian name');
+    return false;
+  }
+
+  // 🔴 At least one contact number required
+  if (fatherMobile.isEmpty &&
+      motherMobile.isEmpty &&
+      guardianMobile.isEmpty) {
+    _showTopPopup('At least one contact number is required');
+    return false;
+  }
+
+  // 🔴 Validate Address Fields
+  if (doorNoCtrl.text.trim().isEmpty ||
+      streetCtrl.text.trim().isEmpty ||
+      villageCtrl.text.trim().isEmpty ||
+      postCtrl.text.trim().isEmpty ||
+      cityCtrl.text.trim().isEmpty ||
+      talukCtrl.text.trim().isEmpty ||
+      districtCtrl.text.trim().isEmpty ||
+      stateCtrl.text.trim().isEmpty ||
+      pincodeCtrl.text.trim().isEmpty) {
+    _showTopPopup('Please fill all address fields');
+    return false;
+  }
+
+  // 🔴 Validate Pincode (6 digits)
+  if (!RegExp(r'^\d{6}$').hasMatch(pincodeCtrl.text.trim())) {
+    _showTopPopup('Enter valid 6-digit pincode');
+    return false;
+  }
+
+  return true;
+
+      case 2:
+        if (education == null) {
+          _showTopPopup('Please select previous education');
+          return false;
+        }
+        return true;
+
+      default:
+        return true;
+    }
+  }
+
+  
   Future<void> _submitApplication() async {
   try {if (program == null || degree == null || preferredCourse == null) {
   ScaffoldMessenger.of(context).showSnackBar(
@@ -770,23 +1252,50 @@ if (emailUsed) {
   return;
 }
 
-if (fatherMobileCtrl.text.length != 10 ||
-    motherMobileCtrl.text.length != 10) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(content: Text('Enter valid 10-digit parent mobile numbers')),
-  );
+// ✅ ADD THIS BLOCK HERE
+final fatherMobile = fatherMobileCtrl.text.trim();
+final motherMobile = motherMobileCtrl.text.trim();
+final guardianMobile = guardianMobileCtrl.text.trim();
+
+final fatherOccupation = fatherOccupationCtrl.text.trim();
+final motherOccupation = motherOccupationCtrl.text.trim();
+final guardianOccupation = guardianOccupationCtrl.text.trim();
+
+// ✅ THEN your conditional validation
+if (fatherMobile.isEmpty &&
+    motherMobile.isEmpty &&
+    guardianMobile.isEmpty) {
+  _showTopPopup('At least one contact number (Father/Mother/Guardian) is required');
+  return;
+}
+if (fatherMobile.isNotEmpty && fatherMobile.length != 10) {
+  _showTopPopup('Father mobile must be 10 digits');
   return;
 }
 
-if (guardianNameCtrl.text.isNotEmpty &&
-    guardianMobileCtrl.text.length != 10) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(
-        content: Text('Enter valid 10-digit guardian mobile number')),
-  );
+if (motherMobile.isNotEmpty && motherMobile.length != 10) {
+  _showTopPopup('Mother mobile must be 10 digits');
   return;
 }
 
+if (guardianMobile.isNotEmpty && guardianMobile.length != 10) {
+  _showTopPopup('Guardian mobile must be 10 digits');
+  return;
+}
+if (fatherMobile.isNotEmpty && fatherOccupation.isEmpty) {
+  _showTopPopup('Father occupation is required if father mobile is provided');
+  return;
+}
+
+if (motherMobile.isNotEmpty && motherOccupation.isEmpty) {
+  _showTopPopup('Mother occupation is required if mother mobile is provided');
+  return;
+}
+
+if (guardianMobile.isNotEmpty && guardianOccupation.isEmpty) {
+  _showTopPopup('Guardian occupation is required if guardian mobile is provided');
+  return;
+}
 
     if (firstNameCtrl.text.isEmpty ||
         lastNameCtrl.text.isEmpty ||
@@ -806,27 +1315,27 @@ if (guardianNameCtrl.text.isNotEmpty &&
         '${postCtrl.text}, ${cityCtrl.text}, ${talukCtrl.text}, '
         '${districtCtrl.text}, ${stateCtrl.text} - ${pincodeCtrl.text}';
 if (!validatePdf(communityCertFile)) {
-  _showError('Community certificate must be PDF ≤ 20KB');
+  _showTopPopup('Community certificate must be PDF ≤ 20KB');
   return;
 }
 
 if (isFirstGraduate && !validatePdf(firstGraduateCertFile)) {
-  _showError('First Graduate certificate must be PDF ≤ 20KB');
+  _showTopPopup('First Graduate certificate must be PDF ≤ 20KB');
   return;
 }
 
 if (!validatePdf(incomeCertFile)) {
-  _showError('Income certificate must be PDF ≤ 20KB');
+  _showTopPopup('Income certificate must be PDF ≤ 20KB');
   return;
 }
 
 if (hasNativityCert && !validatePdf(nativityCertFile)) {
-  _showError('Nativity certificate must be PDF ≤ 20KB');
+  _showTopPopup('Nativity certificate must be PDF ≤ 20KB');
   return;
 }
 
 if (!RegExp(r'^\d+$').hasMatch(annualIncomeCtrl.text)) {
-  _showError('Annual income must contain numbers only');
+  _showTopPopup('Annual income must contain numbers only');
   return;
 }
 
@@ -848,10 +1357,13 @@ if (!RegExp(r'^\d+$').hasMatch(annualIncomeCtrl.text)) {
 'address': fullAddress,
 'fatherName': fatherNameCtrl.text.trim(),
 'fatherMobile': fatherMobileCtrl.text.trim(),
+'fatherOccupation': fatherOccupationCtrl.text.trim(),
 'motherName': motherNameCtrl.text.trim(),
 'motherMobile': motherMobileCtrl.text.trim(),
+'motherOccupation': motherOccupationCtrl.text.trim(),
 'guardianName': guardianNameCtrl.text.trim(),
 'guardianMobile': guardianMobileCtrl.text.trim(),
+'guardianOccupation': guardianOccupationCtrl.text.trim(),
 'emisId': emisIdCtrl.text.trim(),
 'religion': religionCtrl.text.trim(),
 'caste': casteCtrl.text.trim(),
@@ -913,10 +1425,67 @@ bool validatePdf(PlatformFile? file) {
   if (file.size > 20 * 1024) return false; // 20KB
   return true;
 }
+void _showTopPopup(String message) {
+  final overlay = Overlay.of(context);
 
-void _showError(String msg) {
-  ScaffoldMessenger.of(context)
-      .showSnackBar(SnackBar(content: Text(msg)));
+  late OverlayEntry overlayEntry;
+
+  overlayEntry = OverlayEntry(
+    builder: (context) => Positioned(
+      top: MediaQuery.of(context).padding.top + 10,
+      left: 16,
+      right: 16,
+      child: Material(
+        color: Colors.transparent,
+        child: TweenAnimationBuilder(
+          duration: const Duration(milliseconds: 300),
+          tween: Tween(begin: -50.0, end: 0.0),
+          builder: (context, value, child) {
+            return Transform.translate(
+              offset: Offset(0, value),
+              child: child,
+            );
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+                horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              color: Colors.red.shade600,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 10,
+                )
+              ],
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.error_outline,
+                    color: Colors.white),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    message,
+                    style: GoogleFonts.inter(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  overlay.insert(overlayEntry);
+
+  Future.delayed(const Duration(seconds: 3), () {
+    overlayEntry.remove();
+  });
 }
 
 final Map<String, Map<String, List<String>>> courseMap = {
@@ -1129,111 +1698,298 @@ Widget _filePicker({
 
 
 // ---------- File Picker UI (visual only) ----------
+
 class _FilePicker extends StatefulWidget {
   final String label;
-  const _FilePicker({required this.label});
+  final Function(PlatformFile?)? onFileSelected;
+
+  const _FilePicker({
+    required this.label,
+    this.onFileSelected,
+  });
 
   @override
   State<_FilePicker> createState() => _FilePickerState();
 }
 
 class _FilePickerState extends State<_FilePicker> {
-  String fileName = 'No file chosen';
+  PlatformFile? selectedFile;
 
- Future<void> _pickFile() async {
-  final result = await FilePicker.pickFiles(
-    type: FileType.custom,
-    allowedExtensions: ['pdf'], // PDF ONLY
-    withData: true,
+  Future<void> _pickFile() async {
+    final result = await FilePicker.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'],
+      withData: true,
+    );
+
+    if (result == null || result.files.isEmpty) return;
+
+    final file = result.files.first;
+
+    if (file.extension?.toLowerCase() != 'pdf') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Only PDF files allowed')),
+      );
+      return;
+    }
+
+    if (file.size > 20480) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('File must be 20KB or less')),
+      );
+      return;
+    }
+
+    setState(() {
+      selectedFile = file;
+    });
+
+    widget.onFileSelected?.call(file);
+  }
+
+  void _removeFile() {
+    setState(() {
+      selectedFile = null;
+    });
+
+    widget.onFileSelected?.call(null);
+  }
+
+void _viewFile() {
+  if (selectedFile == null) return;
+
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => PdfViewerPage(file: selectedFile!),
+    ),
   );
-
-  if (result == null || result.files.isEmpty) return;
-
-  final file = result.files.first;
-
-  // Check file extension
-  if (file.extension?.toLowerCase() != 'pdf') {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Only PDF files are allowed')),
-    );
-    return;
-  }
-
-  // Check file size (20KB = 20480 bytes)
-  if (file.size > 20480) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('File must be 20KB or less')),
-    );
-    return;
-  }
-
-  setState(() {
-    fileName = file.name;
-  });
 }
+  @override
+  Widget build(BuildContext context) {
+    final isUploaded = selectedFile != null;
 
-
- @override
-Widget build(BuildContext context) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        widget.label,
-        style: GoogleFonts.inter(
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-          color: Colors.black, // BLACK TEXT
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          widget.label,
+          style: GoogleFonts.inter(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-      ),
-      const SizedBox(height: 6),
-      InkWell(
-        onTap: _pickFile,
-        borderRadius: BorderRadius.circular(10),
-        child: Container(
+        const SizedBox(height: 6),
+
+        Container(
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
           decoration: BoxDecoration(
-            color: Colors.white, // WHITE BACKGROUND
+            color: Colors.white,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
-              color: Colors.black, // BLACK BORDER
-              width: 1,
+              color: isUploaded ? Colors.green : Colors.black,
             ),
           ),
           child: Row(
             children: [
-              const Icon(
-                Icons.upload_file,
-                color: Colors.black, // BLACK ICON
+              Icon(
+                isUploaded ? Icons.check_circle : Icons.upload_file,
+                color: isUploaded ? Colors.green : Colors.black,
               ),
               const SizedBox(width: 8),
-              const Text(
-                'Choose PDF',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const Spacer(),
+
               Expanded(
                 child: Text(
-                  fileName,
+                  isUploaded
+                      ? selectedFile!.name
+                      : 'Choose PDF (Max 20KB)',
                   overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.right,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.black, // BLACK FILE NAME
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: isUploaded ? Colors.green : Colors.black,
+                    fontWeight:
+                        isUploaded ? FontWeight.w600 : FontWeight.w500,
                   ),
                 ),
               ),
+
+              if (!isUploaded)
+                TextButton(
+                  onPressed: _pickFile,
+                  child: const Text("Upload"),
+                ),
+
+              if (isUploaded) ...[
+                IconButton(
+                  icon: const Icon(Icons.visibility),
+                  onPressed: _viewFile,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: _removeFile,
+                ),
+              ],
             ],
           ),
         ),
-      ),
-      const SizedBox(height: 10),
-    ],
-  );
+
+        const SizedBox(height: 12),
+      ],
+    );
+  }
+}
+class _ImagePicker extends StatefulWidget {
+  final String label;
+  final Function(PlatformFile?)? onFileSelected;
+
+  const _ImagePicker({
+    required this.label,
+    this.onFileSelected,
+  });
+
+  @override
+  State<_ImagePicker> createState() => _ImagePickerState();
 }
 
+class _ImagePickerState extends State<_ImagePicker> {
+  PlatformFile? selectedImage;
+
+  Future<void> _pickImage() async {
+    final result = await FilePicker.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['png', 'jpg', 'jpeg'],
+      withData: true,
+    );
+
+    if (result == null || result.files.isEmpty) return;
+
+    final file = result.files.first;
+
+    final ext = file.extension?.toLowerCase();
+
+    if (!['png', 'jpg', 'jpeg'].contains(ext)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Only PNG/JPG/JPEG allowed')),
+      );
+      return;
+    }
+
+    if (file.size > 20 * 1024) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Image must be 20KB or less')),
+      );
+      return;
+    }
+
+    setState(() {
+      selectedImage = file;
+    });
+
+    widget.onFileSelected?.call(file);
+  }
+
+  void _removeImage() {
+    setState(() {
+      selectedImage = null;
+    });
+
+    widget.onFileSelected?.call(null);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isUploaded = selectedImage != null;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(widget.label,
+            style: GoogleFonts.inter(
+                fontSize: 13, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 6),
+        Container(
+          padding: const EdgeInsets.symmetric(
+              vertical: 14, horizontal: 12),
+          decoration: BoxDecoration(
+            border: Border.all(
+                color: isUploaded ? Colors.green : Colors.black),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            children: [
+              Icon(
+                isUploaded
+                    ? Icons.check_circle
+                    : Icons.image,
+                color:
+                    isUploaded ? Colors.green : Colors.black,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  isUploaded
+                      ? selectedImage!.name
+                      : 'Choose PNG/JPG (Max 20KB)',
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              if (!isUploaded)
+                TextButton(
+                  onPressed: _pickImage,
+                  child: const Text("Upload"),
+                ),
+              if (isUploaded)
+                IconButton(
+                  icon: const Icon(Icons.delete,
+                      color: Colors.red),
+                  onPressed: _removeImage,
+                ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+      ],
+    );
+  }
+}class PdfViewerPage extends StatelessWidget {
+  final PlatformFile file;
+
+  const PdfViewerPage({super.key, required this.file});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Text(file.name),
+        backgroundColor: Colors.black,
+      ),
+      body: _buildPdf(),
+    );
+  }
+
+  Widget _buildPdf() {
+    // 🔥 IMPORTANT FIX FOR WEB
+    if (kIsWeb) {
+      if (file.bytes == null) {
+        return const Center(child: Text("PDF data not available"));
+      }
+
+      return SfPdfViewer.memory(
+        file.bytes!,
+        key: UniqueKey(), // 👈 VERY IMPORTANT FIX
+      );
+    }
+
+    // Mobile/Desktop
+    if (file.path != null) {
+      return SfPdfViewer.file(File(file.path!));
+    }
+
+    if (file.bytes != null) {
+      return SfPdfViewer.memory(file.bytes!);
+    }
+
+    return const Center(child: Text("Unable to load PDF"));
+  }
 }

@@ -147,10 +147,8 @@ class AdmissionPortalScreen extends StatelessWidget {
                           _StepTile(number: 1, title: 'Online Application', subtitle: 'Fill the application form'),
                           SizedBox(height: 8),
                           _StepTile(number: 2, title: 'Document Upload', subtitle: 'Upload academic documents'),
-                          SizedBox(height: 8),
-                          _StepTile(number: 3, title: 'Fee Payment', subtitle: 'Pay application fee online'),
-                          SizedBox(height: 8),
-                          _StepTile(number: 4, title: 'Admission Review', subtitle: 'Application review & confirmation'),
+                          SizedBox(height: 8),                          
+                          _StepTile(number: 3, title: 'Admission Review', subtitle: 'Application review & confirmation'),
                         ],
                       ),
 

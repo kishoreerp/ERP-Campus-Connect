@@ -1,215 +1,243 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:myapp/services/marks_service.dart';
 
 class StudentMarksScreen extends StatefulWidget {
   const StudentMarksScreen({super.key});
-
 
   @override
   State<StudentMarksScreen> createState() => _StudentMarksScreenState();
 }
 
+class _StudentMarksScreenState extends State<StudentMarksScreen> {
+  int selectedTab = 0;
+  bool loading = true;
 
-class _StudentMarksScreenState extends State<StudentMarksScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
+  Map<String, Map<String, int>> marksData = {};
+  String? studentYear;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _loadStudentAndMarks();
   }
 
+  Future<void> _loadStudentAndMarks() async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+
+      if (currentUser == null) {
+        setState(() => loading = false);
+        return;
+      }
+
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser.uid)
+          .get();
+
+      if (!userDoc.exists) {
+        setState(() => loading = false);
+        return;
+      }
+
+      final userData = userDoc.data()!;
+
+      final String studentRegNo =
+          (userData['rollNo'] ?? '').toString().trim();
+
+      studentYear =
+          (userData['year'] ?? '').toString().trim();
+
+      if (studentRegNo.isEmpty || studentYear == null || studentYear!.isEmpty) {
+        setState(() => loading = false);
+        return;
+      }
+
+      final rawData = await MarksService.instance.getStudentMarks(
+        regNo: studentRegNo,
+        studentYear: studentYear!,
+      );
+
+      final Map<String, Map<String, int>> fixedData = {};
+
+      rawData.forEach((subject, exams) {
+        final Map<String, int> normalized = {
+          'IA1': 0,
+          'IA2': 0,
+          'MODEL': 0,
+        };
+
+        exams.forEach((exam, mark) {
+          final key = exam.toUpperCase().trim();
+          if (normalized.containsKey(key)) {
+            normalized[key] = mark;
+          }
+        });
+
+        fixedData[subject] = normalized;
+      });
+
+      setState(() {
+        marksData = fixedData;
+        loading = false;
+      });
+    } catch (e) {
+      setState(() => loading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.grey[50],
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded,
+              size: 18, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
         title: Text(
-          "Academic Marks",
-          style: GoogleFonts.inter(fontWeight: FontWeight.w600),
-        ),
-        centerTitle: true,
-        iconTheme: const IconThemeData(color: Colors.black87),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "View your internal and university examination results",
-              style: GoogleFonts.inter(color: Colors.grey[700], fontSize: 13),
-            ),
-            const SizedBox(height: 20),
-            // Tabs
-            Container(
-  decoration: BoxDecoration(
-    color: Colors.grey[200],
-    borderRadius: BorderRadius.circular(10),
-  ),
-  child: TabBar(
-    controller: _tabController,
-    labelColor: Colors.deepPurple.shade800,
-    unselectedLabelColor: Colors.black87,
-    indicator: BoxDecoration(
-      color: Colors.deepPurple.shade100, // ✅ light lavender background
-      borderRadius: BorderRadius.circular(10),
-    ),
-    labelStyle: GoogleFonts.inter(
-      fontWeight: FontWeight.w600,
-      fontSize: 13.5,
-    ),
-    indicatorSize: TabBarIndicatorSize.tab, // ✅ makes the fill cover full tab
-    tabs: const [
-      Tab(text: "Internal Marks"),
-      Tab(text: "University Result"),
-    ],
-  ),
-),
-            const SizedBox(height: 16),
-
-
-            // Tab Views
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildInternalMarks(),
-                  _buildUniversityResult(),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-
-  // ---------------- INTERNAL MARKS TAB ----------------
-  Widget _buildInternalMarks() {
-    final marks = [
-      ["Data Structures", "92/100","78/100","96/100"],
-      ["Algorithms", "89/100","87/100","98/100"],
-      ["Database Systems", "78/100","89/100","72/100"],
-      ["Web Development", "87/100","98/100","70/100"],
-      ["Software Engineering", "94/100","98/100","89/100"],
-    ];
-
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Header Row
-        // Header Row (improved)
-Container(
-  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-  decoration: BoxDecoration(
-    color: Colors.deepPurple.shade50,
-    borderRadius: BorderRadius.circular(10),
-    border: Border.all(color: Colors.deepPurple.shade100),
-  ),
-  child: Row(
-    children: [
-      Expanded(
-        flex: 3,
-        child: Text(
-          "Subject",
+          'Academic Marks',
           style: GoogleFonts.inter(
-            fontWeight: FontWeight.w600,
-            color: Colors.deepPurple.shade800,
-            fontSize: 13.5,
+            fontWeight: FontWeight.w700,
+            color: Colors.black,
           ),
         ),
       ),
-      Expanded(
-        child: Center(
-          child: Text(
-            "IA1",
-            style: GoogleFonts.inter(
-              fontWeight: FontWeight.w600,
-              color: Colors.deepPurple.shade800,
-              fontSize: 13.5,
-            ),
-          ),
-        ),
-      ),
-      Expanded(
-        child: Center(
-          child: Text(
-            "IA2",
-            style: GoogleFonts.inter(
-              fontWeight: FontWeight.w600,
-              color: Colors.deepPurple.shade800,
-              fontSize: 13.5,
-            ),
-          ),
-        ),
-      ),
-      Expanded(
-        child: Center(
-          child: Text(
-            "Model",
-            style: GoogleFonts.inter(
-              fontWeight: FontWeight.w600,
-              color: Colors.deepPurple.shade800,
-              fontSize: 13.5,
-            ),
-          ),
-        ),
-      ),
-    ],
-  ),
-),
-        const SizedBox(height: 6),
-
-
-        // Marks Table
-        Expanded(
-          child: ListView.builder(
-            itemCount: marks.length,
-            itemBuilder: (context, index) {
-              final subject = marks[index];
-              return Container(
-                margin: const EdgeInsets.only(bottom: 8),
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
+      body: loading
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'View your internal and university examination results',
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      color: Colors.grey[700],
                     ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 3,
-                      child: Text(subject[0],
-                          style: GoogleFonts.inter(fontSize: 13.5)),
+                  ),
+                  const SizedBox(height: 16),
+
+                  Row(
+                    children: [
+                      _tabButton('Internal Marks', 0),
+                      const SizedBox(width: 12),
+                      _tabButton('University Result', 1),
+                    ],
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  if (selectedTab == 0)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE4D9F7),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            flex: 3,
+                            child: Text(
+                              'Subject',
+                              style: GoogleFonts.inter(
+                                  fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                          Expanded(
+                            child: Center(
+                              child: Text(
+                                'IA1',
+                                style: GoogleFonts.inter(
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Center(
+                              child: Text(
+                                'IA2',
+                                style: GoogleFonts.inter(
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Center(
+                              child: Text(
+                                'Model',
+                                style: GoogleFonts.inter(
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    _markCell(subject[1]),
-                    _markCell(subject[2]),
-                    _markCell(subject[3], isModel: true),
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
-        const SizedBox(height: 10),
 
+                  if (selectedTab == 0) const SizedBox(height: 8),
 
-        // Info Box
+                  Expanded(
+                    child: selectedTab == 0
+                        ? ListView(
+                            children: marksData.entries.map((e) {
+                              final subject = e.key;
+                              final m = e.value;
+
+                              return Container(
+                                margin:
+                                    const EdgeInsets.only(bottom: 8),
+                                padding:
+                                    const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius:
+                                      BorderRadius.circular(12),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black
+                                          .withOpacity(0.05),
+                                      blurRadius: 4,
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      flex: 3,
+                                      child: Text(
+                                        subject,
+                                        style: GoogleFonts.inter(
+                                          fontWeight:
+                                              FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                    _markChip(m['IA1']),
+                                    _markChip(m['IA2']),
+                                    _markChip(m['MODEL']),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                          )
+                        : _buildUniversityResult(),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  if (selectedTab == 0)
+                          // Info Box
         Container(
   width: double.infinity,
   padding: const EdgeInsets.all(14),
@@ -238,37 +266,11 @@ Container(
     ],
   ),
 ),
-      ],
+                ],
+              ),
+            ),
     );
   }
-
-
- Widget _markCell(String text, {bool isModel = false}) {
-  // Use same neutral tone for all marks
-  final color = Colors.grey[800]!; // dark gray text
-  return Expanded(
-    child: Center(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
-        decoration: BoxDecoration(
-          color: Colors.grey.shade100, // ✅ soft light gray background
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey.shade300),
-        ),
-        child: Text(
-          text,
-          style: GoogleFonts.inter(
-            color: color,
-            fontWeight: FontWeight.w600,
-            fontSize: 12.5,
-          ),
-        ),
-      ),
-    ),
-  );
-}
-
-
   // ---------------- UNIVERSITY RESULT TAB ----------------
 Widget _buildUniversityResult() {
   return SingleChildScrollView(
@@ -362,7 +364,62 @@ Widget _buildUniversityResult() {
 }
 
 
-    }
+    
+  Widget _tabButton(String text, int index) {
+    final selected = selectedTab == index;
 
+    return Expanded(
+      child: GestureDetector(
+        onTap: () =>
+            setState(() => selectedTab = index),
+        child: Container(
+          padding:
+              const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: selected
+                ? const Color(0xFFD6C7F0)
+                : Colors.grey[200],
+            borderRadius:
+                BorderRadius.circular(10),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            text,
+            style: GoogleFonts.inter(
+              fontWeight: FontWeight.w600,
+              color: selected
+                  ? Colors.deepPurple
+                  : Colors.black87,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
-
+  Widget _markChip(int? value) {
+    return Expanded(
+      child: Center(
+        child: Container(
+          padding:
+              const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade100,
+            borderRadius:
+                BorderRadius.circular(8),
+          ),
+          child: Text(
+            value != null
+                ? '$value/100'
+                : '-',
+            style: GoogleFonts.inter(
+              fontSize: 12.5,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
