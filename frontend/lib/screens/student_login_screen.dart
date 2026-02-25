@@ -43,7 +43,7 @@ Future<void> handleStudentLogin() async {
       throw 'Please select regulation';
     }
 
-    final input = emailController.text.trim();
+   final input = emailController.text.trim().toLowerCase();
     final password = passwordController.text.trim();
 
     if (input.isEmpty || password.isEmpty) {
@@ -243,19 +243,29 @@ Navigator.pushReplacementNamed(context, '/student');
                 style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
             const SizedBox(height: 6),
             TextField(
-              controller: emailController,
-              decoration: InputDecoration(
-                prefixIcon:
-                    Icon(Icons.email_outlined, color: Colors.grey[700]),
-                hintText: 'student@slec.ac.in',
-                filled: true,
-                fillColor: Colors.grey[100],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
+  controller: emailController,
+  keyboardType: TextInputType.emailAddress,
+  textInputAction: TextInputAction.next,
+  onChanged: (value) {
+    final lowerText = value.toLowerCase();
+    if (value != lowerText) {
+      emailController.value = TextEditingValue(
+        text: lowerText,
+        selection: TextSelection.collapsed(offset: lowerText.length),
+      );
+    }
+  },
+  decoration: InputDecoration(
+    prefixIcon: Icon(Icons.email_outlined, color: Colors.grey[700]),
+    hintText: 'student@slec.ac.in',
+    filled: true,
+    fillColor: Colors.grey[100],
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10),
+      borderSide: BorderSide.none,
+    ),
+  ),
+),
 
 
             const SizedBox(height: 16),

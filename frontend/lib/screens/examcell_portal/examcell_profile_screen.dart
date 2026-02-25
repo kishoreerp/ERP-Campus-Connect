@@ -13,40 +13,12 @@ class ExamCellProfileScreen extends StatefulWidget {
 class _ExamCellProfileScreenState extends State<ExamCellProfileScreen> {
   Map<String, dynamic>? userData;
 
-
-  String status = "Present";
-
-Color get statusColor {
-  switch (status) {
-    case "Absent":
-      return Colors.red;
-    case "Permission":
-      return Colors.orange;
-    case "OD":
-      return Colors.blue;
-    default:
-      return Colors.green;
-  }
-}
+ 
 @override
 void initState() {
   super.initState();
   userData = CurrentUserService.getUser();
 }
-
-IconData get statusIcon {
-  switch (status) {
-    case "Absent":
-      return Icons.cancel;
-    case "Permission":
-      return Icons.access_time;
-    case "OD":
-      return Icons.work_outline;
-    default:
-      return Icons.check_circle;
-  }
-}
-
 
 
   @override
@@ -66,7 +38,7 @@ Text(
   style: GoogleFonts.inter(
     fontSize: 16,
     fontWeight: FontWeight.w600,
-    color: Colors.grey[800],
+    color: Colors.black,
   ),
 ),
 
@@ -142,51 +114,6 @@ Text(
               ),
 
               const SizedBox(height: 14),
-
-// ================= STATUS =================
-InkWell(
-  onTap: _showStatusPopup,
-  borderRadius: BorderRadius.circular(16),
-  child: Container(
-    padding: const EdgeInsets.all(14),
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: Colors.grey.shade200),
-    ),
-    child: Row(
-      children: [
-        Container(
-          height: 40,
-          width: 40,
-          decoration: BoxDecoration(
-            color: statusColor.withOpacity(0.15),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(statusIcon, color: statusColor),
-        ),
-        const SizedBox(width: 12),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Status",
-                style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-            Text(
-              status,
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                color: statusColor,
-              ),
-            ),
-          ],
-        ),
-        const Spacer(),
-        const Icon(Icons.chevron_right, color: Colors.grey),
-      ],
-    ),
-  ),
-),
-
-const SizedBox(height: 14),
               // ================= DETAILS =================
               Container(
                 padding: const EdgeInsets.all(16),
@@ -205,7 +132,7 @@ const SizedBox(height: 14),
 
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 14),
 
               // ================= LOGOUT =================
 
@@ -251,82 +178,7 @@ SizedBox(
         ),
       ),
     );
-  }
-
-
-  // ================= STATUS POPUP =================
-void _showStatusPopup() {
-  showDialog(
-    context: context,
-    barrierColor: Colors.black.withOpacity(0.45),
-    builder: (_) => Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Update Status",
-                    style: GoogleFonts.inter(
-                        fontSize: 16, fontWeight: FontWeight.w600)),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ],
-            ),
-            Text("Select your current attendance status",
-                style: GoogleFonts.inter(
-                    fontSize: 12, color: Colors.grey)),
-            const SizedBox(height: 16),
-
-            _statusOption("Present", Icons.check_circle, Colors.green),
-            _statusOption("Absent", Icons.cancel, Colors.red),
-            _statusOption("Permission", Icons.access_time, Colors.orange),
-            _statusOption("OD", Icons.work_outline, Colors.blue),
-          ],
-        ),
-      ),
-    ),
-  );
-}
-
-Widget _statusOption(String value, IconData icon, Color color) {
-  final selected = status == value;
-  return InkWell(
-    onTap: () {
-      setState(() => status = value);
-      Navigator.pop(context);
-    },
-    borderRadius: BorderRadius.circular(14),
-    child: Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: selected ? Colors.black : Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: selected ? Colors.white : color),
-          const SizedBox(width: 12),
-          Text(value,
-              style: GoogleFonts.inter(
-                  fontWeight: FontWeight.w600,
-                  color: selected ? Colors.white : Colors.black)),
-        ],
-      ),
-    ),
-  );
-}
-
-}
+  }}
 
 // ===================================================================
 // ================= SETTINGS DIALOG =================================

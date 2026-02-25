@@ -21,6 +21,7 @@ dependencies:
   http: ^1.2.2
   file_picker: ^10.3.9
   syncfusion_flutter_pdfviewer: 32.2.7
+  
 
   # Firebase
   firebase_core: ^4.4.0
@@ -48,3 +49,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/images/

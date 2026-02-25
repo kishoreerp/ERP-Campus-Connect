@@ -47,7 +47,7 @@ class _StaffNotesSubjectScreenState
 Future<void> _pickFile() async {
   const int maxFileSize = 20 * 1024; // ✅ 20 KB limit
 
-  final result = await FilePicker.pickFiles(
+  final result = await FilePicker.platform.pickFiles(
     type: FileType.custom,
     allowedExtensions: ['pdf', 'doc', 'docx', 'ppt', 'pptx'],
   );

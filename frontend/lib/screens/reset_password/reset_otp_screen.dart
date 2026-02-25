@@ -149,6 +149,7 @@ class _ResetOTPScreenState extends State<ResetOTPScreen> {
                           TextButton(
   onPressed: () => resendOtp(context, widget.email),
   child: const Text('Resend OTP'),
+  
 ),
 
                         ],

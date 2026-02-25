@@ -41,7 +41,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
       throw 'Please fill all fields';
     }
 
-    final email = emailController.text.trim();
+    final email = emailController.text.trim().toLowerCase();
     final password = passwordController.text.trim();
 
     // 🔐 LOGIN USING EMAIL
@@ -184,10 +184,11 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
                       style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
                         const SizedBox(height: 6),
                         _buildTextField(
-                        controller: emailController,
-                       hint: 'Enter your email',
-                        icon: Icons.email_outlined,
-                      ),
+  controller: emailController,
+  hint: 'Enter your email',
+  icon: Icons.email_outlined,
+  forceLowerCase: true, // 👈 ADD THIS
+),
 
                       const SizedBox(height: 16),
                       Text('Password',style: GoogleFonts.inter(fontWeight: FontWeight.w600),),
@@ -208,6 +209,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
                             MaterialPageRoute(
                         builder: (_) => const AdminResetEmailScreen(),),
                           );
+                          
                         },
                         child: Text(
                          'Forgot Password?',
@@ -245,6 +247,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
         ),
       ),
     );
+    
   }
 
   Widget _buildHeader(BuildContext context) {
@@ -391,10 +394,26 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
   required String hint,
   required IconData icon,
   bool obscure = false,
+  bool forceLowerCase = false, // 👈 ADD THIS
 }) {
   return TextField(
     controller: controller,
     obscureText: obscure ? !_isPasswordVisible : false,
+    keyboardType:
+        forceLowerCase ? TextInputType.emailAddress : TextInputType.text,
+    textInputAction: TextInputAction.next,
+    onChanged: forceLowerCase
+        ? (value) {
+            final lowerText = value.toLowerCase();
+            if (value != lowerText) {
+              controller.value = TextEditingValue(
+                text: lowerText,
+                selection:
+                    TextSelection.collapsed(offset: lowerText.length),
+              );
+            }
+          }
+        : null,
     decoration: InputDecoration(
       prefixIcon: Icon(icon),
       hintText: hint,
@@ -404,14 +423,12 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
         borderSide: BorderSide.none,
         borderRadius: BorderRadius.circular(10),
       ),
-
-      // 👁 EYE ICON ONLY FOR PASSWORD
       suffixIcon: obscure
           ? IconButton(
               icon: Icon(
                 _isPasswordVisible
-                    ? Icons.visibility_outlined 
-                   : Icons.visibility_off_outlined,
+                    ? Icons.visibility_outlined
+                    : Icons.visibility_off_outlined,
                 color: Colors.grey[700],
               ),
               onPressed: () {
@@ -424,17 +441,17 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
     ),
   );
 }
-
-
-  BoxDecoration _cardStyle() => BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4))
-        ],
-      );
-
- }
+BoxDecoration _cardStyle() {
+    return BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(14),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.05),
+          blurRadius: 10,
+          offset: const Offset(0, 4),
+        ),
+      ],
+    );
+  }
+}

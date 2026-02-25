@@ -52,7 +52,7 @@ final TextEditingController branchNameCtrl = TextEditingController();
 
  Future<void> pickResume() async {
   FilePickerResult? result =
-      await FilePicker.pickFiles(
+      await FilePicker.platform.pickFiles(
     type: FileType.custom,
     allowedExtensions: ['pdf', 'doc', 'docx'],
   );
@@ -80,7 +80,7 @@ final TextEditingController branchNameCtrl = TextEditingController();
 
  Future<void> pickDocument(Function(File) onFilePicked) async {
   FilePickerResult? result =
-      await FilePicker.pickFiles(
+      await FilePicker.platform.pickFiles(
     type: FileType.custom,
     allowedExtensions: ['pdf', 'jpg', 'png'],
   );

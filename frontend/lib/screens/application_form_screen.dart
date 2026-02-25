@@ -6,7 +6,9 @@ import 'package:flutter/services.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-
+import 'package:printing/printing.dart';
+import 'application_pdf_generator.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class ApplicationFormScreen extends StatefulWidget {
   const ApplicationFormScreen({super.key});
@@ -95,6 +97,7 @@ final TextEditingController degreePercentCtrl = TextEditingController();
 
 PlatformFile? previousEducationFile;
 PlatformFile? passportPhotoFile;
+PlatformFile? digitalSignatureFile;
 bool isFirstGraduate = false;
 bool hasNativityCert = false;
 bool show12thDetails = false;
@@ -109,7 +112,17 @@ PlatformFile? firstGraduateCertFile;
 PlatformFile? incomeCertFile;
 PlatformFile? nativityCertFile;
 
+late final String formDate;
+@override
+void initState() {
+  super.initState();
 
+  final now = DateTime.now();
+  formDate =
+      "${now.day.toString().padLeft(2, '0')}-"
+      "${now.month.toString().padLeft(2, '0')}-"
+      "${now.year}";
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -521,13 +534,23 @@ Step(
           _input('Religion *', religionCtrl),
           _input('Caste *', casteCtrl),
           _input('Community *', communityCtrl),
-          _input('Community Certificate Number *', communityCertNoCtrl),
+          _input(
+  'Community Certificate Number *',
+  communityCertNoCtrl,
+  inputFormatters: [
+    TNCertificateFormatter(),
+    LengthLimitingTextInputFormatter(16),
+  ],
+),
           _input(
             'Annual Income (₹) *',
             annualIncomeCtrl,
             hint: 'Numbers only',
           ),
-          _input('Income Certificate Number *', incomeCertNoCtrl),
+          _input('Income Certificate Number *', incomeCertNoCtrl,inputFormatters: [
+              TNCertificateFormatter(),
+               LengthLimitingTextInputFormatter(16),
+              ],),
           _yesNoRadio(
             label: 'First Graduate *',
             value: isFirstGraduate,
@@ -537,6 +560,10 @@ Step(
             _input(
               'First Graduate Certificate Number *',
               firstGraduateCertNoCtrl,
+              inputFormatters: [
+              TNCertificateFormatter(),
+               LengthLimitingTextInputFormatter(16),
+              ],
             ),
           _yesNoRadio(
             label: 'Nativity Certificate *',
@@ -547,6 +574,10 @@ Step(
             _input(
               'Nativity Certificate Number *',
               nativityCertNoCtrl,
+              inputFormatters: [
+              TNCertificateFormatter(),
+               LengthLimitingTextInputFormatter(16),
+              ],
             ),
         ],
       ),
@@ -572,7 +603,14 @@ Step(
     });
   },
 ),
-  
+  _ImagePicker(
+  label: 'Digital Signature *',
+  onFileSelected: (file) {
+    setState(() {
+      digitalSignatureFile = file;
+    });
+  },
+),
 
   const _FilePicker(label: '10th Mark Sheet *'),
 
@@ -633,124 +671,238 @@ Step(
 Step(
   title: const Text('Preview'),
   isActive: currentStep >= 4,
- content: SingleChildScrollView(
-  child: Container(
-    padding: const EdgeInsets.all(20),
-    decoration: BoxDecoration(
+  content: SingleChildScrollView(
+    child: Container(
+      padding: const EdgeInsets.all(24),
       color: Colors.white,
-      border: Border.all(color: Colors.grey.shade300),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
 
-        // ================= HEADER =================
-        Center(
-          child: Column(
+          // ====================== HEADER ======================
+         Row(
+  crossAxisAlignment: CrossAxisAlignment.center,
+  children: [
+
+    // Logo
+    FutureBuilder<ByteData>(
+      future: rootBundle.load('assets/images/college_logo.png'),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const SizedBox(width: 90, height: 90);
+        }
+
+        return SizedBox(
+          width: 90,
+          height: 90,
+          child: Image.memory(
+            snapshot.data!.buffer.asUint8List(),
+            fit: BoxFit.contain,
+          ),
+        );
+      },
+    ),
+
+    const SizedBox(width: 2), // 👈 closer spacing
+
+    Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            "ST. LOURDES ENGINEERING COLLEGE",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+              color: const Color.fromARGB(255, 170, 2, 2),
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            "Approved by AICTE, New Delhi & Affiliated to Anna University, Chennai",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            "Thanir Arul Nagar, Perambalur - 621 212",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            "044-24748071 | 8181861735 | 8900500600",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            "www.slec.edu.in | info@slec.edu.in",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            "ADMISSION APPLICATION FORM",
+            style: GoogleFonts.inter(
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1,
+            ),
+          ),
+        ],
+      ),
+    ),
+
+    const SizedBox(width: 10),
+
+    // Photo
+    Container(
+      width: 100,
+      height: 120,
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.black),
+      ),
+      child: passportPhotoFile != null
+          ? Image.memory(
+              passportPhotoFile!.bytes!,
+              fit: BoxFit.cover,
+            )
+          : const Center(child: Text("Photo")),
+    ),
+  ],
+),
+          const SizedBox(height: 10),
+          const Divider(thickness: 1),
+
+          // ====================== PROGRAM ======================
+          _professionalSection("Program Details", [
+            _tableRow("Program", program),
+            _tableRow("Degree", degree),
+            _tableRow("Department", preferredCourse),
+          ]),
+
+          // ====================== PERSONAL ======================
+          _professionalSection("Personal Information", [
+            _tableRow("Full Name", fullNameCtrl.text),
+            _tableRow("Date of Birth", dobCtrl.text),
+            _tableRow("Gender", gender),
+            _tableRow("Blood Group", bloodGroupCtrl.text),
+            _tableRow("Aadhaar Number", aadhaarCtrl.text),
+            _tableRow("Email Address", emailCtrl.text),
+            _tableRow("Mobile Number", phoneCtrl.text),
+          ]),
+
+          // ====================== PARENTS ======================
+          _professionalSection("Parents / Guardian Details", [
+            _tableRow("Father Name", fatherNameCtrl.text),
+            _tableRow("Father Mobile", fatherMobileCtrl.text),
+            _tableRow("Father Occupation", fatherOccupationCtrl.text),
+            _tableRow("Mother Name", motherNameCtrl.text),
+            _tableRow("Mother Mobile", motherMobileCtrl.text),
+            _tableRow("Mother Occupation", motherOccupationCtrl.text),
+            _tableRow("Guardian Name", guardianNameCtrl.text),
+            _tableRow("Guardian Mobile", guardianMobileCtrl.text),
+            _tableRow("Guardian Occupation", guardianOccupationCtrl.text),
+          ]),
+
+          // ====================== ADDRESS ======================
+          _professionalSection("Address", [
+            _tableRow(
+              "Permanent Address",
+              "${doorNoCtrl.text}, ${streetCtrl.text}, "
+              "${villageCtrl.text}, ${cityCtrl.text}, "
+              "${districtCtrl.text}, ${stateCtrl.text} - ${pincodeCtrl.text}",
+            ),
+          ]),
+
+          // ====================== ACADEMIC ======================
+          _professionalSection("Academic Details", [
+            _tableRow("Previous Education", education),
+            _tableRow("10th School", school10Ctrl.text),
+            _tableRow("10th Mark", mark10Ctrl.text),
+            _tableRow("12th School", school12Ctrl.text),
+            _tableRow("12th Mark", mark12Ctrl.text),
+            _tableRow("College", collegeCtrl.text),
+            _tableRow("University", universityCtrl.text),
+            _tableRow("Degree Percentage", degreePercentCtrl.text),
+          ]),
+
+         
+_professionalSection("Community & Certificates", [
+  _tableRow("EMIS ID", emisIdCtrl.text),
+  _tableRow("Religion", religionCtrl.text),
+  _tableRow("Caste", casteCtrl.text),
+  _tableRow("Community", communityCtrl.text),
+  _tableRow("Community Certificate No", communityCertNoCtrl.text),
+  _tableRow("Annual Income", annualIncomeCtrl.text),
+  _tableRow("Income Certificate No", incomeCertNoCtrl.text),
+  _tableRow("First Graduate", isFirstGraduate ? "Yes" : "No"),
+  _tableRow("First Graduate Cert No", firstGraduateCertNoCtrl.text),
+  _tableRow("Nativity Certificate", hasNativityCert ? "Yes" : "No"),
+  _tableRow("Nativity Cert No", nativityCertNoCtrl.text),
+]),
+          // ====================== DECLARATION ======================
+          Text(
+            "Declaration",
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            "I hereby declare that the information provided above is true "
+            "and correct to the best of my knowledge.",
+            style: GoogleFonts.inter(fontSize: 12),
+          ),
+
+          const SizedBox(height: 45),
+
+          // ====================== SIGNATURE ======================
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                "XYZ ENGINEERING COLLEGE",
-                style: GoogleFonts.inter(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                "ADMISSION APPLICATION FORM",
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const Divider(height: 30, thickness: 1),
+              Column(
+  children: [
+    digitalSignatureFile != null
+        ? Image.memory(
+            digitalSignatureFile!.bytes!,
+            width: 120,
+            height: 50,
+          )
+        : const Text("_____________________"),
+    const SizedBox(height: 4),
+    const Text("Applicant Signature"),
+  ],
+),
+              Column(
+  children: [
+    Text(formDate),
+    const SizedBox(height: 4),
+    const Text("Date"),
+  ],
+),
             ],
           ),
-        ),
 
-        // ================= PHOTO + BASIC INFO =================
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+          const SizedBox(height: 30),
 
-            // LEFT SIDE DETAILS
-            Expanded(
-              child: Column(
-                children: [
-                  _docRow("Program", program),
-                  _docRow("Degree", degree),
-                  _docRow("Department", preferredCourse),
-                  _docRow("Full Name", fullNameCtrl.text),
-                  _docRow("Date of Birth", dobCtrl.text),
-                  _docRow("Gender", gender),
-                  _docRow("Blood Group", bloodGroupCtrl.text),
-                  _docRow("Aadhaar", aadhaarCtrl.text),
-                  _docRow("Email", emailCtrl.text),
-                  _docRow("Phone", phoneCtrl.text),
-                ],
-              ),
-            ),
-
-            const SizedBox(width: 20),
-
-            // RIGHT SIDE PHOTO
-            Container(
-              width: 120,
-              height: 140,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black),
-              ),
-              child: passportPhotoFile != null
-                  ? Image.memory(
-                      passportPhotoFile!.bytes!,
-                      fit: BoxFit.cover,
-                    )
-                  : const Center(
-                      child: Text("Photo"),
-                    ),
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 30),
-        const Divider(),
-
-        // ================= PARENTS =================
-        _sectionTitle("Parents / Guardian Details"),
-        _docRow("Father Name", fatherNameCtrl.text),
-        _docRow("Father Mobile", fatherMobileCtrl.text),
-        _docRow("Mother Name", motherNameCtrl.text),
-        _docRow("Mother Mobile", motherMobileCtrl.text),
-        _docRow("Guardian Name", guardianNameCtrl.text),
-
-        const SizedBox(height: 20),
-        const Divider(),
-
-        // ================= ADDRESS =================
-        _sectionTitle("Address"),
-        _docRow(
-          "Full Address",
-          "${doorNoCtrl.text}, ${streetCtrl.text}, ${villageCtrl.text}, "
-          "${cityCtrl.text}, ${districtCtrl.text}, ${stateCtrl.text} - ${pincodeCtrl.text}",
-        ),
-
-        const SizedBox(height: 20),
-        const Divider(),
-
-        // ================= ACADEMIC =================
-        _sectionTitle("Academic Details"),
-        _docRow("Previous Education", education),
-        _docRow("10th School", school10Ctrl.text),
-        _docRow("10th Mark", mark10Ctrl.text),
-        _docRow("12th School", school12Ctrl.text),
-        _docRow("12th Mark", mark12Ctrl.text),
-        _docRow("College", collegeCtrl.text),
-        _docRow("University", universityCtrl.text),
-        _docRow("Degree %", degreePercentCtrl.text),
-
-       const SizedBox(height: 20),
-
-// SUBMIT BUTTON
+          // ====================== BUTTONS ======================
+          // SUBMIT BUTTON
 SizedBox(
   width: double.infinity,
   child: ElevatedButton(
@@ -759,13 +911,25 @@ SizedBox(
       backgroundColor: Colors.black,
       foregroundColor: Colors.white,
       padding: const EdgeInsets.symmetric(vertical: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
+    
     ),
     child: const Text(
       "Submit Application",
       style: TextStyle(fontWeight: FontWeight.w600),
+    ),
+  ),
+),
+const SizedBox(height: 12),
+SizedBox(
+  width: double.infinity,
+  child: ElevatedButton.icon(
+    onPressed: _downloadPdf,
+    icon: const Icon(Icons.download),
+    label: const Text("Download PDF"),
+    style: ElevatedButton.styleFrom(
+      backgroundColor: Colors.black,
+      foregroundColor: Colors.white,
+      padding: const EdgeInsets.symmetric(vertical: 16),
     ),
   ),
 ),
@@ -797,10 +961,11 @@ SizedBox(
     ),
   ),
 ),
-      ],
+
+        ],
+      ),
     ),
   ),
-),
 ),
 
   ],),
@@ -833,6 +998,68 @@ SizedBox(
         ),
         const SizedBox(height: 12),
         ...children,
+      ],
+    ),
+  );
+}
+
+Widget _professionalSection(String title, List<Widget> children) {
+  return Container(
+    margin: const EdgeInsets.only(bottom: 20),
+    decoration: BoxDecoration(
+      border: Border.all(color: Colors.black),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+          color: Colors.grey.shade200,
+          child: Text(
+            title,
+            style: GoogleFonts.inter(
+              fontWeight: FontWeight.w700,
+              fontSize: 13,
+            ),
+          ),
+        ),
+        ...children,
+      ],
+    ),
+  );
+}
+
+Widget _tableRow(String label, String? value) {
+  return Container(
+    decoration: const BoxDecoration(
+      border: Border(
+        top: BorderSide(color: Colors.black),
+      ),
+    ),
+    child: Row(
+      children: [
+        Container(
+          width: 180,
+          padding: const EdgeInsets.all(10),
+          decoration: const BoxDecoration(
+            border: Border(
+              right: BorderSide(color: Colors.black),
+            ),
+          ),
+          child: Text(
+            label,
+            style: const TextStyle(fontWeight: FontWeight.w600),
+          ),
+        ),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Text(
+              (value == null || value.isEmpty) ? "-" : value,
+            ),
+          ),
+        ),
       ],
     ),
   );
@@ -1050,6 +1277,24 @@ Widget _previewItem(String label, String? value) {
 }
 
 
+Future<String?> uploadFileToStorage(
+    PlatformFile? file,
+    String folder,
+) async {
+  if (file == null || file.bytes == null) return null;
+
+  final fileName =
+      "${DateTime.now().millisecondsSinceEpoch}_${file.name}";
+
+  final ref = FirebaseStorage.instance
+      .ref()
+      .child("admission_uploads/$folder/$fileName");
+
+  await ref.putData(file.bytes!);
+
+  return await ref.getDownloadURL();
+}
+
   Future<bool> _isEmailAlreadyUsed(String email) async {
   final result = await FirebaseFirestore.instance
       .collection('admission_forms')
@@ -1177,7 +1422,11 @@ if (passportPhotoFile!.size > 20 * 1024) {
   final motherMobile = motherMobileCtrl.text.trim();
   final guardianMobile = guardianMobileCtrl.text.trim();
 
-  // 🔴 At least one parent name required
+  final fatherOccupation = fatherOccupationCtrl.text.trim();
+  final motherOccupation = motherOccupationCtrl.text.trim();
+  final guardianOccupation = guardianOccupationCtrl.text.trim();
+
+  // 🔴 At least one parent/guardian name required
   if (fatherNameCtrl.text.trim().isEmpty &&
       motherNameCtrl.text.trim().isEmpty &&
       guardianNameCtrl.text.trim().isEmpty) {
@@ -1193,7 +1442,39 @@ if (passportPhotoFile!.size > 20 * 1024) {
     return false;
   }
 
-  // 🔴 Validate Address Fields
+  // 🔴 Validate mobile lengths
+  if (fatherMobile.isNotEmpty && fatherMobile.length != 10) {
+    _showTopPopup('Father mobile must be 10 digits');
+    return false;
+  }
+
+  if (motherMobile.isNotEmpty && motherMobile.length != 10) {
+    _showTopPopup('Mother mobile must be 10 digits');
+    return false;
+  }
+
+  if (guardianMobile.isNotEmpty && guardianMobile.length != 10) {
+    _showTopPopup('Guardian mobile must be 10 digits');
+    return false;
+  }
+
+  // 🔴 IMPORTANT: Occupation required if mobile provided
+  if (fatherMobile.isNotEmpty && fatherOccupation.isEmpty) {
+    _showTopPopup('Father occupation is required if father mobile is provided');
+    return false;
+  }
+
+  if (motherMobile.isNotEmpty && motherOccupation.isEmpty) {
+    _showTopPopup('Mother occupation is required if mother mobile is provided');
+    return false;
+  }
+
+  if (guardianMobile.isNotEmpty && guardianOccupation.isEmpty) {
+    _showTopPopup('Guardian occupation is required if guardian mobile is provided');
+    return false;
+  }
+
+  // 🔴 Address validation
   if (doorNoCtrl.text.trim().isEmpty ||
       streetCtrl.text.trim().isEmpty ||
       villageCtrl.text.trim().isEmpty ||
@@ -1207,7 +1488,6 @@ if (passportPhotoFile!.size > 20 * 1024) {
     return false;
   }
 
-  // 🔴 Validate Pincode (6 digits)
   if (!RegExp(r'^\d{6}$').hasMatch(pincodeCtrl.text.trim())) {
     _showTopPopup('Enter valid 6-digit pincode');
     return false;
@@ -1262,53 +1542,19 @@ final motherOccupation = motherOccupationCtrl.text.trim();
 final guardianOccupation = guardianOccupationCtrl.text.trim();
 
 // ✅ THEN your conditional validation
-if (fatherMobile.isEmpty &&
-    motherMobile.isEmpty &&
-    guardianMobile.isEmpty) {
-  _showTopPopup('At least one contact number (Father/Mother/Guardian) is required');
-  return;
-}
-if (fatherMobile.isNotEmpty && fatherMobile.length != 10) {
-  _showTopPopup('Father mobile must be 10 digits');
-  return;
-}
 
-if (motherMobile.isNotEmpty && motherMobile.length != 10) {
-  _showTopPopup('Mother mobile must be 10 digits');
-  return;
-}
 
-if (guardianMobile.isNotEmpty && guardianMobile.length != 10) {
-  _showTopPopup('Guardian mobile must be 10 digits');
+    if (fullNameCtrl.text.trim().isEmpty ||
+    emailCtrl.text.trim().isEmpty ||
+    phoneCtrl.text.trim().isEmpty ||
+    gender == null ||
+    program == null ||
+    degree == null ||
+    preferredCourse == null ||
+    education == null) {
+  _showTopPopup('Please fill all required fields');
   return;
 }
-if (fatherMobile.isNotEmpty && fatherOccupation.isEmpty) {
-  _showTopPopup('Father occupation is required if father mobile is provided');
-  return;
-}
-
-if (motherMobile.isNotEmpty && motherOccupation.isEmpty) {
-  _showTopPopup('Mother occupation is required if mother mobile is provided');
-  return;
-}
-
-if (guardianMobile.isNotEmpty && guardianOccupation.isEmpty) {
-  _showTopPopup('Guardian occupation is required if guardian mobile is provided');
-  return;
-}
-
-    if (firstNameCtrl.text.isEmpty ||
-        lastNameCtrl.text.isEmpty ||
-        emailCtrl.text.isEmpty ||
-        phoneCtrl.text.isEmpty ||
-        gender == null ||
-        course == null ||
-        education == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all required fields')),
-      );
-      return;
-    }
 
     final fullAddress =
         '${doorNoCtrl.text}, ${streetCtrl.text}, ${villageCtrl.text}, '
@@ -1339,8 +1585,16 @@ if (!RegExp(r'^\d+$').hasMatch(annualIncomeCtrl.text)) {
   return;
 }
 
-
-    await FirebaseFirestore.instance
+// ================= FILE UPLOAD TO FIREBASE STORAGE =================
+//final photoUrl =await uploadFileToStorage(passportPhotoFile, "photos");
+//final signatureUrl =await uploadFileToStorage(digitalSignatureFile, "signatures");
+//final communityUrl =await uploadFileToStorage(communityCertFile, "community");
+//final incomeUrl =await uploadFileToStorage(incomeCertFile, "income");
+//final firstGraduateUrl =await uploadFileToStorage(firstGraduateCertFile, "first_graduate");
+//final nativityUrl =await uploadFileToStorage(nativityCertFile, "nativity");
+//rules_version = '2';service firebase.storage {  match /b/{bucket}/o {match /{allPaths=**} { allow read, write: if true; }}}
+  
+  await FirebaseFirestore.instance
         .collection('admission_forms')
         .add({
           'program': program,
@@ -1397,7 +1651,12 @@ if (!RegExp(r'^\d+$').hasMatch(annualIncomeCtrl.text)) {
 'university': universityCtrl.text.trim(),
 'degreeYear': degreeYearCtrl.text.trim(),
 'degreePercentage': degreePercentCtrl.text.trim(),
-
+//'photoUrl': photoUrl,
+//'signatureUrl': signatureUrl,
+//'communityCertUrl': communityUrl,
+//'incomeCertUrl': incomeUrl,
+//'firstGraduateCertUrl': firstGraduateUrl,
+//'nativityCertUrl': nativityUrl,
 
       'status': 'pending',
       'createdAt': FieldValue.serverTimestamp(),
@@ -1488,6 +1747,8 @@ void _showTopPopup(String message) {
   });
 }
 
+
+
 final Map<String, Map<String, List<String>>> courseMap = {
   'UG': {
     'B.E': [
@@ -1509,6 +1770,73 @@ final Map<String, Map<String, List<String>>> courseMap = {
     ],
   },
 };
+Future<void> _downloadPdf() async {
+
+  // ✅ LOAD LOGO FROM ASSET
+  final logoData =
+      await rootBundle.load('assets/images/college_logo.png');
+  final logoBytes = logoData.buffer.asUint8List();
+
+  final fullAddress =
+      '${doorNoCtrl.text}, ${streetCtrl.text}, ${villageCtrl.text}, '
+      '${postCtrl.text}, ${cityCtrl.text}, ${talukCtrl.text}, '
+      '${districtCtrl.text}, ${stateCtrl.text} - ${pincodeCtrl.text}';
+
+
+  final pdfBytes = await ApplicationPdfGenerator.generate(
+    data: {
+  'program': program,
+  'degree': degree,
+  'department': preferredCourse,
+
+  'fullName': fullNameCtrl.text,
+  'dob': dobCtrl.text,
+  'gender': gender,
+  'bloodGroup': bloodGroupCtrl.text,
+  'aadhaar': aadhaarCtrl.text,
+  'email': emailCtrl.text,
+  'phone': phoneCtrl.text,
+  'address': fullAddress,
+
+  'fatherName': fatherNameCtrl.text,
+  'fatherMobile': fatherMobileCtrl.text,
+  'fatherOccupation': fatherOccupationCtrl.text,
+  'motherName': motherNameCtrl.text,
+  'motherMobile': motherMobileCtrl.text,
+  'motherOccupation': motherOccupationCtrl.text,
+  'guardianName': guardianNameCtrl.text,
+  'guardianMobile': guardianMobileCtrl.text,
+  'guardianOccupation': guardianOccupationCtrl.text,
+
+  'previousEducation': education,
+  '10thMark': mark10Ctrl.text,
+  '12thMark': mark12Ctrl.text,
+  'degreePercentage': degreePercentCtrl.text,
+
+  'emisId': emisIdCtrl.text,
+  'religion': religionCtrl.text,
+  'caste': casteCtrl.text,
+  'community': communityCtrl.text,
+  'communityCertNo': communityCertNoCtrl.text,
+  'annualIncome': annualIncomeCtrl.text,
+  'incomeCertNo': incomeCertNoCtrl.text,
+  'isFirstGraduate': isFirstGraduate,
+  'firstGraduateCertNo': firstGraduateCertNoCtrl.text,
+  'hasNativityCert': hasNativityCert,
+  'nativityCertNo': nativityCertNoCtrl.text,
+
+  'formDate': formDate,
+},
+    photoBytes: passportPhotoFile?.bytes,
+    signatureBytes: digitalSignatureFile?.bytes,
+    logoBytes: logoBytes, // ✅ THIS WAS MISSING
+  );
+
+
+  await Printing.layoutPdf(
+    onLayout: (format) async => pdfBytes,
+  );
+}
 
 }
 
@@ -1549,6 +1877,7 @@ Widget _input(
   String? hint,
   int maxLines = 1,
   Function(String)? onChanged,
+  List<TextInputFormatter>? inputFormatters,
 }) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1561,8 +1890,9 @@ Widget _input(
         controller: controller,
         maxLines: maxLines,
         onChanged: onChanged,
+        inputFormatters: inputFormatters,
         decoration: InputDecoration(
-          hintText: hint,
+          hintText: hint ,
           filled: true,
           fillColor: Colors.grey[100],
           border: OutlineInputBorder(
@@ -1574,7 +1904,6 @@ Widget _input(
     ],
   );
 }
-
 
 Widget _yesNoRadio({
   required String label,
@@ -1634,7 +1963,7 @@ Widget _filePicker({
         icon: const Icon(Icons.upload_file),
         label: const Text('Choose PDF'),
         onPressed: () async {
-          final result = await FilePicker.pickFiles(
+          final result = await FilePicker.platform.pickFiles(
             type: FileType.custom,
             allowedExtensions: ['pdf'],
             withData: true,
@@ -1696,7 +2025,32 @@ Widget _filePicker({
   );
 }
 
+class TNCertificateFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue,
+      TextEditingValue newValue,
+  ) {
+    String text = newValue.text.toUpperCase();
 
+    // Ensure it starts with TN-
+    if (!text.startsWith('TN-')) {
+      text = 'TN-' + text.replaceAll(RegExp(r'[^0-9]'), '');
+    } else {
+      text = 'TN-' + text.substring(3).replaceAll(RegExp(r'[^0-9]'), '');
+    }
+
+    // Limit to 13 digits after TN-
+    if (text.length > 16) {
+      text = text.substring(0, 16);
+    }
+
+    return TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
+    );
+  }
+}
 // ---------- File Picker UI (visual only) ----------
 
 class _FilePicker extends StatefulWidget {
@@ -1716,7 +2070,7 @@ class _FilePickerState extends State<_FilePicker> {
   PlatformFile? selectedFile;
 
   Future<void> _pickFile() async {
-    final result = await FilePicker.pickFiles(
+    final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['pdf'],
       withData: true,
@@ -1855,7 +2209,7 @@ class _ImagePickerState extends State<_ImagePicker> {
   PlatformFile? selectedImage;
 
   Future<void> _pickImage() async {
-    final result = await FilePicker.pickFiles(
+    final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['png', 'jpg', 'jpeg'],
       withData: true,
