@@ -14,6 +14,7 @@ import 'timetable_portal/timetable_portal_screen.dart';
 import 'examcell_portal/examcell_portal_screen.dart';
 import 'admission_portal/admission_portal_screen.dart';
 import 'reset_password/admin_reset_email_screen.dart';
+import 'principal_portal/principal_portal_screen.dart';
 
 class AdminPortalScreen extends StatefulWidget {
   const AdminPortalScreen({super.key});
@@ -128,7 +129,7 @@ class _AdminPortalScreenState extends State<AdminPortalScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => HODPortalScreen(
+          builder: (_) => PrincipalPortalScreen(
             username: userData['username'] ?? email,
           ),
         ),

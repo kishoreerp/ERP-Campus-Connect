@@ -1,4 +1,4 @@
-const functions = require("firebase-functions");
+const functions = require("firebase-functions/v1");
 const admin = require("firebase-admin");
 const nodemailer = require("nodemailer");
 
@@ -12,8 +12,11 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-exports.sendOtpEmail = functions.https.onCall(async (data, context) => {
-  const { email, otp } = data;
+const { onCall } = require("firebase-functions/v2/https");
+
+exports.sendOtpEmail = onCall(async (request) => {
+  const { email, otp } = request.data;
+  
 
   if (!email || !otp) {
     throw new functions.https.HttpsError(
@@ -47,44 +50,47 @@ exports.sendOtpEmail = functions.https.onCall(async (data, context) => {
 
 const cors = require("cors")({ origin: true });
 
-exports.resetPasswordWithOtp = functions
-  .region("asia-south1")
-  .https.onRequest((req, res) => {
-    cors(req, res, async () => {
-      try {
-        const { email, newPassword } = req.body;
+const { onRequest } = require("firebase-functions/v2/https");
 
-        if (!email || !newPassword) {
-          return res.status(400).json({ error: "Missing data" });
-        }
-
-        // 🔎 Check OTP verification
-        const otpDoc = await admin
-          .firestore()
-          .collection("email_otps")
-          .doc(email)
-          .get();
-
-        if (!otpDoc.exists || otpDoc.data().verified !== true) {
-          return res.status(403).json({ error: "OTP not verified" });
-        }
-
-        // 🔐 Update password
-        const user = await admin.auth().getUserByEmail(email);
-        await admin.auth().updateUser(user.uid, {
-          password: newPassword,
-        });
-
-        // 🧹 Cleanup OTP
-        await admin.firestore().collection("email_otps").doc(email).delete();
-
-        return res.json({ success: true });
-      } catch (err) {
-        console.error(err);
-        return res.status(500).json({ error: err.message });
+exports.resetPasswordWithOtp = onRequest(
+  { region: "asia-south1", cors: true },
+  async (req, res) => {
+    try {
+      if (req.method !== "POST") {
+        return res.status(405).json({ error: "Method not allowed" });
       }
-    });
-  });
+
+      const { email, newPassword } = req.body;
+
+      if (!email || !newPassword) {
+        return res.status(400).json({ error: "Missing data" });
+      }
+
+      const otpDoc = await admin
+        .firestore()
+        .collection("email_otps")
+        .doc(email)
+        .get();
+
+      if (!otpDoc.exists || otpDoc.data().verified !== true) {
+        return res.status(403).json({ error: "OTP not verified" });
+      }
+
+      const user = await admin.auth().getUserByEmail(email);
+
+      await admin.auth().updateUser(user.uid, {
+        password: newPassword,
+      });
+
+      await admin.firestore().collection("email_otps").doc(email).delete();
+
+      return res.json({ success: true });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: err.message });
+    }
+  }
+);
 
   // ================= DELETE STUDENT (AUTH + FIRESTORE) =================
 

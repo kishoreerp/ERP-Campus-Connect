@@ -1,0 +1,1236 @@
+import 'package:flutter/material.dart';
+
+class PrincipalStudentScreen extends StatefulWidget {
+  const PrincipalStudentScreen({super.key});
+
+  @override
+  State<PrincipalStudentScreen> createState() =>
+      _PrincipalStudentScreenState();
+}
+
+class _PrincipalStudentScreenState
+    extends State<PrincipalStudentScreen> {
+
+  final List<String> ugYears = [
+    "1st Year",
+    "2nd Year",
+    "3rd Year",
+    "4th Year",
+  ];
+
+  final List<String> pgYears = [
+    "1st Year",
+    "2nd Year",
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+          automaticallyImplyLeading: false, 
+           toolbarHeight: 40, 
+        title: const Text(
+  "Student",
+  style: TextStyle(
+    fontSize: 20,          // Increase size
+    fontWeight: FontWeight.bold, // Make bold
+  ),
+),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+            /// SEARCH CARD
+            _buildSearchCard(),
+
+            const SizedBox(height: 24),
+
+            /// ===============================
+            /// UNDERGRADUATE
+            /// ===============================
+
+            const Text(
+              "Undergraduate",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            GridView.count(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 1.8,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              children: ugYears.map((year) {
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => DepartmentScreen(
+                          program: "UG",
+                          year: year,
+                        ),
+                      ),
+                    );
+                  },
+                  child: _buildYearCard("UG", year),
+                );
+              }).toList(),
+            ),
+
+            const SizedBox(height: 16),
+
+            /// ===============================
+            /// POSTGRADUATE
+            /// ===============================
+
+            const Text(
+              "Postgraduate",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            GridView.count(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 1.8,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              children: pgYears.map((year) {
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => DepartmentScreen(
+                          program: "PG",
+                          year: year,
+                        ),
+                      ),
+                    );
+                  },
+                  child: _buildYearCard("PG", year),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// SEARCH CARD
+  Widget _buildSearchCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: Row(
+        children: const [
+          Icon(Icons.search, color: Colors.blue),
+          SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              "Search Student",
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          Icon(Icons.arrow_forward_ios, size: 16),
+        ],
+      ),
+    );
+  }
+
+  /// YEAR CARD
+  Widget _buildYearCard(String program, String year) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+
+          CircleAvatar(
+            radius: 26,
+            backgroundColor: program == "UG"
+                ? Colors.blue.withOpacity(0.15)
+                : Colors.purple.withOpacity(0.15),
+            child: Icon(
+              Icons.school,
+              color: program == "UG"
+                  ? Colors.blue
+                  : Colors.purple,
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          Text(
+            year,
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// ===============================================
+/// DEPARTMENT SCREEN (Same File - No New File)
+/// ===============================================
+
+class DepartmentScreen extends StatelessWidget {
+  final String program;
+  final String year;
+
+  static const List<Color> iconColors = [
+    Colors.blue,
+    Colors.green,
+    Colors.orange,
+    Colors.purple,
+    Colors.teal,
+  ];
+
+  const DepartmentScreen({
+    super.key,
+    required this.program,
+    required this.year,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final Map<String, int> departments = program == "UG"
+        ? {
+            "Information Technology": 45,
+            "Computer Science and Engineering": 52,
+            "Cyber Security": 38,
+            "Artificial Intelligence & Data Science": 41,
+            "Electronics and Communication": 47,
+          }
+        : {
+            "M.Sc Computer Science": 30,
+            "Master of Education (M.Ed)": 22,
+          };
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          "$program - $year",
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: ListView(
+          children: departments.entries
+              .toList()
+              .asMap()
+              .entries
+              .map((e) {
+            return _buildDepartmentCard(
+              context,
+              e.value,
+              e.key,
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+
+  /// ✅ THIS METHOD MUST BE INSIDE CLASS
+  Widget _buildDepartmentCard(
+    BuildContext context,
+    MapEntry<String, int> entry,
+    int index,
+  ) {
+    final iconColor =
+        iconColors[index % iconColors.length];
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(18),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => StudentListScreen(
+  departmentName: entry.key,
+  totalStudents: entry.value,
+   program: program,   
+  year: year,         
+),
+
+          ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 18),
+        padding: const EdgeInsets.all(18),
+  decoration: BoxDecoration(
+  color: Colors.white,
+  borderRadius: BorderRadius.circular(20),
+
+  // ✅ FULL BORDER
+  border: Border.all(
+    color: const Color.fromARGB(255, 224, 221, 221), // soft grey border
+    width: 1.2,
+  ),
+
+  // Optional soft shadow (recommended)
+  boxShadow: [
+    BoxShadow(
+      color: const Color.fromARGB(255, 255, 255, 255).withOpacity(0.04),
+      blurRadius: 8,
+      offset: const Offset(0, 4),
+    ),
+  ],
+),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: iconColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(
+                Icons.apartment,
+                color: iconColor,
+                size: 26,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                entry.key,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: 5,
+              ),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                "${entry.value} Students",
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+class StudentListScreen extends StatelessWidget {
+  final String departmentName;
+  final int totalStudents;
+  final String program;  
+  final String year;  
+
+  const StudentListScreen({
+    super.key,
+    required this.departmentName,
+    required this.totalStudents,
+    required this.program,   
+  required this.year,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+
+    /// ✅ Proper Student List (NOT List<String>)
+final List<StudentModel> students = [
+  
+  StudentModel(
+    name: "Arun Kumar",
+    registerNumber: "MSC001",
+    year: "1st Year",
+     isPresent: true, 
+    dob: "12-05-2005",
+    gender: "Male",
+    bloodGroup: "B+",
+    aadhar: "123456789012",
+    email: "arun@gmail.com",
+    phone: "9876543210",
+    fatherName: "Ravi Kumar",
+    motherName: "Lakshmi",
+    address: "Chennai",
+    religion: "Hindu",
+    caste: "OC",
+    community: "General",
+    income: "1,50,000",
+    arrears: 2,
+    subjects: ["Mathematics I", "Engineering Physics"],
+  ),
+
+  StudentModel(
+    name: "Bala Murugan",
+    registerNumber: "MSC002",
+    year: "1st Year",
+     isPresent: true, 
+    dob: "03-09-2005",
+    gender: "Male",
+    bloodGroup: "O+",
+    aadhar: "234567890123",
+    email: "bala@gmail.com",
+    phone: "9123456780",
+    fatherName: "Murugan",
+    motherName: "Kavitha",
+    address: "Madurai",
+    religion: "Hindu",
+    caste: "BC",
+    community: "Backward",
+    income: "1,20,000",
+    arrears: 1,
+    subjects: ["C Programming", "Physics"],
+  ),
+
+  StudentModel(
+    name: "Charan Raj",
+    registerNumber: "MSC003",
+    year: "1st Year",
+     isPresent: false, 
+    dob: "21-01-2005",
+    gender: "Male",
+    bloodGroup: "A+",
+    aadhar: "345678901234",
+    email: "charan@gmail.com",
+    phone: "9988776655",
+    fatherName: "Raj Kumar",
+    motherName: "Sangeetha",
+    address: "Coimbatore",
+    religion: "Hindu",
+    caste: "MBC",
+    community: "Most Backward",
+    income: "2,00,000",
+    arrears: 0,
+    subjects: ["Data Structures", "Maths"],
+  ),
+
+  StudentModel(
+    name: "Divya Lakshmi",
+    registerNumber: "MSC004",
+    year: "1st Year",
+     isPresent: true, 
+    dob: "15-02-2006",
+    gender: "Female",
+    bloodGroup: "AB+",
+    aadhar: "456789012345",
+    email: "divya@gmail.com",
+    phone: "9871234567",
+    fatherName: "Lakshman",
+    motherName: "Rani",
+    address: "Salem",
+    religion: "Hindu",
+    caste: "OC",
+    community: "General",
+    income: "1,75,000",
+    arrears: 3,
+    subjects: ["Operating Systems", "Digital Logic"],
+  ),
+
+  StudentModel(
+    name: "Eshwar Reddy",
+    registerNumber: "MSC005",
+    year: "1st Year",
+     isPresent: true, 
+    dob: "08-08-2005",
+    gender: "Male",
+    bloodGroup: "B-",
+    aadhar: "567890123456",
+    email: "eshwar@gmail.com",
+    phone: "9998887776",
+    fatherName: "Reddy",
+    motherName: "Anitha",
+    address: "Vellore",
+    religion: "Hindu",
+    caste: "BC",
+    community: "Backward",
+    income: "1,40,000",
+    arrears: 0,
+    subjects: ["Java", "Maths II"],
+  ),
+
+  StudentModel(
+    name: "Farhana Begum",
+    registerNumber: "MSC006",
+    year: "1st Year",
+     isPresent: true, 
+    dob: "12-11-2005",
+    gender: "Female",
+    bloodGroup: "O-",
+    aadhar: "678901234567",
+    email: "farhana@gmail.com",
+    phone: "9001122334",
+    fatherName: "Ahmed",
+    motherName: "Shabana",
+    address: "Chennai",
+    religion: "Muslim",
+    caste: "BC",
+    community: "Minority",
+    income: "1,10,000",
+    arrears: 1,
+    subjects: ["Python", "Statistics"],
+  ),
+
+  StudentModel(
+    name: "Ganesh Kumar",
+    registerNumber: "MSC007",
+    year: "1st Year",
+     isPresent: true, 
+    dob: "30-04-2005",
+    gender: "Male",
+    bloodGroup: "A-",
+    aadhar: "789012345678",
+    email: "ganesh@gmail.com",
+    phone: "9011223344",
+    fatherName: "Kumar",
+    motherName: "Meena",
+    address: "Trichy",
+    religion: "Hindu",
+    caste: "SC",
+    community: "Scheduled Caste",
+    income: "90,000",
+    arrears: 4,
+    subjects: ["Networks", "DBMS"],
+  ),
+
+  StudentModel(
+    name: "Harini S",
+    registerNumber: "MSC008",
+    year: "1st Year",
+     isPresent:false, 
+    dob: "19-06-2005",
+    gender: "Female",
+    bloodGroup: "B+",
+    aadhar: "890123456789",
+    email: "harini@gmail.com",
+    phone: "9090909090",
+    fatherName: "Suresh",
+    motherName: "Kala",
+    address: "Erode",
+    religion: "Hindu",
+    caste: "OC",
+    community: "General",
+    income: "2,50,000",
+    arrears: 0,
+    subjects: ["AI", "Machine Learning"],
+  ),
+
+  StudentModel(
+    name: "Imran Khan",
+    registerNumber: "MSC009",
+    year: "1st Year",
+     isPresent: true, 
+    dob: "07-07-2005",
+    gender: "Male",
+    bloodGroup: "O+",
+    aadhar: "901234567890",
+    email: "imran@gmail.com",
+    phone: "9898989898",
+    fatherName: "Khan",
+    motherName: "Ayesha",
+    address: "Chennai",
+    religion: "Muslim",
+    caste: "BC",
+    community: "Minority",
+    income: "1,30,000",
+    arrears: 2,
+    subjects: ["Cloud Computing", "Linux"],
+  ),
+
+  StudentModel(
+    name: "Janani V",
+    registerNumber: "MSC010",
+    year: "1st Year",
+     isPresent: true, 
+    dob: "25-12-2005",
+    gender: "Female",
+    bloodGroup: "AB-",
+    aadhar: "112233445566",
+    email: "janani@gmail.com",
+    phone: "9876501234",
+    fatherName: "Venkatesh",
+    motherName: "Uma",
+    address: "Tirunelveli",
+    religion: "Hindu",
+    caste: "MBC",
+    community: "Most Backward",
+    income: "1,60,000",
+    arrears: 1,
+    subjects: ["Compiler Design", "Software Engineering"],
+  ),
+
+  // You can duplicate structure to add more up to 15+
+  StudentModel(
+    name: "Karthik R",
+    registerNumber: "MSC011",
+    year: "1st Year",
+     isPresent: true, 
+    dob: "14-03-2005",
+    gender: "Male",
+    bloodGroup: "B+",
+    aadhar: "223344556677",
+    email: "karthik@gmail.com",
+    phone: "9988001122",
+    fatherName: "Ramesh",
+    motherName: "Geetha",
+    address: "Namakkal",
+    religion: "Hindu",
+    caste: "BC",
+    community: "Backward",
+    income: "1,45,000",
+    arrears: 0,
+    subjects: ["Cyber Security", "Ethical Hacking"],
+  ),
+
+  StudentModel(
+    name: "Lavanya M",
+    registerNumber: "MSC012",
+    year: "1st Year",
+     isPresent: true, 
+    dob: "10-10-2005",
+    gender: "Female",
+    bloodGroup: "A+",
+    aadhar: "334455667788",
+    email: "lavanya@gmail.com",
+    phone: "9000012345",
+    fatherName: "Mani",
+    motherName: "Radha",
+    address: "Karur",
+    religion: "Hindu",
+    caste: "OC",
+    community: "General",
+    income: "1,70,000",
+    arrears: 2,
+    subjects: ["Data Mining", "Big Data"],
+  ),
+  StudentModel(
+    name: "Arun Kumar",
+    registerNumber: "MSC001",
+    year: "1st Year",
+     isPresent: true, 
+    dob: "12-05-2005",
+    gender: "Male",
+    bloodGroup: "B+",
+    aadhar: "123456789012",
+    email: "arun@gmail.com",
+    phone: "9876543210",
+    fatherName: "Ravi Kumar",
+    motherName: "Lakshmi",
+    address: "Chennai, Tamil Nadu",
+    religion: "Hindu",
+    caste: "OC",
+    community: "General",
+    income: "1,50,000",
+    arrears: 2,
+    subjects: [
+      "Mathematics I",
+      "Engineering Physics",
+    ],
+  ),
+
+  StudentModel(
+    name: "Naveen P",
+    registerNumber: "MSC013",
+    year: "1st Year",
+     isPresent: true, 
+    dob: "02-02-2005",
+    gender: "Male",
+    bloodGroup: "O+",
+    aadhar: "445566778899",
+    email: "naveen@gmail.com",
+    phone: "9012345678",
+    fatherName: "Prakash",
+    motherName: "Latha",
+    address: "Dharmapuri",
+    religion: "Hindu",
+    caste: "SC",
+    community: "Scheduled Caste",
+    income: "80,000",
+    arrears: 3,
+    subjects: ["Android Dev", "Kotlin"],
+  ),
+
+  StudentModel(
+    name: "Priya K",
+    registerNumber: "MSC014",
+    year: "1st Year",
+     isPresent: true, 
+    dob: "09-09-2005",
+    gender: "Female",
+    bloodGroup: "B+",
+    aadhar: "556677889900",
+    email: "priya@gmail.com",
+    phone: "9098765432",
+    fatherName: "Kumar",
+    motherName: "Anjali",
+    address: "Chennai",
+    religion: "Hindu",
+    caste: "BC",
+    community: "Backward",
+    income: "1,25,000",
+    arrears: 0,
+    subjects: ["Web Development", "React"],
+  ),
+
+  StudentModel(
+    name: "Rahul S",
+    registerNumber: "MSC015",
+    year: "1st Year",
+     isPresent: true, 
+    dob: "18-05-2005",
+    gender: "Male",
+    bloodGroup: "A+",
+    aadhar: "667788990011",
+    email: "rahul@gmail.com",
+    phone: "9876001122",
+    fatherName: "Sankar",
+    motherName: "Rekha",
+    address: "Salem",
+    religion: "Hindu",
+    caste: "MBC",
+    community: "Most Backward",
+    income: "1,90,000",
+    arrears: 1,
+    subjects: ["Flutter", "Firebase"],
+  ),
+];
+
+
+    return Scaffold(
+    appBar: AppBar(
+  toolbarHeight: 70, // increase height to fit 2 lines
+  titleSpacing: 0,
+  title: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+
+        /// 🔷 Program + Year (Dynamic)
+    Text(
+  "$program - $year",
+  style: const TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.bold,
+  ),
+),
+
+      const SizedBox(height: 2),
+
+      /// 🔷 Department Name (Normal)
+      Text(
+        departmentName,
+        style: const TextStyle(
+          fontSize: 15,
+          color: Color.fromARGB(255, 73, 72, 72),
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    ],
+  ),
+),
+   body: Column(
+  children: [
+
+
+    const SizedBox(height: 10),
+
+    /// 🔷 STUDENT LIST
+    Expanded(
+      child: ListView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: students.length,
+        itemBuilder: (context, index) {
+          return _buildStudentTile(context, students[index]);
+        },
+      ),
+    ),
+  ],
+),
+    );
+  }
+
+  /// ✅ Navigate Properly
+  Widget _buildStudentTile(BuildContext context, StudentModel student) {
+   return InkWell(
+  borderRadius: BorderRadius.circular(20),
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => StudentProfileScreen(student: student),
+      ),
+    );
+  },
+  child: Container(
+    margin: const EdgeInsets.only(bottom: 18),
+    padding: const EdgeInsets.all(18),
+    decoration: BoxDecoration(
+  color: Colors.white,
+  borderRadius: BorderRadius.circular(20),
+
+  // ✅ FULL BORDER
+  border: Border.all(
+    color: const Color.fromARGB(255, 224, 221, 221), // soft grey border
+    width: 1.2,
+  ),
+
+  // Optional soft shadow (recommended)
+  boxShadow: [
+    BoxShadow(
+      color: const Color.fromARGB(255, 255, 255, 255).withOpacity(0.04),
+      blurRadius: 8,
+      offset: const Offset(0, 4),
+    ),
+  ],
+),
+    child: Row(
+      children: [
+
+        /// 🔵 Avatar
+        CircleAvatar(
+          radius: 26,
+          backgroundColor: Colors.blue.withOpacity(0.1),
+          child: Text(
+            student.name[0],
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.blue,
+            ),
+          ),
+        ),
+
+        const SizedBox(width: 16),
+
+        /// 🔷 Student Info
+       Expanded(
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        student.name,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+        ),
+      ),
+      const SizedBox(height: 6),
+      Text(
+        "Reg No: ${student.registerNumber}",
+        style: const TextStyle(
+          color: Colors.grey,
+          fontSize: 13,
+        ),
+      ),
+    ],
+  ),
+),
+
+/// ✅ Attendance Badge
+Container(
+  padding: const EdgeInsets.symmetric(
+    horizontal: 12,
+    vertical: 6,
+  ),
+  decoration: BoxDecoration(
+    color: student.isPresent
+        ? Colors.green.withOpacity(0.1)
+        : Colors.red.withOpacity(0.1),
+    borderRadius: BorderRadius.circular(20),
+  ),
+  child: Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Icon(
+        student.isPresent
+            ? Icons.check_circle
+            : Icons.cancel,
+        size: 14,
+        color: student.isPresent
+            ? Colors.green
+            : Colors.red,
+      ),
+      const SizedBox(width: 5),
+      Text(
+        student.isPresent
+            ? "Present"
+            : "Absent",
+        style: TextStyle(
+          color: student.isPresent
+              ? Colors.green
+              : Colors.red,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
+        ),
+      ),
+    ],
+  ),
+),
+
+const SizedBox(width: 8),
+      ],
+    ),
+  ),
+);
+  }
+}
+class StudentModel {
+  final String name;
+  final String registerNumber;
+  final String year;
+  final bool isPresent;
+  final String dob;
+  final String gender;
+  final String bloodGroup;
+  final String aadhar;
+  final String email;
+  final String phone;
+
+  final String fatherName;
+  final String motherName;
+  final String address;
+
+  final String religion;
+  final String caste;
+  final String community;
+  final String income;
+
+  final List<String> subjects;
+  final int arrears;
+
+  StudentModel({
+    required this.name,
+    required this.registerNumber,
+    required this.year,
+     required this.isPresent, 
+    required this.dob,
+    required this.gender,
+    required this.bloodGroup,
+    required this.aadhar,
+    required this.email,
+    required this.phone,
+    required this.fatherName,
+    required this.motherName,
+    required this.address,
+    required this.religion,
+    required this.caste,
+    required this.community,
+    required this.income,
+    required this.subjects,
+    required this.arrears,
+  });
+}
+class StudentProfileScreen extends StatelessWidget {
+  final StudentModel student;
+
+  const StudentProfileScreen({
+    super.key,
+    required this.student,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+    appBar: AppBar(
+  title: const Text(
+    "Student Profile",
+    style: TextStyle(
+      fontSize: 20,
+      fontWeight: FontWeight.bold,
+    ),
+  ),
+  centerTitle: false,
+),
+body: SingleChildScrollView(
+  padding: const EdgeInsets.all(16),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+
+      /// 🔷 STUDENT HEADER CARD
+      Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.blue.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.blue.withOpacity(0.2)),
+        ),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 28,
+              backgroundColor: Colors.blue,
+              child: Text(
+                student.name[0],
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    student.name,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(student.email),
+                ],
+              ),
+            ),
+         Container(
+  padding: const EdgeInsets.symmetric(
+    horizontal: 12,
+    vertical: 6,
+  ),
+  decoration: BoxDecoration(
+    color: student.isPresent
+        ? Colors.green
+        : Colors.red,
+    borderRadius: BorderRadius.circular(20),
+  ),
+  child: Text(
+    student.isPresent ? "PRESENT" : "ABSENT",
+    style: const TextStyle(
+      color: Colors.white,
+      fontSize: 12,
+      fontWeight: FontWeight.bold,
+    ),
+  ),
+),
+          ],
+        ),
+      ),
+
+      const SizedBox(height: 20),
+
+      /// 🔷 PERSONAL INFORMATION
+      _buildSectionCard(
+        title: "Personal Information",
+        children: [
+          _infoRow(Icons.calendar_today, "Date of Birth", student.dob),
+          _infoRow(Icons.person, "Gender", student.gender),
+          _infoRow(Icons.bloodtype, "Blood Group", student.bloodGroup),
+          _infoRow(Icons.phone, "Phone", student.phone),
+          _infoRow(Icons.email, "Email", student.email),
+        ],
+      ),
+
+      /// 🔷 PARENTS & ADDRESS
+      _buildSectionCard(
+        title: "Parents & Address",
+        children: [
+          _infoRow(Icons.man, "Father Name", student.fatherName),
+          _infoRow(Icons.woman, "Mother Name", student.motherName),
+          _infoRow(Icons.home, "Address", student.address),
+        ],
+      ),
+
+      /// 🔷 COMMUNITY DETAILS
+      _buildSectionCard(
+        title: "Community Details",
+        children: [
+          _infoRow(Icons.account_balance, "Religion", student.religion),
+          _infoRow(Icons.badge, "Caste", student.caste),
+          _infoRow(Icons.group, "Community", student.community),
+          _infoRow(Icons.currency_rupee, "Income", student.income),
+        ],
+      ),
+     _buildSectionCard(
+  title: "Academic Details",
+  children: [
+
+    /// 🔴 Arrear Count
+    _infoRow(Icons.warning, "Arrear Count", "${student.arrears}"),
+
+    const SizedBox(height: 10),
+
+    /// 📘 Arrear Subjects
+    if (student.arrears > 0)
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Arrear Subjects",
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.grey,
+            ),
+          ),
+          const SizedBox(height: 6),
+
+          ...student.subjects.map(
+            (subject) => Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Text(
+                "• $subject",
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+        ],
+      )
+    else
+      const Text(
+        "No Arrears 🎉",
+        style: TextStyle(
+          color: Colors.green,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+  ],
+),
+      const SizedBox(height: 30),
+    ],
+  ),
+),
+    );
+  }
+
+ Widget _buildSectionCard({
+  required String title,
+  required List<Widget> children,
+}) {
+  return Container(
+    margin: const EdgeInsets.only(bottom: 16),
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(16),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.05),
+          blurRadius: 8,
+          offset: const Offset(0, 4),
+        ),
+      ],
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 12),
+        ...children,
+      ],
+    ),
+  );
+}
+
+Widget _infoRow(IconData icon, String title, String value) {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 14),
+    child: Row(
+      children: [
+        Icon(icon, size: 20, color: Colors.blue),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+Widget _buildRow(IconData icon, String title, String value) {
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 14),
+    child: Row(
+      children: [
+        Icon(icon, size: 20, color: Colors.blue),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+}
