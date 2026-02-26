@@ -1586,13 +1586,12 @@ if (!RegExp(r'^\d+$').hasMatch(annualIncomeCtrl.text)) {
 }
 
 // ================= FILE UPLOAD TO FIREBASE STORAGE =================
-//final photoUrl =await uploadFileToStorage(passportPhotoFile, "photos");
-//final signatureUrl =await uploadFileToStorage(digitalSignatureFile, "signatures");
-//final communityUrl =await uploadFileToStorage(communityCertFile, "community");
-//final incomeUrl =await uploadFileToStorage(incomeCertFile, "income");
-//final firstGraduateUrl =await uploadFileToStorage(firstGraduateCertFile, "first_graduate");
-//final nativityUrl =await uploadFileToStorage(nativityCertFile, "nativity");
-//rules_version = '2';service firebase.storage {  match /b/{bucket}/o {match /{allPaths=**} { allow read, write: if true; }}}
+final photoUrl =await uploadFileToStorage(passportPhotoFile, "photos");
+final signatureUrl =await uploadFileToStorage(digitalSignatureFile, "signatures");
+final communityUrl =await uploadFileToStorage(communityCertFile, "community");
+final incomeUrl =await uploadFileToStorage(incomeCertFile, "income");
+final firstGraduateUrl =await uploadFileToStorage(firstGraduateCertFile, "first_graduate");
+final nativityUrl =await uploadFileToStorage(nativityCertFile, "nativity");
   
   await FirebaseFirestore.instance
         .collection('admission_forms')
@@ -1634,7 +1633,7 @@ if (!RegExp(r'^\d+$').hasMatch(annualIncomeCtrl.text)) {
 'nativityCertNo': nativityCertNoCtrl.text.trim(),
 
 
-      'course': course,
+      'course': preferredCourse,
       'previousEducation': education,
 
 '12thSchool': school12Ctrl.text.trim(),
@@ -1651,12 +1650,12 @@ if (!RegExp(r'^\d+$').hasMatch(annualIncomeCtrl.text)) {
 'university': universityCtrl.text.trim(),
 'degreeYear': degreeYearCtrl.text.trim(),
 'degreePercentage': degreePercentCtrl.text.trim(),
-//'photoUrl': photoUrl,
-//'signatureUrl': signatureUrl,
-//'communityCertUrl': communityUrl,
-//'incomeCertUrl': incomeUrl,
-//'firstGraduateCertUrl': firstGraduateUrl,
-//'nativityCertUrl': nativityUrl,
+'photoUrl': photoUrl,
+'signatureUrl': signatureUrl,
+'communityCertUrl': communityUrl,
+'incomeCertUrl': incomeUrl,
+'firstGraduateCertUrl': firstGraduateUrl,
+'nativityCertUrl': nativityUrl,
 
       'status': 'pending',
       'createdAt': FieldValue.serverTimestamp(),
