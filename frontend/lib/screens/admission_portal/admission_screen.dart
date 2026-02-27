@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'ug_programs_screen.dart';
 import 'Pg_programs_screen.dart';
-class AdmissionScreen extends StatelessWidget {
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+
+class AdmissionScreen extends StatefulWidget {
   const AdmissionScreen({super.key});
 
+  @override
+  State<AdmissionScreen> createState() => _AdmissionScreenState();
+}
+class _AdmissionScreenState extends State<AdmissionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -12,53 +19,78 @@ class AdmissionScreen extends StatelessWidget {
      
 
       // ================= BODY =================
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Admissions',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 4),
-            const Text(
-              'Select program type to manage applications',
-              style: TextStyle(color: Colors.grey),
-            ),
-            const SizedBox(height: 20),
+   body: StreamBuilder<QuerySnapshot>(
+  stream: FirebaseFirestore.instance
+      .collection('admission_forms')
+      .snapshots(),
+  builder: (context, snapshot) {
+    if (!snapshot.hasData) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
-            _programCard(
-              title: 'UG Programs',
-              subtitle: 'Undergraduate Admissions',
-              applications: '4 Applications',
-               onTap: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const UgDepartmentsScreen(),
-      ),
-    );
-  },
-            ),
-            const SizedBox(height: 16),
-            _programCard(
-  title: 'PG Programs',
-  subtitle: 'Postgraduate Admissions',
-  applications: '2 Applications',
-  onTap: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const PgProgramsScreen(),
+    final docs = snapshot.data!.docs;
+
+    final ugCount = docs
+        .where((doc) => doc['program'] == 'UG')
+        .length;
+
+    final pgCount = docs
+        .where((doc) => doc['program'] == 'PG')
+        .length;
+
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Admissions',
+            style: TextStyle(
+                fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'Select program type to manage applications',
+            style: TextStyle(color: Colors.grey),
+          ),
+          const SizedBox(height: 20),
+
+          _programCard(
+            title: 'UG Programs',
+            subtitle: 'Undergraduate Admissions',
+            applications: '$ugCount Applications',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      const UgDepartmentsScreen(),
+                ),
+              );
+            },
+          ),
+
+          const SizedBox(height: 16),
+
+          _programCard(
+            title: 'PG Programs',
+            subtitle: 'Postgraduate Admissions',
+            applications: '$pgCount Applications',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      const PgProgramsScreen(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   },
 ),
-
-          ],
-        ),
-      ),
     );
   }
 

@@ -7,8 +7,8 @@ admin.initializeApp();
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "kishore01kumar10@gmail.com",   // ✅ SYSTEM EMAIL
-    pass: "APP_PASSWORD",                // ✅ Gmail App Password
+    user: "solveinspire.team@gmail.com",   // ✅ SYSTEM EMAIL
+    pass: "updbcambpgfeznmj",                // ✅ Gmail App Password
   },
 });
 
@@ -26,7 +26,7 @@ exports.sendOtpEmail = onCall(async (request) => {
   }
 
   const mailOptions = {
-    from: `"SLEC Campus Connect" <kishore01kumar10@gmail.com>`, // ✅ FIXED
+    from: `"SLEC Campus Connect" <solveinspire.team@gmail.com>`, // ✅ FIXED
     to: email,                                                  // ✅ STUDENT EMAIL
     subject: "Password Reset OTP - SLEC",
     html: `
@@ -117,3 +117,92 @@ exports.deleteStudentUser = functions.firestore
     }
   });
 
+// ================= ADMISSION CONFIRMATION EMAIL =================
+exports.sendAdmissionConfirmation = functions
+  .region("asia-south1") // 👈 ADD THIS
+  .firestore
+  .document("admission_forms/{docId}")
+  .onCreate(async (snap, context) => {
+    try {
+      const data = snap.data();
+
+      const mailOptions = {
+        from: `"SLEC Campus Connect" <kishore01kumar10@gmail.com>`,
+        to: data.email,
+        subject: "Application Submitted Successfully - SLEC",
+        html: `
+          <h2>Application Submitted Successfully</h2>
+
+          <p>Dear <b>${data.fullName}</b>,</p>
+
+          <p>
+            Your application for 
+            <b>${data.department}</b> (${data.program} - ${data.degree})
+            has been received successfully.
+          </p>
+
+          <p><b>Status:</b> Pending Review</p>
+
+          <br/>
+
+          <p>
+            Our admission team will review your application and contact you soon.
+          </p>
+
+          <br/>
+
+          <p>
+            Regards,<br/>
+            <b>St. Lourdes Engineering College</b><br/>
+            Thanir Arul Nagar, Perambalur
+          </p>
+        `,
+      };
+
+      await transporter.sendMail(mailOptions);
+
+      console.log("Admission confirmation email sent to:", data.email);
+    } catch (error) {
+      console.error("Error sending admission confirmation:", error);
+    }
+  });
+
+  // ================= apllication accept reject mail =================
+  exports.sendAdmissionStatusEmail = onCall(async (request) => {
+
+  const { email, status } = request.data;
+
+  let subject;
+  let html;
+
+  if (status === "approved") {
+    subject = "Admission Approved - SLEC";
+    html = `
+      <h2>Congratulations!</h2>
+      <p>Your admission has been <b>approved</b>.</p>
+      <p>Please visit the college within the next <b>15 working days</b> 
+      to complete admission formalities.</p>
+      <br/>
+      <p>– SLEC Campus Connect</p>
+    `;
+  } else {
+    subject = "Admission Application Status - SLEC";
+    html = `
+      <h2>Admission Update</h2>
+      <p>We regret to inform you that your application 
+      has been <b>rejected</b>.</p>
+      <p>For further clarification, contact admission office.</p>
+      <br/>
+      <p>– SLEC Campus Connect</p>
+    `;
+  }
+
+  await transporter.sendMail({
+    from: "SLEC Campus Connect <kishore01kumar10@gmail.com>",
+    to: email,
+    subject: subject,
+    html: html,
+  });
+
+  return { success: true };
+});

@@ -4,15 +4,15 @@ import 'package:file_picker/file_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
-import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:printing/printing.dart';
 import 'application_pdf_generator.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
+
 class ApplicationFormScreen extends StatefulWidget {
   const ApplicationFormScreen({super.key});
-
 
 
   @override
@@ -2065,40 +2065,71 @@ class _FilePicker extends StatefulWidget {
   State<_FilePicker> createState() => _FilePickerState();
 }
 
+class NetworkPdfViewerPage extends StatelessWidget {
+  final String url;
+  final String title;
+
+  const NetworkPdfViewerPage({
+    super.key,
+    required this.url,
+    required this.title,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+        backgroundColor: Colors.black,
+      ),
+      body: SfPdfViewer.network(url),
+    );
+  }
+}
+
 class _FilePickerState extends State<_FilePicker> {
   PlatformFile? selectedFile;
 
   Future<void> _pickFile() async {
-    final result = await FilePicker.platform.pickFiles(
+  final result = await FilePicker.platform.pickFiles(
+    type: FileType.custom,
+    allowedExtensions: ['pdf'],
+    withData: true,
+  );
+
+  if (result == null || result.files.isEmpty) return;
+
+  PlatformFile file = result.files.first;
+
+  // 🔥 FORCE LOAD BYTES FOR WEB
+  if (kIsWeb && file.bytes == null) {
+    file = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['pdf'],
       withData: true,
-    );
-
-    if (result == null || result.files.isEmpty) return;
-
-    final file = result.files.first;
-
-    if (file.extension?.toLowerCase() != 'pdf') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Only PDF files allowed')),
-      );
-      return;
-    }
-
-    if (file.size > 20480) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('File must be 20KB or less')),
-      );
-      return;
-    }
-
-    setState(() {
-      selectedFile = file;
-    });
-
-    widget.onFileSelected?.call(file);
+    ).then((res) => res!.files.first);
   }
+
+  if (file.bytes == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Unable to read PDF bytes")),
+    );
+    return;
+  }
+
+  if (file.size > 20480) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('File must be 20KB or less')),
+    );
+    return;
+  }
+
+  setState(() {
+    selectedFile = file;
+  });
+
+  widget.onFileSelected?.call(file);
+}
 
   void _removeFile() {
     setState(() {
@@ -2108,16 +2139,7 @@ class _FilePickerState extends State<_FilePicker> {
     widget.onFileSelected?.call(null);
   }
 
-void _viewFile() {
-  if (selectedFile == null) return;
 
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => PdfViewerPage(file: selectedFile!),
-    ),
-  );
-}
   @override
   Widget build(BuildContext context) {
     final isUploaded = selectedFile != null;
@@ -2172,11 +2194,7 @@ void _viewFile() {
                   child: const Text("Upload"),
                 ),
 
-              if (isUploaded) ...[
-                IconButton(
-                  icon: const Icon(Icons.visibility),
-                  onPressed: _viewFile,
-                ),
+               if (isUploaded) ...[
                 IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
                   onPressed: _removeFile,
@@ -2304,45 +2322,5 @@ class _ImagePickerState extends State<_ImagePicker> {
       ],
     );
   }
-}class PdfViewerPage extends StatelessWidget {
-  final PlatformFile file;
-
-  const PdfViewerPage({super.key, required this.file});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text(file.name),
-        backgroundColor: Colors.black,
-      ),
-      body: _buildPdf(),
-    );
-  }
-
-  Widget _buildPdf() {
-    // 🔥 IMPORTANT FIX FOR WEB
-    if (kIsWeb) {
-      if (file.bytes == null) {
-        return const Center(child: Text("PDF data not available"));
-      }
-
-      return SfPdfViewer.memory(
-        file.bytes!,
-        key: UniqueKey(), // 👈 VERY IMPORTANT FIX
-      );
-    }
-
-    // Mobile/Desktop
-    if (file.path != null) {
-      return SfPdfViewer.file(File(file.path!));
-    }
-
-    if (file.bytes != null) {
-      return SfPdfViewer.memory(file.bytes!);
-    }
-
-    return const Center(child: Text("Unable to load PDF"));
-  }
 }
+
