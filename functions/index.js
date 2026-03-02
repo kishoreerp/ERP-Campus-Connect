@@ -50,7 +50,7 @@ exports.sendOtpEmail = onCall(async (request) => {
 
 const cors = require("cors")({ origin: true });
 
-const { onRequest } = require("firebase-functions/v2/https");
+const { onRequest } = require("firebase-functions/v1/https");
 
 exports.resetPasswordWithOtp = onRequest(
   { region: "asia-south1", cors: true },

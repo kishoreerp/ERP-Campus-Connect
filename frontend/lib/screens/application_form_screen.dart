@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
-import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
+
 
 import 'package:flutter/foundation.dart';
 import 'package:printing/printing.dart';
@@ -12,10 +12,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 
 class ApplicationFormScreen extends StatefulWidget {
-  const ApplicationFormScreen({super.key});
+   const ApplicationFormScreen({super.key});
 
-
-  @override
+   @override
   State<ApplicationFormScreen> createState() => _ApplicationFormScreenState();
 }
 
@@ -27,9 +26,10 @@ class _ApplicationFormScreenState extends State<ApplicationFormScreen> {
 String? degree;    // B.E / B.Tech / M.E / MBA
 String? preferredCourse;
 
+
 int currentStep = 0;
 
-  final TextEditingController firstNameCtrl = TextEditingController();
+final TextEditingController firstNameCtrl = TextEditingController();
 final TextEditingController lastNameCtrl = TextEditingController();
 final TextEditingController emailCtrl = TextEditingController();
 final TextEditingController phoneCtrl = TextEditingController();
@@ -68,17 +68,13 @@ final TextEditingController emisIdCtrl = TextEditingController();
 final TextEditingController religionCtrl = TextEditingController();
 final TextEditingController casteCtrl = TextEditingController();
 final TextEditingController communityCtrl = TextEditingController();
-final TextEditingController communityCertNoCtrl = TextEditingController();
+ final TextEditingController communityCertNoCtrl = TextEditingController();
+ final TextEditingController firstGraduateCertNoCtrl = TextEditingController();
+ final TextEditingController annualIncomeCtrl = TextEditingController();
+ final TextEditingController incomeCertNoCtrl = TextEditingController();
+ final TextEditingController nativityCertNoCtrl = TextEditingController();
 
-final TextEditingController firstGraduateCertNoCtrl = TextEditingController();
-
-final TextEditingController annualIncomeCtrl = TextEditingController();
-final TextEditingController incomeCertNoCtrl = TextEditingController();
-
-final TextEditingController nativityCertNoCtrl = TextEditingController();
-
-
-// Academic dynamic controllers
+ // Academic dynamic controllers
 
 final TextEditingController school12Ctrl = TextEditingController();
 final TextEditingController board12Ctrl = TextEditingController();
@@ -94,7 +90,10 @@ final TextEditingController collegeCtrl = TextEditingController();
 final TextEditingController universityCtrl = TextEditingController();
 final TextEditingController degreeYearCtrl = TextEditingController();
 final TextEditingController degreePercentCtrl = TextEditingController();
-
+PlatformFile? mark10File;
+PlatformFile? mark12File;
+PlatformFile? transferCertFile;
+PlatformFile? degreeMarksheetFile;
 PlatformFile? previousEducationFile;
 PlatformFile? passportPhotoFile;
 PlatformFile? digitalSignatureFile;
@@ -105,8 +104,7 @@ bool show10thDetails = false;
 
 double percent12 = 0;
 double percent10 = 0;
-
-
+ 
 PlatformFile? communityCertFile;
 PlatformFile? firstGraduateCertFile;
 PlatformFile? incomeCertFile;
@@ -489,8 +487,7 @@ Step(
       ),
     ),
   ],
-),
-
+ ),
             ],
             const SizedBox(height: 10),
             _input('10th School Name *', school10Ctrl),
@@ -612,17 +609,50 @@ Step(
   },
 ),
 
-  const _FilePicker(label: '10th Mark Sheet *'),
+
+  _FilePicker(
+  label: '10th Mark Sheet *',
+  onFileSelected: (file) {
+    setState(() {
+      mark10File = file;
+    });
+  },
+),
+
 
   // Show 12th only when needed
   if (education == '12th' || show12thDetails)
-    const _FilePicker(label: '12th Mark Sheet *'),
+    _FilePicker(
+  label: '12th Mark Sheet *',
+  onFileSelected: (file) {
+    setState(() {
+      mark12File = file;
+    });
+  },
+),
+
 
   // Show diploma/degree marksheet only if NOT 12th
-  if (education != null && education != '12th')
-    _FilePicker(label: '$education Marksheet *'),
+if (education != null && education != '12th')
+  _FilePicker(
+    label: '$education Marksheet *',
+    onFileSelected: (file) {
+      setState(() {
+        degreeMarksheetFile = file;
+      });
+    },
+  ),
 
-  _FilePicker(label: 'Transfer Certificate *'),
+
+  _FilePicker(
+  label: 'Transfer Certificate *',
+  onFileSelected: (file) {
+    setState(() {
+      transferCertFile = file;
+    });
+  },
+),
+
 
  _FilePicker(
   label: 'Community Certificate *',
@@ -633,6 +663,7 @@ Step(
   },
 ),
 
+
   if (isFirstGraduate)
     _FilePicker(
       label: 'First Graduate Certificate *',
@@ -642,6 +673,7 @@ Step(
         });
       },
     ),
+
 
  _FilePicker(
   label: 'Income Certificate *',
@@ -961,8 +993,7 @@ SizedBox(
     ),
   ),
 ),
-
-        ],
+    ],
       ),
     ),
   ),
@@ -1081,8 +1112,7 @@ Widget _emailInput() {
         keyboardType: TextInputType.emailAddress,
         onChanged: (value) {
           final lower = value.toLowerCase();
-
-          if (value != lower) {
+           if (value != lower) {
             emailCtrl.value = TextEditingValue(
               text: lower,
               selection: TextSelection.collapsed(offset: lower.length),
@@ -1275,8 +1305,7 @@ Widget _previewItem(String label, String? value) {
     ),
   );
 }
-
-
+ 
 Future<String?> uploadFileToStorage(
     PlatformFile? file,
     String folder,
@@ -1301,8 +1330,7 @@ Future<String?> uploadFileToStorage(
       .where('email', isEqualTo: email)
       .limit(1)
       .get();
-
-  return result.docs.isNotEmpty;
+   return result.docs.isNotEmpty;
 }
 
 bool _validateCurrentStep() {
@@ -1391,11 +1419,13 @@ if (passportPhotoFile!.size > 20 * 1024) {
     return false;
   }
 
+
   if (isFirstGraduate) {
     if (firstGraduateCertFile == null) {
       _showTopPopup('First Graduate certificate is required');
       return false;
     }
+
 
     if (!validatePdf(firstGraduateCertFile)) {
       _showTopPopup('First Graduate certificate must be PDF ≤ 20KB');
@@ -1403,11 +1433,13 @@ if (passportPhotoFile!.size > 20 * 1024) {
     }
   }
 
+
   if (hasNativityCert) {
     if (nativityCertFile == null) {
       _showTopPopup('Nativity certificate is required');
       return false;
     }
+
 
     if (!validatePdf(nativityCertFile)) {
       _showTopPopup('Nativity certificate must be PDF ≤ 20KB');
@@ -1415,16 +1447,20 @@ if (passportPhotoFile!.size > 20 * 1024) {
     }
   }
 
+
   return true;
+
 
       case 1:
   final fatherMobile = fatherMobileCtrl.text.trim();
   final motherMobile = motherMobileCtrl.text.trim();
   final guardianMobile = guardianMobileCtrl.text.trim();
 
+
   final fatherOccupation = fatherOccupationCtrl.text.trim();
   final motherOccupation = motherOccupationCtrl.text.trim();
   final guardianOccupation = guardianOccupationCtrl.text.trim();
+
 
   // 🔴 At least one parent/guardian name required
   if (fatherNameCtrl.text.trim().isEmpty &&
@@ -1434,6 +1470,7 @@ if (passportPhotoFile!.size > 20 * 1024) {
     return false;
   }
 
+
   // 🔴 At least one contact number required
   if (fatherMobile.isEmpty &&
       motherMobile.isEmpty &&
@@ -1442,21 +1479,25 @@ if (passportPhotoFile!.size > 20 * 1024) {
     return false;
   }
 
+
   // 🔴 Validate mobile lengths
   if (fatherMobile.isNotEmpty && fatherMobile.length != 10) {
     _showTopPopup('Father mobile must be 10 digits');
     return false;
   }
 
+
   if (motherMobile.isNotEmpty && motherMobile.length != 10) {
     _showTopPopup('Mother mobile must be 10 digits');
     return false;
   }
 
+
   if (guardianMobile.isNotEmpty && guardianMobile.length != 10) {
     _showTopPopup('Guardian mobile must be 10 digits');
     return false;
   }
+
 
   // 🔴 IMPORTANT: Occupation required if mobile provided
   if (fatherMobile.isNotEmpty && fatherOccupation.isEmpty) {
@@ -1464,15 +1505,18 @@ if (passportPhotoFile!.size > 20 * 1024) {
     return false;
   }
 
+
   if (motherMobile.isNotEmpty && motherOccupation.isEmpty) {
     _showTopPopup('Mother occupation is required if mother mobile is provided');
     return false;
   }
 
+
   if (guardianMobile.isNotEmpty && guardianOccupation.isEmpty) {
     _showTopPopup('Guardian occupation is required if guardian mobile is provided');
     return false;
   }
+
 
   // 🔴 Address validation
   if (doorNoCtrl.text.trim().isEmpty ||
@@ -1488,12 +1532,15 @@ if (passportPhotoFile!.size > 20 * 1024) {
     return false;
   }
 
+
   if (!RegExp(r'^\d{6}$').hasMatch(pincodeCtrl.text.trim())) {
     _showTopPopup('Enter valid 6-digit pincode');
     return false;
   }
 
+
   return true;
+
 
       case 2:
         if (education == null) {
@@ -1502,10 +1549,12 @@ if (passportPhotoFile!.size > 20 * 1024) {
         }
         return true;
 
+
       default:
         return true;
     }
   }
+
 
   
   Future<void> _submitApplication() async {
@@ -1523,6 +1572,7 @@ if (!RegExp(r'^\d{12}$').hasMatch(aadhaarCtrl.text)) {
   return;
 }
 
+
 // Email already used check
 final emailUsed = await _isEmailAlreadyUsed(emailCtrl.text.trim());
 if (emailUsed) {
@@ -1531,6 +1581,7 @@ if (emailUsed) {
   );
   return;
 }
+
 
 // ✅ ADD THIS BLOCK HERE
 final fatherMobile = fatherMobileCtrl.text.trim();
@@ -1541,8 +1592,7 @@ final fatherOccupation = fatherOccupationCtrl.text.trim();
 final motherOccupation = motherOccupationCtrl.text.trim();
 final guardianOccupation = guardianOccupationCtrl.text.trim();
 
-// ✅ THEN your conditional validation
-
+// ✅ THEN your conditional validation 
 
     if (fullNameCtrl.text.trim().isEmpty ||
     emailCtrl.text.trim().isEmpty ||
@@ -1592,7 +1642,20 @@ final communityUrl =await uploadFileToStorage(communityCertFile, "community");
 final incomeUrl =await uploadFileToStorage(incomeCertFile, "income");
 final firstGraduateUrl =await uploadFileToStorage(firstGraduateCertFile, "first_graduate");
 final nativityUrl =await uploadFileToStorage(nativityCertFile, "nativity");
-  
+final mark10Url =
+    await uploadFileToStorage(mark10File, "marksheets");
+
+
+final mark12Url =
+    await uploadFileToStorage(mark12File, "marksheets");
+
+
+final transferUrl =
+    await uploadFileToStorage(transferCertFile, "tc");
+
+
+final degreeMarksheetUrl =
+    await uploadFileToStorage(degreeMarksheetFile, "marksheets");  
   await FirebaseFirestore.instance
         .collection('admission_forms')
         .add({
@@ -1600,7 +1663,8 @@ final nativityUrl =await uploadFileToStorage(nativityCertFile, "nativity");
 'degree': degree,
 'department': preferredCourse,
 
-      'fullName': fullNameCtrl.text.trim(),
+
+      'name': fullNameCtrl.text.trim(),
 'dob': dobCtrl.text.trim(),
 'gender': gender,
 'bloodGroup': bloodGroupCtrl.text,
@@ -1631,21 +1695,20 @@ final nativityUrl =await uploadFileToStorage(nativityCertFile, "nativity");
 
 'hasNativityCert': hasNativityCert,
 'nativityCertNo': nativityCertNoCtrl.text.trim(),
-
-
-      'course': preferredCourse,
+ 
+       'course': preferredCourse,
       'previousEducation': education,
 
 '12thSchool': school12Ctrl.text.trim(),
 '12thBoard': board12Ctrl.text.trim(),
 '12thYear': year12Ctrl.text.trim(),
 '12thMark': mark12Ctrl.text.trim(),
-
+'12thPercentage': percentageCtrl.text.trim(),
 '10thSchool': school10Ctrl.text.trim(),
 '10thBoard': board10Ctrl.text.trim(),
 '10thYear': year10Ctrl.text.trim(),
 '10thMark': mark10Ctrl.text.trim(),
-
+'10thPercentage': percentageCtrl.text.trim(),
 'collegeName': collegeCtrl.text.trim(),
 'university': universityCtrl.text.trim(),
 'degreeYear': degreeYearCtrl.text.trim(),
@@ -1656,18 +1719,24 @@ final nativityUrl =await uploadFileToStorage(nativityCertFile, "nativity");
 'incomeCertUrl': incomeUrl,
 'firstGraduateCertUrl': firstGraduateUrl,
 'nativityCertUrl': nativityUrl,
-
+'mark10Url': mark10Url,
+'mark12Url': mark12Url,
+'transferCertUrl': transferUrl,
+'degreeMarksheetUrl': degreeMarksheetUrl,
       'status': 'pending',
       'createdAt': FieldValue.serverTimestamp(),
     });
 
+
     if (!mounted) return;
+
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Application submitted successfully'),
       ),
     );
+
 
     Navigator.pop(context);
   } catch (e) {
@@ -1686,7 +1755,9 @@ bool validatePdf(PlatformFile? file) {
 void _showTopPopup(String message) {
   final overlay = Overlay.of(context);
 
+
   late OverlayEntry overlayEntry;
+
 
   overlayEntry = OverlayEntry(
     builder: (context) => Positioned(
@@ -1739,12 +1810,17 @@ void _showTopPopup(String message) {
     ),
   );
 
+
   overlay.insert(overlayEntry);
+
 
   Future.delayed(const Duration(seconds: 3), () {
     overlayEntry.remove();
   });
 }
+
+
+
 
 
 
@@ -1771,10 +1847,12 @@ final Map<String, Map<String, List<String>>> courseMap = {
 };
 Future<void> _downloadPdf() async {
 
+
   // ✅ LOAD LOGO FROM ASSET
   final logoData =
       await rootBundle.load('assets/images/college_logo.png');
   final logoBytes = logoData.buffer.asUint8List();
+
 
   final fullAddress =
       '${doorNoCtrl.text}, ${streetCtrl.text}, ${villageCtrl.text}, '
@@ -1782,11 +1860,14 @@ Future<void> _downloadPdf() async {
       '${districtCtrl.text}, ${stateCtrl.text} - ${pincodeCtrl.text}';
 
 
+
+
   final pdfBytes = await ApplicationPdfGenerator.generate(
     data: {
   'program': program,
   'degree': degree,
   'department': preferredCourse,
+
 
   'fullName': fullNameCtrl.text,
   'dob': dobCtrl.text,
@@ -1796,6 +1877,7 @@ Future<void> _downloadPdf() async {
   'email': emailCtrl.text,
   'phone': phoneCtrl.text,
   'address': fullAddress,
+
 
   'fatherName': fatherNameCtrl.text,
   'fatherMobile': fatherMobileCtrl.text,
@@ -1807,10 +1889,12 @@ Future<void> _downloadPdf() async {
   'guardianMobile': guardianMobileCtrl.text,
   'guardianOccupation': guardianOccupationCtrl.text,
 
+
   'previousEducation': education,
   '10thMark': mark10Ctrl.text,
   '12thMark': mark12Ctrl.text,
   'degreePercentage': degreePercentCtrl.text,
+
 
   'emisId': emisIdCtrl.text,
   'religion': religionCtrl.text,
@@ -1824,6 +1908,7 @@ Future<void> _downloadPdf() async {
   'hasNativityCert': hasNativityCert,
   'nativityCertNo': nativityCertNoCtrl.text,
 
+
   'formDate': formDate,
 },
     photoBytes: passportPhotoFile?.bytes,
@@ -1832,14 +1917,19 @@ Future<void> _downloadPdf() async {
   );
 
 
+
+
   await Printing.layoutPdf(
     onLayout: (format) async => pdfBytes,
   );
 }
 
+
 }
 
+
   // ---------- Helpers ----------
+
 
   Widget _section({
     required String title,
@@ -1904,6 +1994,7 @@ Widget _input(
   );
 }
 
+
 Widget _yesNoRadio({
   required String label,
   required bool value,
@@ -1947,6 +2038,8 @@ Widget _yesNoRadio({
 }
 
 
+
+
 Widget _filePicker({
   required String label,
   required Function(PlatformFile file) onSelected,
@@ -1968,6 +2061,7 @@ Widget _filePicker({
             withData: true,
           );
 
+
           if (result != null && result.files.isNotEmpty) {
             onSelected(result.files.first);
           }
@@ -1976,6 +2070,7 @@ Widget _filePicker({
     ],
   );
 }
+
 
  Widget _dropdown({
   required String label,
@@ -2024,6 +2119,7 @@ Widget _filePicker({
   );
 }
 
+
 class TNCertificateFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
@@ -2032,6 +2128,7 @@ class TNCertificateFormatter extends TextInputFormatter {
   ) {
     String text = newValue.text.toUpperCase();
 
+
     // Ensure it starts with TN-
     if (!text.startsWith('TN-')) {
       text = 'TN-' + text.replaceAll(RegExp(r'[^0-9]'), '');
@@ -2039,10 +2136,12 @@ class TNCertificateFormatter extends TextInputFormatter {
       text = 'TN-' + text.substring(3).replaceAll(RegExp(r'[^0-9]'), '');
     }
 
+
     // Limit to 13 digits after TN-
     if (text.length > 16) {
       text = text.substring(0, 16);
     }
+
 
     return TextEditingValue(
       text: text,
@@ -2052,43 +2151,26 @@ class TNCertificateFormatter extends TextInputFormatter {
 }
 // ---------- File Picker UI (visual only) ----------
 
+
 class _FilePicker extends StatefulWidget {
   final String label;
   final Function(PlatformFile?)? onFileSelected;
+
 
   const _FilePicker({
     required this.label,
     this.onFileSelected,
   });
 
+
   @override
   State<_FilePicker> createState() => _FilePickerState();
 }
 
-class NetworkPdfViewerPage extends StatelessWidget {
-  final String url;
-  final String title;
-
-  const NetworkPdfViewerPage({
-    super.key,
-    required this.url,
-    required this.title,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-        backgroundColor: Colors.black,
-      ),
-      body: SfPdfViewer.network(url),
-    );
-  }
-}
 
 class _FilePickerState extends State<_FilePicker> {
   PlatformFile? selectedFile;
+
 
   Future<void> _pickFile() async {
   final result = await FilePicker.platform.pickFiles(
@@ -2097,9 +2179,12 @@ class _FilePickerState extends State<_FilePicker> {
     withData: true,
   );
 
+
   if (result == null || result.files.isEmpty) return;
 
+
   PlatformFile file = result.files.first;
+
 
   // 🔥 FORCE LOAD BYTES FOR WEB
   if (kIsWeb && file.bytes == null) {
@@ -2110,12 +2195,14 @@ class _FilePickerState extends State<_FilePicker> {
     ).then((res) => res!.files.first);
   }
 
+
   if (file.bytes == null) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Unable to read PDF bytes")),
     );
     return;
   }
+
 
   if (file.size > 20480) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -2124,25 +2211,32 @@ class _FilePickerState extends State<_FilePicker> {
     return;
   }
 
+
   setState(() {
     selectedFile = file;
   });
 
+
   widget.onFileSelected?.call(file);
 }
+
 
   void _removeFile() {
     setState(() {
       selectedFile = null;
     });
 
+
     widget.onFileSelected?.call(null);
   }
+
+
 
 
   @override
   Widget build(BuildContext context) {
     final isUploaded = selectedFile != null;
+
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -2155,6 +2249,7 @@ class _FilePickerState extends State<_FilePicker> {
           ),
         ),
         const SizedBox(height: 6),
+
 
         Container(
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
@@ -2173,6 +2268,7 @@ class _FilePickerState extends State<_FilePicker> {
               ),
               const SizedBox(width: 8),
 
+
               Expanded(
                 child: Text(
                   isUploaded
@@ -2188,11 +2284,13 @@ class _FilePickerState extends State<_FilePicker> {
                 ),
               ),
 
+
               if (!isUploaded)
                 TextButton(
                   onPressed: _pickFile,
                   child: const Text("Upload"),
                 ),
+
 
                if (isUploaded) ...[
                 IconButton(
@@ -2204,6 +2302,7 @@ class _FilePickerState extends State<_FilePicker> {
           ),
         ),
 
+
         const SizedBox(height: 12),
       ],
     );
@@ -2213,17 +2312,21 @@ class _ImagePicker extends StatefulWidget {
   final String label;
   final Function(PlatformFile?)? onFileSelected;
 
+
   const _ImagePicker({
     required this.label,
     this.onFileSelected,
   });
 
+
   @override
   State<_ImagePicker> createState() => _ImagePickerState();
 }
 
+
 class _ImagePickerState extends State<_ImagePicker> {
   PlatformFile? selectedImage;
+
 
   Future<void> _pickImage() async {
     final result = await FilePicker.platform.pickFiles(
@@ -2232,11 +2335,15 @@ class _ImagePickerState extends State<_ImagePicker> {
       withData: true,
     );
 
+
     if (result == null || result.files.isEmpty) return;
+
 
     final file = result.files.first;
 
+
     final ext = file.extension?.toLowerCase();
+
 
     if (!['png', 'jpg', 'jpeg'].contains(ext)) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -2245,6 +2352,7 @@ class _ImagePickerState extends State<_ImagePicker> {
       return;
     }
 
+
     if (file.size > 20 * 1024) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Image must be 20KB or less')),
@@ -2252,24 +2360,30 @@ class _ImagePickerState extends State<_ImagePicker> {
       return;
     }
 
+
     setState(() {
       selectedImage = file;
     });
 
+
     widget.onFileSelected?.call(file);
   }
+
 
   void _removeImage() {
     setState(() {
       selectedImage = null;
     });
 
+
     widget.onFileSelected?.call(null);
   }
+
 
   @override
   Widget build(BuildContext context) {
     final isUploaded = selectedImage != null;
+
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -2323,4 +2437,3 @@ class _ImagePickerState extends State<_ImagePicker> {
     );
   }
 }
-

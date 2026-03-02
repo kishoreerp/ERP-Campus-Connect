@@ -1,174 +1,219 @@
 import 'package:flutter/material.dart';
-import 'admission_student_detail_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'pg_department_students_screen.dart';
 
-class PgProgramsScreen extends StatelessWidget {
+
+class PgProgramsScreen extends StatefulWidget {
   const PgProgramsScreen({super.key});
+
+
+  @override
+  State<PgProgramsScreen> createState() =>
+      _PgProgramsScreenState();
+}
+
+
+class _PgProgramsScreenState
+    extends State<PgProgramsScreen> {
+
+
+  Stream<int> _getDepartmentCount(String department) {
+    return FirebaseFirestore.instance
+        .collection('admission_forms')
+        .where('program', isEqualTo: 'PG')
+        .where('department', isEqualTo: department)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.length);
+  }
+
+
+  final List<Map<String, String>> departments = [
+    {
+      "title": "Master of Business Administration",
+      "code": "MBA",
+      "degree": "MBA"
+    },
+    {
+      "title": "Computer Science and Engineering",
+      "code": "ME CSE",
+      "degree": "M.E"
+    },
+  ];
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF4F6F8),
 
-      // ================= APP BAR =================
+
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
-        automaticallyImplyLeading: false,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+        foregroundColor: Colors.black,
+        title: const Text(
+          "PG Departments",
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+          ),
         ),
-        titleSpacing: 12,
-        title: Row(
-          children: [
-            
-            const Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'PG Departments',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 17,
-                    color: Colors.black,
-                  ),
-                ),
-                Text(
-                  'Select department to view students',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      
       ),
 
-      // ================= BODY =================
-body: Padding(
+
+      body: ListView.separated(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-           
-            const SizedBox(height: 10),
-
-            _deptCard(
-              title: 'Master of Business Administration',
-              code: 'MBA',
-              students: '2 Students',
-               onTap: () {
-    Navigator.push(
-  context,
-  MaterialPageRoute(
-    builder: (_) => const AdmissionStudentDetailScreen(
-      name: 'Rahul Sharma',
-      email: 'rahul.sharma@slecedu.in',
-      department: 'MBA',
-      year: '1st Year',
-      admissionNumber: 'ADM2024001',
-      studentPhone: '+91-98765-43210',
-      parentPhone: '+91-97654-32100',
-    ),
-  ),
-);
-
-  },
-            ),
-            _deptCard(
-              title:  'ME Computer science Engineering',
-              code: 'ME CSE',
-              students: '1 Students',
-              onTap: () {
-    Navigator.push(
-  context,
-  MaterialPageRoute(
-    builder: (_) => const AdmissionStudentDetailScreen(
-      name: 'Vikram Reddy',
-      email: 'vikram.reddy@slecedu.in',
-      department: 'MBA',
-      year: '1st Year',
-      admissionNumber: 'ADM2024005',
-      studentPhone: '+91-98765-43214',
-      parentPhone: '+91-97654-32104',
-    ),
-  ),
-);
+        itemCount: departments.length,
+        separatorBuilder: (_, __) =>
+            const SizedBox(height: 14),
+        itemBuilder: (context, index) {
+          final dept = departments[index];
 
 
-  },
-  
-            ),
-
-          ],
-        ),
+          return _deptCard(
+            title: dept["title"]!,
+            code: dept["code"]!,
+            degree: dept["degree"]!,
+          );
+        },
       ),
     );
   }
 
-  // =================  DEPARTMENT CARD =================
- Widget _deptCard({
-  required String title,
-  required String code,
-  required String students,
-  required VoidCallback onTap,
-}) {
 
-    return InkWell(
-    onTap: onTap, // ✅ USE IT
-    borderRadius: BorderRadius.circular(16),
-    child: Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15,
+  // ================= PROFESSIONAL CARD =================
+  Widget _deptCard({
+    required String title,
+    required String code,
+    required String degree,
+  }) {
+
+
+    IconData icon;
+    Color iconColor;
+
+
+    switch (code) {
+      case "MBA":
+        icon = Icons.business_center;
+        iconColor = Colors.blue;
+        break;
+      case "ME CSE":
+        icon = Icons.memory;
+        iconColor = Colors.indigo;
+        break;
+      default:
+        icon = Icons.school;
+        iconColor = Colors.grey;
+    }
+
+
+    return StreamBuilder<int>(
+      stream: _getDepartmentCount(title),
+      builder: (context, snapshot) {
+        final count = snapshot.data ?? 0;
+
+
+        return Material(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          elevation: 1.5,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      PgDepartmentStudentsScreen(
+                    departmentName: title,
+                    program: "PG",
+                  degree: degree,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  code,
-                  style: const TextStyle(color: Colors.grey),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade200,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              students,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
+              ),
+              child: Row(
+                children: [
+
+
+                  // LEFT: Colored Logo
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: iconColor.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      icon,
+                      size: 20,
+                      color: iconColor,
+                    ),
+                  ),
+
+
+                  const SizedBox(width: 14),
+
+
+                  // CENTER: Title + Code
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          code,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+
+                  // RIGHT: Student Count
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius:
+                          BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      "$count Students",
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-          const SizedBox(width: 8),
-          const Icon(Icons.chevron_right, color: Colors.grey),
-        ],
-      ),
-    ),
-  );
+        );
+      },
+    );
+  }
 }
-}
+
+
+

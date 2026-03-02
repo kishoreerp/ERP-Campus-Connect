@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
 
+
 class PrincipalStaffScreen extends StatefulWidget {
   const PrincipalStaffScreen({super.key});
+
 
   @override
   State<PrincipalStaffScreen> createState() =>
       _PrincipalStaffScreenState();
 }
 
+
 class _PrincipalStaffScreenState
     extends State<PrincipalStaffScreen> {
 
+
   final TextEditingController _searchController = TextEditingController();
-  
+ 
  final List<String> departments = [
   "All",
   "Information Technology",
@@ -32,8 +36,10 @@ void _filterStaff() {
               .toLowerCase()
               .contains(_searchController.text.toLowerCase());
 
+
       final matchesDepartment = selectedDepartment == "All" ||
           staff.department == selectedDepartment;
+
 
       return matchesSearch && matchesDepartment;
     }).toList();
@@ -41,7 +47,10 @@ void _filterStaff() {
 }
 String selectedDepartment = "All";
 
+
   final List<StaffModel> staffList = [
+
+
 
 
   StaffModel(
@@ -66,6 +75,7 @@ String selectedDepartment = "All";
     isActive: true,
   ),
 
+
   StaffModel(
     name: "Ms. Anitha",
     staffId: "STF002",
@@ -88,6 +98,7 @@ String selectedDepartment = "All";
   ],
    isActive: true,
   ),
+
 
   StaffModel(
     name: "Mr. Suresh",
@@ -134,6 +145,7 @@ StaffModel(
   isActive: true,
 ),
 
+
 StaffModel(
   name: "Mr. Arjun Verma",
   staffId: "STF005",
@@ -156,6 +168,7 @@ StaffModel(
   ],
   isActive: true,
 ),
+
 
 StaffModel(
   name: "Dr. Kavitha Rao",
@@ -180,16 +193,19 @@ StaffModel(
   isActive: true,
 ),
 ];
-  
+ 
+
 
   List<StaffModel> filteredStaff = [];
+
 
   @override
   void initState() {
     super.initState();
     filteredStaff = staffList;
   }
-  
+ 
+
 
   void _searchStaff(String query) {
     setState(() {
@@ -201,61 +217,60 @@ StaffModel(
     });
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
-       automaticallyImplyLeading: false, 
-        centerTitle: false,
-         toolbarHeight: 45, 
-  title:/// 🔹 Section Title
-
-Padding(
-  padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
-  child: Text(
+  automaticallyImplyLeading: false,
+  toolbarHeight: 44,
+  elevation: 0,
+  backgroundColor: Colors.white,      // ✅ important
+  surfaceTintColor: Colors.white,     // ✅ very important (Material 3)
+  shadowColor: Colors.transparent,    // ✅ removes grey shadow
+  title: const Text(
     "Staff Management",
-    style: const TextStyle(
-      fontSize: 20,        // 🔥 Change size here
+    style: TextStyle(
+      fontSize: 20,
       fontWeight: FontWeight.bold,
+      color: Colors.black,
     ),
   ),
 ),
-  
-),
+
 
       body: Column(
         children: [
-          
+         
+
 
           /// 🔎 Search Bar
           Padding(
-            padding: const EdgeInsets.all(16),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                  )
-                ],
-              ),
-              child: TextField(
-                controller: _searchController,
-                onChanged: _searchStaff,
-                decoration: const InputDecoration(
-                  icon: Icon(Icons.search),
-                  hintText: "Search Staff...",
-                  border: InputBorder.none,
-                ),
-              ),
-            ),
-          ),
+  padding: const EdgeInsets.fromLTRB(16, 4, 16, 10),
+  child: Container(
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(14),
+      border: Border.all(color: Colors.grey.shade300),
+    ),
+    child: TextField(
+      controller: _searchController,
+      onChanged: (value) {
+        _filterStaff();
+      },
+      decoration: const InputDecoration(
+        hintText: "Search Staff...",
+        prefixIcon: Icon(Icons.search, color: Colors.blue),
+        border: InputBorder.none,
+        contentPadding: EdgeInsets.symmetric(vertical: 14),
+      ),
+    ),
+  ),
+),
 
-/// 🏢 Department Filter 
+
+/// 🏢 Department Filter
 Padding(
   padding: const EdgeInsets.symmetric(horizontal: 16),
   child: ClipRRect(
@@ -266,13 +281,14 @@ Padding(
       child: InteractiveViewer(
         constrained: false,
         boundaryMargin: const EdgeInsets.all(20),
-        
+       
         minScale: 1,
-        maxScale: 1, 
+        maxScale: 1,
          panAxis: PanAxis.horizontal,
         child: Row(
           children: departments.map((dept) {
             final isSelected = selectedDepartment == dept;
+
 
             return Padding(
               padding: const EdgeInsets.only(right: 14),
@@ -282,7 +298,7 @@ Padding(
                     selectedDepartment = dept;
                   });
                   _filterStaff();
-                  
+                 
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(
@@ -335,80 +351,102 @@ const SizedBox(height: 10),
     );
   }
 
+
   Widget _buildStaffCard(BuildContext context, StaffModel staff) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(20),
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => StaffProfileScreen(staff: staff),
-          ),
-        );
-      },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 18),
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.08),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
+  return InkWell(
+    borderRadius: BorderRadius.circular(18),
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => StaffProfileScreen(staff: staff),
         ),
-        child: Row(
-          children: [
-
-            /// Avatar
-            CircleAvatar(
-              radius: 26,
-              backgroundColor: Colors.blue.withOpacity(0.1),
-              child: Text(
-                staff.name[0],
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                ),
-              ),
-            ),
-
-            const SizedBox(width: 16),
-
-            /// Info
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    staff.name,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    staff.designation,
-                    style: const TextStyle(
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const Icon(Icons.arrow_forward_ios, size: 16),
-          ],
-        ),
+      );
+    },
+    child: Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.grey.shade200),
       ),
-    );
-  }
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 24,
+            backgroundColor: Colors.blue.withOpacity(0.1),
+            child: Text(
+              staff.name[0],
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.blue,
+              ),
+            ),
+          ),
+          const SizedBox(width: 14),
+
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  staff.name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  staff.designation,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  staff.department,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.black54,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+
+          /// Status Badge
+          Container(
+            padding: const EdgeInsets.symmetric(
+                horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: staff.isActive
+                  ? Colors.green.withOpacity(0.1)
+                  : Colors.red.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              staff.isActive ? "Present" : "Absent",
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: staff.isActive
+                    ? Colors.green
+                    : Colors.red,
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }
+}
+
 
 class StaffModel {
   final String name;
@@ -422,13 +460,12 @@ class StaffModel {
   final String bloodGroup;
   final String address;
   final String qualification;
-  final int experience; 
+  final int experience;
   final String salary;
   final String joiningDate;
   final List<String> subjects;
   final bool isActive;
-
-
+ 
   StaffModel({
     required this.name,
     required this.staffId,
@@ -495,8 +532,10 @@ class StaffProfileScreen extends StatelessWidget {
       border: Border.all(color: Colors.blue.withOpacity(0.2)),
     ),
 
+
   child: Row(
     children: [
+
 
       /// 🔵 Avatar
       CircleAvatar(
@@ -512,7 +551,9 @@ class StaffProfileScreen extends StatelessWidget {
         ),
       ),
 
+
       const SizedBox(width: 14),
+
 
       /// 🔷 Staff Info
       Expanded(
@@ -536,6 +577,7 @@ class StaffProfileScreen extends StatelessWidget {
           ],
         ),
       ),
+
 
       /// ✅ Status Badge (Like Student Present)
       Container(
@@ -563,9 +605,7 @@ class StaffProfileScreen extends StatelessWidget {
             ),
             const SizedBox(width: 5),
             Text(
-              staff.isActive
-                  ? "Active"
-                  : "On Leave",
+              staff.isActive ? "Present" : "Absent",
               style: TextStyle(
                 color: staff.isActive
                     ? Colors.green
@@ -582,7 +622,9 @@ class StaffProfileScreen extends StatelessWidget {
   ),
 ),
 
+
                   const SizedBox(height: 20),
+
 
                   /// 📋 PROFESSIONAL INFORMATION
                   _buildInfoCard("Professional Information", [
@@ -590,6 +632,7 @@ class StaffProfileScreen extends StatelessWidget {
                     _infoRow("Phone", staff.phone),
                     _infoRow("Email", staff.email),
                   ]),
+
 
                   /// 👤 PERSONAL INFORMATION
                   _buildInfoCard("Personal Information", [
@@ -600,6 +643,7 @@ class StaffProfileScreen extends StatelessWidget {
                   ]),
                   _buildInfoCard("Professional Information", [
 
+
   _infoRow("Department", staff.department),
   _infoRow("Designation", staff.designation),
   _infoRow("Qualification", staff.qualification),
@@ -607,8 +651,10 @@ class StaffProfileScreen extends StatelessWidget {
   _infoRow("Date of Joining", staff.joiningDate),
   _infoRow("Salary", staff.salary),
 
+
 ]),
 _buildInfoCard("Subjects Handling", [
+
 
   Wrap(
     spacing: 8,
@@ -632,6 +678,7 @@ _buildInfoCard("Subjects Handling", [
     }).toList(),
   ),
 
+
 ]),
                   const SizedBox(height: 30),
                 ],
@@ -642,6 +689,7 @@ _buildInfoCard("Subjects Handling", [
       ),
     );
   }
+
 
   /// 🔹 Info Card
   Widget _buildInfoCard(String title, List<Widget> children) {
@@ -675,6 +723,7 @@ _buildInfoCard("Subjects Handling", [
       ),
     );
   }
+
 
   /// 🔹 Info Row
   Widget _infoRow(String title, String value) {

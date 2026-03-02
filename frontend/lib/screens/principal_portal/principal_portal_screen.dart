@@ -5,23 +5,29 @@ import 'principal_home_screen.dart';
 import 'principal_staff_screen.dart';
 import 'principal_student_screen.dart';
 
+
 class PrincipalPortalScreen extends StatefulWidget {
   final String username;
+
 
   const PrincipalPortalScreen({
     super.key,
     required this.username,
   });
 
+
   @override
   State<PrincipalPortalScreen> createState() =>
       _PrincipalPortalScreenState();
 }
 
+
 class _PrincipalPortalScreenState extends State<PrincipalPortalScreen> {
   int _selectedIndex = 0;
 
+
   late final List<Widget> _pages;
+
 
   @override
   void initState() {
@@ -34,10 +40,12 @@ class _PrincipalPortalScreenState extends State<PrincipalPortalScreen> {
     ];
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+
 
       // ✅ COMMON HEADER
       appBar: AppBar(
@@ -49,22 +57,12 @@ class _PrincipalPortalScreenState extends State<PrincipalPortalScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
             children: [
-              Container(
+              Image.asset(
+                'assets/slec_logo.png',
                 height: 34,
                 width: 34,
-                decoration: BoxDecoration(
-                  color: Colors.indigo,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  'SLEC',
-                  style: GoogleFonts.inter(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 12,
-                  ),
-                ),
+                errorBuilder: (_, __, ___) =>
+                    const Icon(Icons.school, color: Colors.indigo,),
               ),
               const SizedBox(width: 10),
               Text(
@@ -81,7 +79,9 @@ class _PrincipalPortalScreenState extends State<PrincipalPortalScreen> {
         ),
       ),
 
+
       body: SafeArea(child: _pages[_selectedIndex]),
+
 
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
